@@ -9,7 +9,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   Accordion,
@@ -17,6 +17,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const ProfilePage = () => {
   const { user, updateUserProfile } = useAuth();
@@ -42,6 +43,22 @@ const ProfilePage = () => {
   const [mentorshipAreas, setMentorshipAreas] = useState<string[]>(user?.profile?.mentorshipAreas || []);
   
   const [isSaving, setIsSaving] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  
+  // Check required fields
+  const checkRequiredFieldsComplete = () => {
+    const missingFields = [];
+    
+    if (!avatarUrl) missingFields.push('Profile Picture');
+    if (!bio) missingFields.push('Bio');
+    if (!profession) missingFields.push('Profession');
+    if (!organization) missingFields.push('Organization');
+    if (!city) missingFields.push('City');
+    if (!country) missingFields.push('Country');
+    if (expertise.length === 0) missingFields.push('Areas of Expertise');
+    
+    return missingFields;
+  };
   
   const addExpertise = () => {
     const trimmedExpertise = newExpertise.trim();
@@ -69,7 +86,21 @@ const ProfilePage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const missingFields = checkRequiredFieldsComplete();
+    if (missingFields.length > 0) {
+      setValidationErrors(missingFields);
+      toast({
+        title: "Missing Required Fields",
+        description: `Please complete all required fields: ${missingFields.join(', ')}`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsSaving(true);
+    setValidationErrors([]);
     
     try {
       const success = await updateUserProfile({
@@ -110,6 +141,10 @@ const ProfilePage = () => {
     }
   };
 
+  // Check if profile is complete
+  const missingRequiredFields = checkRequiredFieldsComplete();
+  const isProfileComplete = missingRequiredFields.length === 0;
+
   if (!user) {
     return (
       <Card className="mb-6">
@@ -122,13 +157,22 @@ const ProfilePage = () => {
 
   return (
     <div className="space-y-6">
+      {!isProfileComplete && !isEditing && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Your profile is incomplete. Please complete all required fields to access the Alumni Directory.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <Card>
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl font-bold text-cpscs-blue">My Profile</CardTitle>
             {!isEditing ? (
               <Button onClick={() => setIsEditing(true)}>
-                Edit Profile
+                {isProfileComplete ? "Edit Profile" : "Complete Profile"}
               </Button>
             ) : (
               <Button variant="outline" onClick={() => setIsEditing(false)}>
@@ -164,24 +208,31 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="avatarUrl">Profile Picture URL</Label>
+                  <Label htmlFor="avatarUrl" className="flex items-center">
+                    Profile Picture URL <span className="text-red-500 ml-1">*</span>
+                  </Label>
                   <Input 
                     id="avatarUrl" 
                     value={avatarUrl} 
                     onChange={(e) => setAvatarUrl(e.target.value)} 
                     placeholder="https://example.com/your-photo.jpg" 
+                    className={validationErrors.includes('Profile Picture') ? "border-red-500" : ""}
                   />
-                  <p className="text-xs text-gray-500">Paste a link to your profile picture</p>
+                  <p className="text-xs text-gray-500">
+                    Paste a link to your profile picture (required)
+                  </p>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio" className="flex items-center">
+                    Bio <span className="text-red-500 ml-1">*</span>
+                  </Label>
                   <Textarea 
                     id="bio" 
                     value={bio} 
                     onChange={(e) => setBio(e.target.value)} 
                     placeholder="Tell us about yourself..." 
-                    className="min-h-[100px]"
+                    className={`min-h-[100px] ${validationErrors.includes('Bio') ? "border-red-500" : ""}`}
                   />
                 </div>
               </div>
@@ -191,27 +242,35 @@ const ProfilePage = () => {
                 <h3 className="text-lg font-semibold text-cpscs-blue">Professional Information</h3>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="profession">Profession</Label>
+                  <Label htmlFor="profession" className="flex items-center">
+                    Profession <span className="text-red-500 ml-1">*</span>
+                  </Label>
                   <Input 
                     id="profession" 
                     value={profession} 
                     onChange={(e) => setProfession(e.target.value)} 
                     placeholder="E.g., Software Engineer, Doctor, Teacher, etc." 
+                    className={validationErrors.includes('Profession') ? "border-red-500" : ""}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="organization">Organization</Label>
+                  <Label htmlFor="organization" className="flex items-center">
+                    Organization <span className="text-red-500 ml-1">*</span>
+                  </Label>
                   <Input 
                     id="organization" 
                     value={organization} 
                     onChange={(e) => setOrganization(e.target.value)} 
                     placeholder="Where do you work or study?" 
+                    className={validationErrors.includes('Organization') ? "border-red-500" : ""}
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="expertise">Areas of Expertise</Label>
+                  <Label htmlFor="expertise" className="flex items-center">
+                    Areas of Expertise <span className="text-red-500 ml-1">*</span>
+                  </Label>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {expertise.map((tag) => (
                       <Badge key={tag} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
@@ -234,9 +293,13 @@ const ProfilePage = () => {
                       onChange={(e) => setNewExpertise(e.target.value)} 
                       placeholder="Add an expertise area (e.g., Web Development)" 
                       onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addExpertise())}
+                      className={validationErrors.includes('Areas of Expertise') ? "border-red-500" : ""}
                     />
                     <Button type="button" onClick={addExpertise}>Add</Button>
                   </div>
+                  {expertise.length === 0 && validationErrors.includes('Areas of Expertise') && (
+                    <p className="text-xs text-red-500">At least one expertise area is required</p>
+                  )}
                 </div>
               </div>
               
@@ -268,22 +331,28 @@ const ProfilePage = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city" className="flex items-center">
+                      City <span className="text-red-500 ml-1">*</span>
+                    </Label>
                     <Input 
                       id="city" 
                       value={city} 
                       onChange={(e) => setCity(e.target.value)} 
                       placeholder="Current city" 
+                      className={validationErrors.includes('City') ? "border-red-500" : ""}
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country" className="flex items-center">
+                      Country <span className="text-red-500 ml-1">*</span>
+                    </Label>
                     <Input 
                       id="country" 
                       value={country} 
                       onChange={(e) => setCountry(e.target.value)} 
                       placeholder="Current country" 
+                      className={validationErrors.includes('Country') ? "border-red-500" : ""}
                     />
                   </div>
                 </div>
@@ -382,7 +451,17 @@ const ProfilePage = () => {
                 )}
               </div>
               
-              <div className="pt-4 flex justify-end">
+              {validationErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Please fill in all required fields marked with *
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="pt-4 flex justify-between items-center">
+                <p className="text-sm text-red-500">* Required fields</p>
                 <Button type="submit" className="bg-cpscs-blue hover:bg-blue-700" disabled={isSaving}>
                   {isSaving ? "Saving..." : "Save Profile"}
                 </Button>

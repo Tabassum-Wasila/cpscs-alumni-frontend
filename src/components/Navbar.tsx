@@ -78,7 +78,10 @@ const Navbar = () => {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem asChild>
-                  <Link to="/alumni-directory" className="w-full">Profile</Link>
+                  <Link to="/complete-profile" className="w-full">My Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/alumni-directory" className="w-full">Alumni Directory</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
@@ -88,16 +91,26 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
-              asChild
-            >
-              <Link to="/register">
-                <User size={16} />
-                <span>Login</span>
-              </Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
+                asChild
+              >
+                <Link to="/login">
+                  <User size={16} />
+                  <span>Login</span>
+                </Link>
+              </Button>
+              <Button
+                className="flex items-center gap-2 bg-cpscs-blue hover:bg-blue-700"
+                asChild
+              >
+                <Link to="/signup">
+                  Sign up
+                </Link>
+              </Button>
+            </div>
           )}
         </div>
 
@@ -131,8 +144,19 @@ const Navbar = () => {
             
             {isAuthenticated ? (
               <div className="flex flex-col space-y-2">
-                <Link to="/alumni-directory" className="py-2 border-b border-gray-100 dark:border-gray-800">
-                  Profile
+                <Link 
+                  to="/complete-profile" 
+                  className="py-2 border-b border-gray-100 dark:border-gray-800"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  My Profile
+                </Link>
+                <Link 
+                  to="/alumni-directory" 
+                  className="py-2 border-b border-gray-100 dark:border-gray-800"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Alumni Directory
                 </Link>
                 <Button 
                   variant="outline" 
@@ -144,16 +168,33 @@ const Navbar = () => {
                 </Button>
               </div>
             ) : (
-              <Button 
-                variant="outline" 
-                className="flex items-center justify-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
-                asChild
-              >
-                <Link to="/register">
-                  <User size={16} />
-                  <span>Login</span>
+              <div className="flex flex-col space-y-2">
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
+                  asChild
+                >
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <User size={16} />
+                    <span>Login</span>
+                  </Link>
+                </Button>
+                <Button 
+                  className="flex items-center justify-center gap-2 bg-cpscs-blue hover:bg-blue-700"
+                  asChild
+                >
+                  <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                    Sign up
+                  </Link>
+                </Button>
+                <Link 
+                  to="/register" 
+                  className="py-2 border-b border-gray-100 dark:border-gray-800 text-center"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Register for Reunion
                 </Link>
-              </Button>
+              </div>
             )}
           </div>
         </div>
