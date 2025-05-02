@@ -1,12 +1,9 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!heroRef.current) return;
@@ -29,37 +26,39 @@ const Hero = () => {
     document.addEventListener('mousemove', handleMouseMove);
     return () => document.removeEventListener('mousemove', handleMouseMove);
   }, []);
-  
+
   // Function to calculate time until the reunion
   const calculateTimeLeft = () => {
     const reunionDate = new Date('December 25, 2025 09:00:00').getTime();
     const now = new Date().getTime();
     const difference = reunionDate - now;
-    
     if (difference > 0) {
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      return { days, hours, minutes, seconds };
+      const hours = Math.floor(difference % (1000 * 60 * 60 * 24) / (1000 * 60 * 60));
+      const minutes = Math.floor(difference % (1000 * 60 * 60) / (1000 * 60));
+      const seconds = Math.floor(difference % (1000 * 60) / 1000);
+      return {
+        days,
+        hours,
+        minutes,
+        seconds
+      };
     }
-    
-    return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0
+    };
   };
-  
   const [timeLeft, setTimeLeft] = React.useState(calculateTimeLeft());
-  
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
-    
     return () => clearInterval(timer);
   }, []);
-
-  return (
-    <div ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden animated-bg">
+  return <div ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden animated-bg">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-[10%] left-[15%] w-32 h-32 rounded-full bg-cpscs-gold/30 blur-3xl parallax" data-speed="3"></div>
@@ -74,7 +73,7 @@ const Hero = () => {
         }}>
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-cpscs-gold text-2xl">Cantonment Public School &amp; College,  Saidpur</span>
             <br />
-            <span className="text-white text-6xl">Alumni Association</span>
+            <span className="text-white text-4xl">Alumni Association</span>
           </h1>
           
           <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto opacity-0 animate-fade-in" style={{
@@ -84,7 +83,9 @@ const Hero = () => {
           </p>
           
           {/* Countdown Timer for Grand Reunion */}
-          <div className="mb-8 opacity-0 animate-fade-in" style={{animationDelay: '0.7s'}}>
+          <div className="mb-8 opacity-0 animate-fade-in" style={{
+          animationDelay: '0.7s'
+        }}>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 inline-block">
               <div className="flex items-center justify-center mb-2">
                 <Calendar className="text-cpscs-gold mr-2" size={20} />
@@ -143,8 +144,6 @@ const Hero = () => {
           <div className="w-1.5 h-3 bg-white/50 rounded-full mt-2"></div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Hero;
