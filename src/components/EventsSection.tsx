@@ -66,7 +66,7 @@ const EventsSection = () => {
       date: "June 15, 2025",
       time: "6:00 PM - 10:00 PM",
       location: "CPSCS Campus, Saidpur",
-      image: "https://lh3.googleusercontent.com/pw/AP1GczPo97OKC-fKffD8mFdfJja5YWGcOg5ocXVPvyWPUFvGqDXv_-i6iCoWpmPbXFOQCk7pnvFDyjzB87fM75mCVzWTH_LBcH8aZE9qPIjQrNq5hj38pOlb8Q=w2400",
+      image: "https://i.imgur.com/j75BIZN.jpg",
       category: "Reunion",
       delay: 0.3
     },
@@ -75,7 +75,7 @@ const EventsSection = () => {
       date: "July 8, 2025",
       time: "10:00 AM - 3:00 PM",
       location: "Virtual Event",
-      image: "https://lh3.googleusercontent.com/pw/AP1GczMJH_wLGYcpGcS7NQDBs25W32cU64Q7Qo1YfzoLoYdFDTUQRn_vr9KsPnQhP9421dYfDYtqGjIbp5atnfP6mDT6LV4xsQRSVwYZqtr8g02goiEiVbQJaw=w2400",
+      image: "https://i.imgur.com/BcF7rBZ.jpg",
       category: "Workshop",
       delay: 0.5
     },
@@ -84,7 +84,7 @@ const EventsSection = () => {
       date: "August 20, 2025",
       time: "11:00 AM - 8:00 PM",
       location: "CPSCS Campus Grounds",
-      image: "https://lh3.googleusercontent.com/pw/AP1GczP2psGl-FOMO_vA858fb91ZO5VXFnZ3MX5waMIpFO70gwwWgJomeszGp4mRhCm5a3V_Ghf2TmmJ6_0Zn5obQCmQVQJf-uTzBJ_X71TnSv6AgDiecXZrJw=w2400",
+      image: "https://i.imgur.com/WtfTf9U.jpg",
       category: "Festival",
       delay: 0.7
     }
