@@ -6,8 +6,11 @@ import Footer from '../components/Footer';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCheck } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
 
 const CompleteProfile = () => {
+  const { user } = useAuth();
+  
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -21,7 +24,7 @@ const CompleteProfile = () => {
               </div>
               <CardTitle className="text-3xl font-bold text-cpscs-blue">Registration Successful!</CardTitle>
               <CardDescription className="text-lg mt-2">
-                Thank you for registering for the Grand Alumni Reunion 2025!
+                {user?.fullName ? `Thank you, ${user.fullName.split(' ')[0]}!` : 'Thank you!'} Your registration for the Grand Alumni Reunion 2025 is confirmed!
               </CardDescription>
             </CardHeader>
             

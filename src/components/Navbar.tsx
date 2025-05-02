@@ -2,11 +2,20 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +42,10 @@ const Navbar = () => {
     { name: 'Contact', path: '/contact' },
   ];
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -54,10 +67,38 @@ const Navbar = () => {
               {link.name}
             </Link>
           ))}
-          <Button variant="outline" className="flex items-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white">
-            <User size={16} />
-            <span>Login</span>
-          </Button>
+          
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white">
+                  <User size={16} />
+                  <span>{user?.fullName?.split(' ')[0] || 'Account'}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem asChild>
+                  <Link to="/alumni-directory" className="w-full">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-500 cursor-pointer">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="outline"
+              className="flex items-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
+              asChild
+            >
+              <Link to="/register">
+                <User size={16} />
+                <span>Login</span>
+              </Link>
+            </Button>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -87,10 +128,33 @@ const Navbar = () => {
                 {link.name}
               </Link>
             ))}
-            <Button variant="outline" className="flex items-center justify-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white">
-              <User size={16} />
-              <span>Login</span>
-            </Button>
+            
+            {isAuthenticated ? (
+              <div className="flex flex-col space-y-2">
+                <Link to="/alumni-directory" className="py-2 border-b border-gray-100 dark:border-gray-800">
+                  Profile
+                </Link>
+                <Button 
+                  variant="outline" 
+                  className="flex items-center justify-center gap-2 border-red-500 text-red-500"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={16} />
+                  <span>Log out</span>
+                </Button>
+              </div>
+            ) : (
+              <Button 
+                variant="outline" 
+                className="flex items-center justify-center gap-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
+                asChild
+              >
+                <Link to="/register">
+                  <User size={16} />
+                  <span>Login</span>
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       )}
