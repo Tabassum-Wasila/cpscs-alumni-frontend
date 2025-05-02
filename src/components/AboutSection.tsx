@@ -13,7 +13,7 @@ const AboutSection = () => {
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-cpscs-gold/20 rounded-full blur-xl z-0"></div>
               <div className="relative z-10 overflow-hidden rounded-2xl shadow-xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1487958449943-2429e8be8625" 
+                  src="https://lh3.googleusercontent.com/pw/AP1GczNvRSOEssX-vZpNnQyfh4OLYjxVMu1uLvjHVZH602cgECBZkW-VZFy1LEgCS5yvRwM7pqZtWWfNQP0l2qS5gE6ltAYbzqyQ9GJo1yJb5n-c_MBbBXydcw=w2400" 
                   alt="CPSCS Campus" 
                   className="w-full h-auto object-cover transition-transform duration-700 hover:scale-105"
                 />

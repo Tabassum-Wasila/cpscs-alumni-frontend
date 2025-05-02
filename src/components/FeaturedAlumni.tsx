@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -53,7 +52,7 @@ const FeaturedAlumni = () => {
       name: "Dr. Aminul Islam",
       batch: "1995",
       profession: "Neurosurgeon at Boston Medical",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczOjV4F8rUpPiX_7MwJX5K_XbR5315Xl44QLTNLShdz2HD8y9BwOIfcL7vHWXBGUrdXNrb4krGnd4eGnSyv61qQtBnnPm3QctkQHfrGMBawjJ-_XM6SP-w=w2400",
       quote: "The foundation of my medical career was built at CPSCS. The discipline and knowledge I gained there have been invaluable throughout my journey.",
       delay: 0.3
     },
@@ -61,7 +60,7 @@ const FeaturedAlumni = () => {
       name: "Farida Rahman",
       batch: "2003",
       profession: "Tech Entrepreneur & CEO",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczPU_m0hv4u24TUsfQqsBC8BUSQIglem1B35ntR7DJnxmamnQcwlmgXuzkFR2pu5fx5Ud6bJfuww3f_zFd8CZLPI8gUbkeeSOpzM6vztuFU832z0AS5pnw=w2400",
       quote: "CPSCS taught me to aim high and never give up. Those values helped me build my tech company from scratch to a global enterprise.",
       delay: 0.5
     },
@@ -69,7 +68,7 @@ const FeaturedAlumni = () => {
       name: "Lt. Col. Shahriar Khan",
       batch: "1989",
       profession: "Military Officer & UN Peacekeeper",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczN1wJQ6_VQ6A5_pUZpRlnjaBjGXOhiyd7rZJpvF7Sc_7rqMXQbcyHPqGTv2X91ryMxHFGGEkqUMZhFsP_vFFn5twrVQVUZgAG1qkyo1iA2k_U01Ji_VqA=w2400",
       quote: "The values of integrity, discipline and leadership I learned at CPSCS have guided me through my military career and international peacekeeping missions.",
       delay: 0.7
     }

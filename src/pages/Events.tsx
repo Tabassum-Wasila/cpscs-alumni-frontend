@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -29,7 +28,7 @@ const Events = () => {
       venue: "Cantonment Public School and College, Saidpur",
       type: "In-person",
       deadline: "November 30, 2025",
-      image: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczPo97OKC-fKffD8mFdfJja5YWGcOg5ocXVPvyWPUFvGqDXv_-i6iCoWpmPbXFOQCk7pnvFDyjzB87fM75mCVzWTH_LBcH8aZE9qPIjQrNq5hj38pOlb8Q=w2400",
       slug: "grand-alumni-reunion-2025"
     },
     {
@@ -40,7 +39,7 @@ const Events = () => {
       venue: "Zoom",
       type: "Online",
       deadline: "September 10, 2025",
-      image: "https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczMJH_wLGYcpGcS7NQDBs25W32cU64Q7Qo1YfzoLoYdFDTUQRn_vr9KsPnQhP9421dYfDYtqGjIbp5atnfP6mDT6LV4xsQRSVwYZqtr8g02goiEiVbQJaw=w2400",
       slug: "virtual-career-workshop"
     },
     {
@@ -51,7 +50,7 @@ const Events = () => {
       venue: "CPSCS Sports Ground",
       type: "In-person",
       deadline: "September 30, 2025",
-      image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?q=80&w=1000",
+      image: "https://lh3.googleusercontent.com/pw/AP1GczP2psGl-FOMO_vA858fb91ZO5VXFnZ3MX5waMIpFO70gwwWgJomeszGp4mRhCm5a3V_Ghf2TmmJ6_0Zn5obQCmQVQJf-uTzBJ_X71TnSv6AgDiecXZrJw=w2400",
       slug: "alumni-sports-day"
     }
   ]);
