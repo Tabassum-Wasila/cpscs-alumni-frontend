@@ -1,0 +1,43 @@
+
+import React, { useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  const { isAuthenticated, user } = useAuth();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to access the Alumni Directory",
+        variant: "destructive",
+      });
+    }
+  }, [isAuthenticated, toast]);
+
+  if (!isAuthenticated) {
+    // Redirect to login with return path
+    return <Navigate to="/register" state={{ from: location.pathname }} replace />;
+  }
+
+  // If user hasn't completed their profile
+  if (isAuthenticated && user && (!user.profile?.profession || !user.profile?.city)) {
+    toast({
+      title: "Complete Your Profile",
+      description: "Please complete your profile to fully access the Alumni Directory",
+    });
+    return <Navigate to="/complete-profile" state={{ from: location.pathname }} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+export default ProtectedRoute;
