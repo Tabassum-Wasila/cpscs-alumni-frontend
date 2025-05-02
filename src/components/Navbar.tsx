@@ -25,9 +25,11 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
-    { name: 'Directory', path: '/directory' },
-    { name: 'News', path: '/news' },
-    { name: 'Donate', path: '/donate' },
+    { name: 'Alumni Directory', path: '/alumni-directory' },
+    { name: 'Committee', path: '/committee' },
+    { name: 'Sponsors', path: '/sponsors' },
+    { name: 'Mentorship & Career', path: '/mentorship-career' },
+    { name: 'Blog', path: '/blog' },
     { name: 'Contact', path: '/contact' },
   ];
 
