@@ -88,7 +88,7 @@ const AlumniDirectory = () => {
   };
 
   const handleFilterChange = (key: string, value: string | null) => {
-    if (!value) {
+    if (!value || value === "all") {
       const newFilters = { ...activeFilters };
       delete newFilters[key];
       setActiveFilters(newFilters);
@@ -181,7 +181,7 @@ const AlumniDirectory = () => {
                             <SelectValue placeholder="Batch" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Batches</SelectItem>
+                            <SelectItem value="all">All Batches</SelectItem>
                             {batchYears.map(year => (
                               <SelectItem key={year} value={year}>{year}</SelectItem>
                             ))}
@@ -193,7 +193,7 @@ const AlumniDirectory = () => {
                             <SelectValue placeholder="Profession" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Professions</SelectItem>
+                            <SelectItem value="all">All Professions</SelectItem>
                             <SelectItem value="Engineer">Engineer</SelectItem>
                             <SelectItem value="Doctor">Doctor</SelectItem>
                             <SelectItem value="Teacher">Teacher</SelectItem>
@@ -207,7 +207,7 @@ const AlumniDirectory = () => {
                             <SelectValue placeholder="Location" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="">All Locations</SelectItem>
+                            <SelectItem value="all">All Locations</SelectItem>
                             <SelectItem value="Bangladesh">Bangladesh</SelectItem>
                             <SelectItem value="USA">USA</SelectItem>
                             <SelectItem value="Canada">Canada</SelectItem>
