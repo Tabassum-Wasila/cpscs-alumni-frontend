@@ -254,7 +254,7 @@ const Register = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="">Not Applicable</SelectItem>
+                              <SelectItem value="not_applicable">Not Applicable</SelectItem>
                               {generateYears(1981, 2027).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
