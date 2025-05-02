@@ -194,7 +194,8 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="not_applicable">Not Applicable</SelectItem>
+                              {/* Fixed issue: Changed empty string to valid string value */}
+                              <SelectItem key="not_applicable" value="not_applicable">Not Applicable</SelectItem>
                               {generateYears(1981, 2027).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
