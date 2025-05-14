@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Filter,
   Users,
-  Star
+  Star,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Dialog,
@@ -37,12 +38,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { 
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate, Link } from 'react-router-dom';
 import ProfilePage from '@/components/alumni/ProfilePage';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { 
+  addDemoUsers, 
+  removeDemoUsers, 
+  isDemoModeActive, 
+  DEMO_USERS_KEY
+} from '@/utils/dummyData';
 
 const AlumniDirectory = () => {
   const { user, searchAlumni, requestMentorship, toggleContactVisibility } = useAuth();
@@ -54,11 +66,17 @@ const AlumniDirectory = () => {
   const [mentorshipMessage, setMentorshipMessage] = useState("");
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showingMentorsOnly, setShowingMentorsOnly] = useState(false);
+  const [demoModeActive, setDemoModeActive] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   // Batch options (generated for demo)
   const batchYears = Array.from({ length: 30 }, (_, i) => (2025 - i).toString());
+
+  // Check if demo mode is active on component mount
+  useEffect(() => {
+    setDemoModeActive(isDemoModeActive());
+  }, []);
 
   // Fetch initial results
   useEffect(() => {
@@ -134,6 +152,46 @@ const AlumniDirectory = () => {
       description: "Contact information has been revealed.",
     });
   };
+  
+  // Handle loading demo users
+  const handleAddDemoUsers = () => {
+    try {
+      addDemoUsers(20); // Add 20 demo users
+      setDemoModeActive(true);
+      toast({
+        title: "Demo Data Added",
+        description: "20 dummy alumni profiles have been added successfully.",
+      });
+      handleSearch(); // Refresh the search results
+    } catch (error) {
+      console.error("Error adding demo users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add demo users. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  // Handle removing demo users
+  const handleRemoveDemoUsers = () => {
+    try {
+      removeDemoUsers();
+      setDemoModeActive(false);
+      toast({
+        title: "Demo Data Removed",
+        description: "All dummy alumni profiles have been removed.",
+      });
+      handleSearch(); // Refresh the search results
+    } catch (error) {
+      console.error("Error removing demo users:", error);
+      toast({
+        title: "Error",
+        description: "Failed to remove demo users. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <ProtectedRoute>
@@ -148,9 +206,34 @@ const AlumniDirectory = () => {
               <TabsList className="mb-6">
                 <TabsTrigger value="directory" className="text-base">Directory</TabsTrigger>
                 <TabsTrigger value="profile" className="text-base">My Profile</TabsTrigger>
+                
+                {user?.isAdmin && (
+                  <TabsTrigger value="admin" className="text-base">Admin</TabsTrigger>
+                )}
               </TabsList>
               
               <TabsContent value="directory" className="space-y-6">
+                {/* Demo Mode Alert */}
+                {demoModeActive && (
+                  <Alert variant="info" className="bg-amber-50 border-amber-200 text-amber-800">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Demo Mode Active</AlertTitle>
+                    <AlertDescription>
+                      The directory is currently showing demo data. These profiles are for demonstration purposes only.
+                      {user?.isAdmin && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-2 border-amber-300 hover:bg-amber-100"
+                          onClick={handleRemoveDemoUsers}
+                        >
+                          Remove Demo Data
+                        </Button>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
                 {/* Search Section */}
                 <Card className="shadow-md border-cpscs-gold/30">
                   <CardContent className="pt-6">
@@ -226,7 +309,20 @@ const AlumniDirectory = () => {
                           Mentors Only
                         </Button>
 
-                        <div className="ml-auto flex items-center space-x-1">
+                        {/* Demo Data Button - shown to admins when demo mode is not active */}
+                        {user?.isAdmin && !demoModeActive && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="ml-auto"
+                            onClick={handleAddDemoUsers}
+                          >
+                            <UserPlus size={14} className="mr-1" />
+                            Add Demo Data
+                          </Button>
+                        )}
+
+                        <div className={`${!user?.isAdmin || demoModeActive ? 'ml-auto' : ''} flex items-center space-x-1`}>
                           <Button 
                             variant={viewMode === 'grid' ? 'secondary' : 'outline'} 
                             size="icon" 
@@ -592,6 +688,69 @@ const AlumniDirectory = () => {
               <TabsContent value="profile">
                 <ProfilePage />
               </TabsContent>
+              
+              {/* Admin Tab - Only shown to admins */}
+              {user?.isAdmin && (
+                <TabsContent value="admin" className="space-y-6">
+                  <Card className="shadow-md">
+                    <CardHeader>
+                      <h2 className="text-2xl font-semibold">Demo Data Management</h2>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h3 className="font-medium mb-2">Current Status</h3>
+                        <p>Demo Mode: <span className={demoModeActive ? "text-green-600 font-medium" : "text-gray-600"}>
+                          {demoModeActive ? "Active" : "Inactive"}
+                        </span></p>
+                        
+                        <div className="mt-4">
+                          {!demoModeActive ? (
+                            <div>
+                              <p className="mb-2 text-sm text-gray-600">
+                                Add 20 demo alumni profiles to showcase the directory functionality.
+                                These profiles will be marked with <code>isDemoUser: true</code> and
+                                can be easily removed later.
+                              </p>
+                              <Button 
+                                onClick={handleAddDemoUsers}
+                                className="mt-2"
+                              >
+                                <UserPlus size={16} className="mr-2" />
+                                Add Demo Data
+                              </Button>
+                            </div>
+                          ) : (
+                            <div>
+                              <p className="mb-2 text-sm text-gray-600">
+                                Demo data is currently active. You can remove all demo alumni profiles
+                                from the directory by clicking the button below.
+                              </p>
+                              <Button 
+                                variant="destructive" 
+                                onClick={handleRemoveDemoUsers}
+                                className="mt-2"
+                              >
+                                Remove All Demo Data
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                        <h3 className="font-medium mb-2 text-amber-800">How Demo Data Works</h3>
+                        <ul className="list-disc list-inside space-y-1 text-sm text-amber-800">
+                          <li>Demo users are stored in localStorage with the regular users</li>
+                          <li>Each demo user is marked with <code>isDemoUser: true</code> property</li>
+                          <li>A flag in localStorage (<code>{DEMO_USERS_KEY}</code>) tracks if demo mode is active</li>
+                          <li>Demo data can be completely removed with a single click</li>
+                          <li>Demo mode status is visibly displayed to all users via a banner</li>
+                        </ul>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              )}
             </Tabs>
           </div>
         </div>
