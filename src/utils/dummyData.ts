@@ -151,6 +151,8 @@ export const generateDummyUser = (id: string): User => {
     sscYear: years.sscYear,
     hscYear: years.hscYear,
     isDemoUser: true, // Mark as demo user for easy filtering
+    isAuthenticated: true, // Add missing property
+    hasMembership: true, // Add missing property
     profile: {
       profession,
       organization,
