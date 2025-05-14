@@ -27,6 +27,8 @@ export type User = {
   sscYear: string;
   hscYear?: string;
   isAuthenticated: boolean;
+  isAdmin?: boolean; // Added isAdmin property
+  isDemoUser?: boolean; // Added isDemoUser property
   profile?: UserProfile;
   hasMembership: boolean;
   dateJoined?: string;
