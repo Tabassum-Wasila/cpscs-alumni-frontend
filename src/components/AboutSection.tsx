@@ -1,67 +1,153 @@
 
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Compass, Handshake, GraduationCap, Globe, Heart, Lightbulb, Users, Rocket, Building, TrendingUp } from 'lucide-react';
 
 const AboutSection = () => {
+  const values = [
+    {
+      icon: <Handshake className="h-8 w-8 text-cpscs-blue" />,
+      title: "Belonging",
+      description: "Rooted in shared history, open to every voice."
+    },
+    {
+      icon: <GraduationCap className="h-8 w-8 text-cpscs-blue" />,
+      title: "Legacy",
+      description: "Honoring the past by investing in the future."
+    },
+    {
+      icon: <Globe className="h-8 w-8 text-cpscs-blue" />,
+      title: "Unity",
+      description: "Diverse journeys, one community."
+    },
+    {
+      icon: <Compass className="h-8 w-8 text-cpscs-blue" />,
+      title: "Integrity",
+      description: "Leading with truth, always."
+    },
+    {
+      icon: <Heart className="h-8 w-8 text-cpscs-blue" />,
+      title: "Service",
+      description: "Giving back with heart and purpose."
+    }
+  ];
+
+  const goals = [
+    {
+      icon: <Lightbulb className="h-8 w-8 text-cpscs-gold" />,
+      title: "Inspire Growth",
+      description: "For students, alumni, and the school."
+    },
+    {
+      icon: <Users className="h-8 w-8 text-cpscs-gold" />,
+      title: "Strengthen Bonds",
+      description: "Across batches, borders, and generations."
+    },
+    {
+      icon: <Rocket className="h-8 w-8 text-cpscs-gold" />,
+      title: "Fuel Impact",
+      description: "Through knowledge, action, and giving."
+    },
+    {
+      icon: <Building className="h-8 w-8 text-cpscs-gold" />,
+      title: "Build Together",
+      description: "Infrastructure, opportunity, and legacy."
+    },
+    {
+      icon: <TrendingUp className="h-8 w-8 text-cpscs-gold" />,
+      title: "Evolve Forward",
+      description: "Digitally, socially, and sustainably."
+    }
+  ];
+
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div className="order-2 lg:order-1">
-            <div className="relative">
-              <div className="absolute -top-4 -left-4 w-24 h-24 bg-cpscs-gold/20 rounded-full blur-xl z-0"></div>
-              <div className="relative z-10 overflow-hidden rounded-2xl shadow-xl">
-                <img 
-                  src="https://i.imgur.com/JRSeRaX.jpg" 
-                  alt="CPSCS Campus" 
-                  className="w-full h-auto object-cover transition-transform duration-700 hover:scale-105"
-                />
-              </div>
-              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-cpscs-blue/20 rounded-full blur-xl z-0"></div>
-            </div>
+    <section className="py-20 bg-gradient-to-br from-white via-cpscs-light/30 to-white">
+      <div className="container mx-auto px-4 max-w-6xl">
+        {/* Header Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold text-cpscs-blue mb-8 leading-tight">
+            About Our Alumni Association
+          </h2>
+          
+          <div className="max-w-4xl mx-auto space-y-6 text-lg text-gray-700 leading-relaxed">
+            <p>
+              The CPSCS Alumni Association is a vibrant and growing community of graduates from 
+              Cantonment Public School and College, Saidpur. Founded to foster lifelong connections, 
+              our association serves as a bridge between generations—celebrating achievements, 
+              supporting professional growth, and giving back to the school that shaped us.
+            </p>
+            
+            <p>
+              Whether you're reconnecting with old friends, mentoring the next generation, or 
+              contributing to school initiatives, the alumni association is your home base for 
+              all things CPSCS. Together, we preserve legacy, inspire impact, and build a 
+              future of shared excellence.
+            </p>
+          </div>
+        </div>
+
+        {/* Values Section */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-cpscs-blue mb-4 flex items-center justify-center gap-3">
+              <Compass className="h-8 w-8" />
+              Our Values
+            </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              The core principles that guide our community and define who we are
+            </p>
           </div>
           
-          <div className="order-1 lg:order-2">
-            <div className="space-y-6">
-              <h2 className="text-3xl md:text-4xl font-bold text-cpscs-blue mb-4">About Our Alumni Association</h2>
-              
-              <p className="text-gray-700 leading-relaxed">
-                The Cantonment Public School and College, Saidpur Alumni Association is more than just an organization; it's a community that celebrates our shared history and bright future. Since its inception, our association has been dedicated to fostering strong connections among alumni and supporting the institution that shaped us.
-              </p>
-              
-              <p className="text-gray-700 leading-relaxed">
-                Our mission is to strengthen the ties between alumni, current students, and the institution. We strive to create meaningful networking opportunities, facilitate professional growth, and give back to our alma mater through various initiatives and scholarship programs.
-              </p>
-              
-              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="neumorphic-card p-4">
-                  <h4 className="font-semibold text-cpscs-blue mb-2">Our Values</h4>
-                  <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Excellence in education</li>
-                    <li>• Lifelong connections</li>
-                    <li>• Community service</li>
-                    <li>• Professional development</li>
-                  </ul>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {values.map((value, index) => (
+              <div 
+                key={index} 
+                className="neumorphic-card p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform duration-300">
+                  {value.icon}
                 </div>
-                
-                <div className="neumorphic-card p-4">
-                  <h4 className="font-semibold text-cpscs-blue mb-2">Our Goals</h4>
-                  <ul className="text-sm text-gray-700 space-y-1">
-                    <li>• Unite alumni globally</li>
-                    <li>• Support student scholarships</li>
-                    <li>• Organize meaningful events</li>
-                    <li>• Preserve school traditions</li>
-                  </ul>
+                <h4 className="font-semibold text-cpscs-blue mb-3 text-lg">
+                  {value.title}
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {value.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Goals Section */}
+        <div>
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-cpscs-blue mb-4 flex items-center justify-center gap-3">
+              <Rocket className="h-8 w-8 text-cpscs-gold" />
+              Our Goals
+            </h3>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              The ambitious objectives we're working toward as a united community
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+            {goals.map((goal, index) => (
+              <div 
+                key={index} 
+                className="neumorphic-card p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group bg-gradient-to-br from-white to-cpscs-gold/5"
+                style={{ animationDelay: `${(index + 5) * 100}ms` }}
+              >
+                <div className="mb-4 flex justify-center group-hover:scale-110 transition-transform duration-300">
+                  {goal.icon}
                 </div>
+                <h4 className="font-semibold text-cpscs-blue mb-3 text-lg">
+                  {goal.title}
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {goal.description}
+                </p>
               </div>
-              
-              <div className="pt-4">
-                <Button className="bg-cpscs-blue hover:bg-cpscs-blue/90 text-white">
-                  <Link to="/about">Learn More About Us</Link>
-                </Button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
