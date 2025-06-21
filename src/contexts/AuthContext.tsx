@@ -3,25 +3,6 @@ import { AuthService, LoginCredentials, SignupData } from '@/services/authServic
 import { AlumniService, SearchFilters } from '@/services/alumniService';
 import { UserService, UserProfile } from '@/services/userService';
 
-type UserProfile = {
-  profilePicture?: string;
-  bio?: string;
-  profession?: string;
-  organization?: string;
-  city?: string;
-  country?: string;
-  phoneNumber?: string;
-  showPhone?: boolean;
-  expertise?: string[];
-  socialLinks?: {
-    facebook?: string;
-    linkedin?: string;
-    youtube?: string;
-  };
-  willingToMentor?: boolean;
-  mentorshipAreas?: string[];
-};
-
 export type User = {
   id: string;
   fullName: string;
