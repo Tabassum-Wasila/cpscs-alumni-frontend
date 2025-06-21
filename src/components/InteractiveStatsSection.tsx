@@ -123,7 +123,7 @@ const InteractiveStatsSection = () => {
               key={index}
               frontContent={stat.frontContent}
               backContent={stat.backContent}
-              autoFlipDelay={2000 + (index * 200)} // Stagger the auto-flip timing
+              autoFlipDelay={3000 + (index * 200)} // Updated to 3 seconds with stagger
               className="h-48 md:h-52"
             />
           ))}
