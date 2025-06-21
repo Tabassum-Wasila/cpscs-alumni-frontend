@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,8 +12,10 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import { PaymentService } from '@/services/paymentService';
+import PaymentModal from '@/components/PaymentModal';
 
 // Generate year options from 1979 to 2025
 const generateYears = (start: number, end: number) => {
@@ -77,48 +80,40 @@ const Signup = () => {
     }
   };
 
-  // Simulate bKash payment process
-  const handleBkashPayment = async () => {
-    // This would be replaced by actual bKash integration
-    toast({
-      title: "Payment Processing",
-      description: "Connecting to bKash...",
+  const handlePaymentSuccess = async () => {
+    const data = form.getValues();
+    
+    // Complete signup after payment
+    const success = await signup({
+      fullName: data.fullName,
+      email: data.email,
+      sscYear: data.sscYear,
+      hscYear: data.hscYear,
+      password: data.password,
     });
     
-    // Simulate payment processing
-    setTimeout(async () => {
-      const data = form.getValues();
-      
-      // Complete signup after payment
-      const success = await signup({
-        fullName: data.fullName,
-        email: data.email,
-        sscYear: data.sscYear,
-        hscYear: data.hscYear,
-        password: data.password,
+    if (success) {
+      toast({
+        title: "Registration Successful",
+        description: "Your account has been created. Please complete your profile to access all features.",
+        variant: "default",
       });
       
-      if (success) {
-        toast({
-          title: "Registration Successful",
-          description: "Your account has been created. Please complete your profile to access all features.",
-          variant: "default",
-        });
-        
-        navigate("/complete-profile");
-      } else {
-        toast({
-          title: "Registration Failed",
-          description: "Could not create your account. Please try again.",
-          variant: "destructive",
-        });
-      }
-    }, 2000);
+      navigate("/complete-profile");
+    } else {
+      toast({
+        title: "Registration Failed",
+        description: "Could not create your account. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const cancelPayment = () => {
+  const handlePaymentCancel = () => {
     setShowingPaymentModal(false);
   };
+
+  const membershipFee = PaymentService.getMembershipFee();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -193,7 +188,6 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {/* Fixed issue: Changed empty string to valid string value */}
                               <SelectItem key="not_applicable" value="not_applicable">Not Applicable</SelectItem>
                               {generateYears(1981, 2027).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
@@ -301,7 +295,7 @@ const Signup = () => {
                   <div className="bg-cpscs-light p-4 rounded-lg w-full mt-4">
                     <div className="flex justify-between text-sm mb-2">
                       <span>Membership Fee:</span>
-                      <span>৳1,000</span>
+                      <span>৳{membershipFee}</span>
                     </div>
                     <p className="text-sm text-gray-600">
                       This one-time fee gives you access to the Alumni Directory and all alumni benefits.
@@ -332,50 +326,12 @@ const Signup = () => {
           
           {/* Payment Modal */}
           {showingPaymentModal && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-              <Card className="w-full max-w-md animate-fade-in">
-                <CardHeader>
-                  <CardTitle>bKash Payment</CardTitle>
-                  <CardDescription>
-                    Complete your payment securely with bKash
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-white p-4 rounded-lg border text-center">
-                    <p className="font-bold text-lg mb-2">Membership Fee</p>
-                    <p className="text-3xl font-bold text-cpscs-blue">৳1,000</p>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm">Please follow these steps:</p>
-                    <ol className="list-decimal pl-5 text-sm space-y-1">
-                      <li>Open your bKash app</li>
-                      <li>Go to "Make Payment"</li>
-                      <li>Enter merchant number: 01XXXXXXXXX</li>
-                      <li>Enter the exact amount: ৳1,000</li>
-                      <li>Use reference: "CPSCS Alumni"</li>
-                      <li>Complete payment with your PIN</li>
-                    </ol>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3">
-                  <Button 
-                    onClick={handleBkashPayment}
-                    className="w-full bg-[#E2136E] hover:bg-[#c11160] flex items-center justify-center gap-2 py-6"
-                  >
-                    <CreditCard size={18} />
-                    Pay with bKash
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={cancelPayment}
-                    className="w-full"
-                  >
-                    Cancel
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
+            <PaymentModal
+              amount={membershipFee}
+              description="CPSCS Alumni Membership"
+              onSuccess={handlePaymentSuccess}
+              onCancel={handlePaymentCancel}
+            />
           )}
         </div>
       </div>
