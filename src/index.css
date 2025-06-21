@@ -101,7 +101,12 @@
   }
 
   .glass-effect {
-    @apply bg-white/50 backdrop-blur-md border border-white/20;
+    @apply bg-white/50 backdrop-blur-md border border border-white/20;
+  }
+
+  /* Smooth glow pulse for active game elements */
+  .glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
   }
 
   /* Flip Card Styles */
@@ -180,6 +185,24 @@
 }
 
 /* Keyframe Animations */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4);
+  }
+}
+
+@keyframes dashMove {
+  0% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 12;
+  }
+}
+
 @keyframes gradientFlow {
   0% {
     background-position: 0% 50%;
@@ -241,6 +264,29 @@
 }
 
 @keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Background Gradient X Animation */
+@keyframes gradient-x {
   0% {
     background-position: 0% 50%;
   }

@@ -38,20 +38,20 @@ const ParticleSystem: React.FC<ParticleSystemProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Create particles
-    for (let i = 0; i < 20; i++) {
-      const angle = (Math.PI * 2 * i) / 20;
-      const velocity = 2 + Math.random() * 3;
+    // Create fewer particles for better performance
+    for (let i = 0; i < 10; i++) {
+      const angle = (Math.PI * 2 * i) / 10;
+      const velocity = 1.5 + Math.random() * 2;
       
       particlesRef.current.push({
         x: centerX,
         y: centerY,
         vx: Math.cos(angle) * velocity,
         vy: Math.sin(angle) * velocity,
-        life: 60,
-        maxLife: 60,
+        life: 45,
+        maxLife: 45,
         color,
-        size: 2 + Math.random() * 3
+        size: 1.5 + Math.random() * 2
       });
     }
 
@@ -92,8 +92,8 @@ const ParticleSystem: React.FC<ParticleSystemProps> = ({
     <canvas
       ref={canvasRef}
       className="absolute inset-0 pointer-events-none"
-      width={800}
-      height={400}
+      width={600}
+      height={288}
     />
   );
 };
