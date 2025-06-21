@@ -8,7 +8,7 @@ interface TypewriterTextProps {
   className?: string;
 }
 
-const TypewriterText = ({ text, speed = 50, delay = 0, className = "" }: TypewriterTextProps) => {
+const TypewriterText = ({ text, speed = 75, delay = 0, className = "" }: TypewriterTextProps) => {
   const [displayText, setDisplayText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 

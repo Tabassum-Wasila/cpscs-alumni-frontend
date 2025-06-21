@@ -156,12 +156,12 @@
     pointer-events: none;
   }
 
-  /* Icon Animations */
-  .animated-icon {
-    animation: iconPulse 3s ease-in-out infinite;
+  /* Icon Animations - Slower and more subtle */
+  .animated-icon-slow {
+    animation: iconPulse 8s ease-in-out infinite;
   }
 
-  .animated-icon:hover {
+  .animated-icon-slow:hover {
     animation: iconBounce 0.6s ease-in-out;
   }
 
@@ -174,7 +174,7 @@
     transform: rotateY(180deg) scale(1.02);
   }
 
-  .flip-card-container:hover .animated-icon {
+  .flip-card-container:hover .animated-icon-slow {
     animation: iconRotate 0.8s ease-in-out;
   }
 }
@@ -205,7 +205,7 @@
   }
   50% {
     transform: scale(1.05);
-    opacity: 0.8;
+    opacity: 0.85;
   }
 }
 

@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import TypewriterText from './TypewriterText';
+import { useFlipCard } from '../contexts/FlipCardContext';
 
 interface FlipCardProps {
   frontContent: {
@@ -11,53 +12,76 @@ interface FlipCardProps {
   backContent: {
     description: string;
   };
+  cardIndex: number;
   autoFlipDelay?: number;
   className?: string;
 }
 
-const FlipCard = ({ frontContent, backContent, autoFlipDelay = 3000, className = "" }: FlipCardProps) => {
+const FlipCard = ({ 
+  frontContent, 
+  backContent, 
+  cardIndex,
+  autoFlipDelay = 3000, 
+  className = "" 
+}: FlipCardProps) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showTypewriter, setShowTypewriter] = useState(false);
+  const { canFlip, flipCard, unflipCard } = useFlipCard();
 
   useEffect(() => {
-    if (isHovered) return; // Don't auto-flip when user is hovering
+    if (isHovered) return;
 
     const interval = setInterval(() => {
-      // Random chance to flip (30% chance every interval)
-      if (Math.random() < 0.3) {
+      if (Math.random() < 0.3 && canFlip(cardIndex)) {
+        flipCard(cardIndex);
         setIsFlipped(true);
         setShowTypewriter(true);
         
-        // Flip back after 5 seconds
+        // Flip back after 10 seconds
         setTimeout(() => {
           setIsFlipped(false);
           setShowTypewriter(false);
-        }, 5000);
+          unflipCard(cardIndex);
+        }, 10000);
       }
     }, autoFlipDelay);
 
     return () => clearInterval(interval);
-  }, [autoFlipDelay, isHovered]);
+  }, [autoFlipDelay, isHovered, cardIndex, canFlip, flipCard, unflipCard]);
 
   const handleMouseEnter = () => {
-    setIsHovered(true);
-    setIsFlipped(true);
-    setShowTypewriter(true);
+    if (canFlip(cardIndex)) {
+      setIsHovered(true);
+      flipCard(cardIndex);
+      setIsFlipped(true);
+      setShowTypewriter(true);
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
     setIsFlipped(false);
     setShowTypewriter(false);
+    unflipCard(cardIndex);
   };
 
   const handleClick = () => {
-    setIsFlipped(prev => {
-      const newFlipped = !prev;
-      setShowTypewriter(newFlipped);
-      return newFlipped;
-    });
+    if (!isFlipped && canFlip(cardIndex)) {
+      flipCard(cardIndex);
+      setIsFlipped(true);
+      setShowTypewriter(true);
+      
+      setTimeout(() => {
+        setIsFlipped(false);
+        setShowTypewriter(false);
+        unflipCard(cardIndex);
+      }, 10000);
+    } else if (isFlipped) {
+      setIsFlipped(false);
+      setShowTypewriter(false);
+      unflipCard(cardIndex);
+    }
   };
 
   return (
@@ -70,7 +94,7 @@ const FlipCard = ({ frontContent, backContent, autoFlipDelay = 3000, className =
       <div className={`flip-card ${isFlipped ? 'flipped' : ''}`}>
         {/* Front Side */}
         <div className="flip-card-front neumorphic-card p-6 flex flex-col items-center justify-center">
-          <div className="text-cpscs-gold mb-4 transform transition-transform duration-300 hover:scale-110 animated-icon">
+          <div className="text-cpscs-gold mb-4 transform transition-transform duration-300 hover:scale-110 animated-icon-slow">
             {frontContent.icon}
           </div>
           <div className="text-3xl md:text-4xl font-bold text-cpscs-blue mb-2 text-center">
@@ -87,7 +111,7 @@ const FlipCard = ({ frontContent, backContent, autoFlipDelay = 3000, className =
             {showTypewriter ? (
               <TypewriterText 
                 text={backContent.description}
-                speed={50}
+                speed={75}
                 delay={500}
                 className="text-sm md:text-base leading-relaxed"
               />
