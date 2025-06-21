@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { UserService } from "@/services/userService";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -24,24 +25,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }, [isAuthenticated, toast]);
 
   if (!isAuthenticated) {
-    // Redirect to login with return path
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Check if profile is complete (all mandatory fields)
   if (isAuthenticated && user) {
-    const { profile } = user;
-    const requiredFields = [
-      profile?.profilePicture,
-      profile?.profession,
-      profile?.organization,
-      profile?.city,
-      profile?.country,
-      profile?.bio,
-      (profile?.expertise && profile.expertise.length > 0)
-    ];
-    
-    const isProfileComplete = requiredFields.every(field => !!field);
+    const isProfileComplete = UserService.isProfileComplete(user);
     
     if (!isProfileComplete) {
       toast({

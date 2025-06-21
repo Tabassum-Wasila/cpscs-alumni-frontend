@@ -1,5 +1,7 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { AuthService, LoginCredentials, SignupData } from '@/services/authService';
+import { AlumniService, SearchFilters } from '@/services/alumniService';
+import { UserService, UserProfile } from '@/services/userService';
 
 type UserProfile = {
   profilePicture?: string;
@@ -61,218 +63,76 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   
   useEffect(() => {
-    // Check if we have a user in localStorage
-    const storedUser = localStorage.getItem("cpscs_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    const currentUser = AuthService.getCurrentUser();
+    if (currentUser) {
+      setUser(currentUser);
     }
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // Simulating login verification (would connect to backend in real implementation)
-    try {
-      // For demo purposes, we'll check if the user exists in localStorage
-      const users = JSON.parse(localStorage.getItem("cpscs_users") || "[]");
-      const user = users.find((u: any) => u.email === email);
-      
-      if (user && user.password === password) {
-        // Set user without password in state and localStorage
-        const { password: _, ...userWithoutPassword } = user;
-        const authUser = {
-          ...userWithoutPassword,
-          isAuthenticated: true
-        };
-        
-        setUser(authUser);
-        localStorage.setItem("cpscs_user", JSON.stringify(authUser));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Login error:", error);
-      return false;
+    const loggedInUser = await AuthService.login({ email, password });
+    if (loggedInUser) {
+      setUser(loggedInUser);
+      return true;
     }
+    return false;
   };
 
   const signup = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    try {
-      // Generate a unique ID
-      const userId = `user_${Date.now()}`;
-      
-      // Create new user object with default profile
-      const newUser = {
-        id: userId,
-        fullName: userData.fullName || "",
-        email: userData.email || "",
-        sscYear: userData.sscYear || "",
-        hscYear: userData.hscYear || "",
-        password: userData.password,
-        hasMembership: true, // Assume paid if registering
-        dateJoined: new Date().toISOString(),
-        profile: {
-          profilePicture: "",
-          bio: "",
-          profession: "",
-          organization: "",
-          city: "",
-          country: "",
-          phoneNumber: "",
-          showPhone: false,
-          expertise: [],
-          socialLinks: {},
-          willingToMentor: false,
-          mentorshipAreas: []
-        }
-      };
-
-      // Store in "users" array (simulating a database)
-      const users = JSON.parse(localStorage.getItem("cpscs_users") || "[]");
-      users.push(newUser);
-      localStorage.setItem("cpscs_users", JSON.stringify(users));
-      
-      // Store user info in state and localStorage (without password)
-      const { password: _, ...userWithoutPassword } = newUser;
-      const authUser = {
-        ...userWithoutPassword,
-        isAuthenticated: true
-      };
-      
-      setUser(authUser);
-      localStorage.setItem("cpscs_user", JSON.stringify(authUser));
-      
+    const newUser = await AuthService.signup(userData);
+    if (newUser) {
+      setUser(newUser);
       return true;
-    } catch (error) {
-      console.error("Signup error:", error);
-      return false;
     }
+    return false;
   };
 
   const updateUserProfile = async (profileData: Partial<UserProfile>): Promise<boolean> => {
-    try {
-      if (!user) return false;
-      
-      // Update user profile in localStorage
-      const updatedUser = {
-        ...user,
-        profile: {
-          ...user.profile,
-          ...profileData
-        }
-      };
-      
-      // Update in users array
-      const users = JSON.parse(localStorage.getItem("cpscs_users") || "[]");
-      const userIndex = users.findIndex((u: any) => u.id === user.id);
-      
-      if (userIndex !== -1) {
-        const { password } = users[userIndex];
-        users[userIndex] = { ...updatedUser, password };
-        localStorage.setItem("cpscs_users", JSON.stringify(users));
-      }
-      
-      // Update current user
+    if (!user) return false;
+    
+    const updatedUser = await UserService.updateProfile(user.id, profileData);
+    if (updatedUser) {
       setUser(updatedUser);
-      localStorage.setItem("cpscs_user", JSON.stringify(updatedUser));
-      
       return true;
-    } catch (error) {
-      console.error("Profile update error:", error);
-      return false;
     }
+    return false;
   };
   
   const searchAlumni = async (query: string, filters?: Record<string, any>): Promise<User[]> => {
-    try {
-      // Get all users
-      const users = JSON.parse(localStorage.getItem("cpscs_users") || "[]");
-      
-      // Filter users based on search query and filters
-      return users
-        .filter((user: any) => {
-          // Remove password from user objects
-          const { password: _, ...userWithoutPassword } = user;
-          
-          // Basic search (case insensitive)
-          const searchString = `${user.fullName} ${user.sscYear} ${user.profile?.profession || ''} ${user.profile?.organization || ''} ${user.profile?.city || ''} ${user.profile?.country || ''} ${user.profile?.expertise?.join(' ') || ''}`.toLowerCase();
-          
-          let matchesQuery = true;
-          if (query) {
-            matchesQuery = searchString.includes(query.toLowerCase());
-          }
-          
-          // Apply additional filters if provided
-          let matchesFilters = true;
-          if (filters) {
-            if (filters.batch && filters.batch !== user.sscYear) {
-              matchesFilters = false;
-            }
-            if (filters.profession && (!user.profile?.profession || !user.profile.profession.toLowerCase().includes(filters.profession.toLowerCase()))) {
-              matchesFilters = false;
-            }
-            if (filters.location && (!user.profile?.country || !user.profile.country.toLowerCase().includes(filters.location.toLowerCase()))) {
-              matchesFilters = false;
-            }
-            if (filters.mentorsOnly && (!user.profile?.willingToMentor)) {
-              matchesFilters = false;
-            }
-          }
-          
-          return matchesQuery && matchesFilters;
-        })
-        .map((user: any) => {
-          // Remove password from user objects
-          const { password: _, ...userWithoutPassword } = user;
-          return userWithoutPassword;
-        });
-    } catch (error) {
-      console.error("Search error:", error);
-      return [];
-    }
+    const searchFilters: SearchFilters = {
+      batch: filters?.batch,
+      profession: filters?.profession,
+      location: filters?.location,
+      mentorsOnly: filters?.mentorsOnly
+    };
+    
+    return await AlumniService.searchAlumni(query, searchFilters);
   };
   
   const requestMentorship = async (mentorId: string, message: string): Promise<boolean> => {
-    try {
-      if (!user) return false;
-      
-      // In a real app, this would send an email and store the request in a database
-      console.log(`Mentorship request from ${user.fullName} to ${mentorId}: ${message}`);
-      
-      // Store mentorship request in localStorage for demo purposes
-      const mentorshipRequests = JSON.parse(localStorage.getItem("cpscs_mentorship_requests") || "[]");
-      mentorshipRequests.push({
-        id: `request_${Date.now()}`,
-        mentorId,
-        requesterId: user.id,
-        requesterName: user.fullName,
-        requesterEmail: user.email,
-        requesterBatch: user.sscYear,
-        message,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      });
-      localStorage.setItem("cpscs_mentorship_requests", JSON.stringify(mentorshipRequests));
-      
-      return true;
-    } catch (error) {
-      console.error("Mentorship request error:", error);
-      return false;
-    }
+    if (!user) return false;
+    
+    return await AlumniService.requestMentorship(
+      mentorId, 
+      user.id, 
+      { name: user.fullName, email: user.email, batch: user.sscYear }, 
+      message
+    );
   };
   
   const toggleContactVisibility = async (contactType: 'email' | 'phone', userId: string): Promise<void> => {
-    // In a real app, this would log the access in a database
-    console.log(`${contactType} viewed for user ${userId} by ${user?.id}`);
+    if (user) {
+      AlumniService.logContactView(contactType, userId, user.id);
+    }
   };
 
   const logout = () => {
+    AuthService.logout();
     setUser(null);
-    localStorage.removeItem("cpscs_user");
   };
 
   const checkEmailExists = async (email: string): Promise<boolean> => {
-    // Simulating database check
-    const users = JSON.parse(localStorage.getItem("cpscs_users") || "[]");
-    return users.some((user: any) => user.email === email);
+    return await AuthService.checkEmailExists(email);
   };
 
   return (
