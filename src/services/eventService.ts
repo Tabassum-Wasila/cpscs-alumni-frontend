@@ -1,119 +1,77 @@
 
-export interface EventRegistration {
-  userId: string;
-  eventType: 'reunion' | 'workshop' | 'networking';
-  attendeeInfo: {
-    name: string;
-    email: string;
-    phone: string;
-    batch: string;
-    dietaryRestrictions?: string;
-    accommodationNeeded?: boolean;
-    emergencyContact?: {
-      name: string;
-      phone: string;
-    };
-  };
-  paymentStatus: 'pending' | 'completed' | 'failed';
-  registrationDate: string;
+export interface ReunionRegistration {
+  sscYear: string;
+  bringingSpouse: boolean;
+  numberOfKids: number;
+  bringingMother: boolean;
+  bringingFather: boolean;
+}
+
+export interface FeeBreakdown {
+  baseFee: number;
+  spouseFee: number;
+  kidsFee: number;
+  parentsFee: number;
+  totalFee: number;
 }
 
 export class EventService {
-  private static REGISTRATIONS_KEY = 'cpscs_registrations';
-
-  static async registerForEvent(registration: Omit<EventRegistration, 'registrationDate'>): Promise<boolean> {
-    try {
-      const registrations = this.getStoredRegistrations();
-      
-      const newRegistration: EventRegistration = {
-        ...registration,
-        registrationDate: new Date().toISOString()
-      };
-
-      registrations.push(newRegistration);
-      localStorage.setItem(this.REGISTRATIONS_KEY, JSON.stringify(registrations));
-      
-      return true;
-    } catch (error) {
-      console.error('Event registration error:', error);
-      return false;
+  static calculateReunionFees(registration: ReunionRegistration): FeeBreakdown {
+    // Calculate base fee based on SSC year
+    let baseFee = 0;
+    if (registration.sscYear) {
+      const year = parseInt(registration.sscYear);
+      if (year <= 2000) baseFee = 5000;
+      else if (year <= 2015) baseFee = 3500;
+      else if (year <= 2022) baseFee = 3000;
+      else baseFee = 1000;
     }
+
+    // Calculate additional fees
+    const spouseFee = registration.bringingSpouse ? 2000 : 0;
+    const kidsFee = registration.numberOfKids * 1000;
+    const parentsFee = (registration.bringingMother ? 1000 : 0) + (registration.bringingFather ? 1000 : 0);
+    const totalFee = baseFee + spouseFee + kidsFee + parentsFee;
+
+    return {
+      baseFee,
+      spouseFee,
+      kidsFee,
+      parentsFee,
+      totalFee
+    };
   }
 
-  static async updatePaymentStatus(userId: string, eventType: string, status: 'completed' | 'failed'): Promise<boolean> {
-    try {
-      const registrations = this.getStoredRegistrations();
-      const registrationIndex = registrations.findIndex(
-        reg => reg.userId === userId && reg.eventType === eventType
-      );
-
-      if (registrationIndex !== -1) {
-        registrations[registrationIndex].paymentStatus = status;
-        localStorage.setItem(this.REGISTRATIONS_KEY, JSON.stringify(registrations));
-        return true;
-      }
-      
-      return false;
-    } catch (error) {
-      console.error('Payment status update error:', error);
-      return false;
-    }
+  static getEventDetails() {
+    return {
+      title: "Grand Alumni Reunion 2025",
+      date: "December 25, 2025",
+      time: "9:00 AM - 10:00 PM",
+      venue: "CPSCS Campus, Saidpur",
+      activities: [
+        "Campus Tour",
+        "Cultural Program", 
+        "Alumni Dinner",
+        "Guest Speeches",
+        "Cultural Events",
+        "Group Photos"
+      ]
+    };
   }
 
-  static async getUserRegistrations(userId: string): Promise<EventRegistration[]> {
-    try {
-      const registrations = this.getStoredRegistrations();
-      return registrations.filter(reg => reg.userId === userId);
-    } catch (error) {
-      console.error('Get user registrations error:', error);
-      return [];
-    }
-  }
-
-  static async checkRegistrationExists(userId: string, eventType: string): Promise<boolean> {
-    try {
-      const registrations = this.getStoredRegistrations();
-      return registrations.some(reg => reg.userId === userId && reg.eventType === eventType);
-    } catch (error) {
-      console.error('Check registration error:', error);
-      return false;
-    }
-  }
-
-  private static getStoredRegistrations(): EventRegistration[] {
-    try {
-      return JSON.parse(localStorage.getItem(this.REGISTRATIONS_KEY) || '[]');
-    } catch (error) {
-      console.error('Error getting stored registrations:', error);
-      return [];
-    }
-  }
-
-  static getEventDetails(eventType: string) {
-    const events = {
-      reunion: {
-        title: 'CPSCS Alumni Reunion 2024',
-        description: 'Join us for an unforgettable reunion celebration',
-        venue: 'Dhaka Regency Hotel',
-        date: '2024-12-15',
-        time: '6:00 PM - 11:00 PM'
+  static getFeeStructure() {
+    return {
+      batchFees: {
+        "2000 and before": 5000,
+        "2001-2015": 3500,
+        "2016-2022": 3000,
+        "2023 and after": 1000
       },
-      workshop: {
-        title: 'Professional Development Workshop',
-        description: 'Enhance your career skills with industry experts',
-        venue: 'CPSCS Campus',
-        date: '2024-11-20',
-        time: '2:00 PM - 5:00 PM'
-      },
-      networking: {
-        title: 'Alumni Networking Evening',
-        description: 'Connect with fellow alumni across industries',
-        venue: 'Pan Pacific Sonargaon',
-        date: '2024-10-25',
-        time: '7:00 PM - 10:00 PM'
+      additionalFees: {
+        spouse: 2000,
+        childPerPerson: 1000,
+        parentPerPerson: 1000
       }
     };
-
-    return events[eventType as keyof typeof events] || null;
   }
 }

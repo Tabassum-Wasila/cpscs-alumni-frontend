@@ -2,6 +2,8 @@
 import { User } from '@/contexts/AuthContext';
 
 export class AdminService {
+  private static readonly STORAGE_KEY = 'cpscs_users';
+
   static async addDemoUsers(): Promise<boolean> {
     try {
       const demoUsers = [
@@ -70,12 +72,12 @@ export class AdminService {
         }
       ];
 
-      const existingUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+      const existingUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
       const demoUserIds = demoUsers.map(user => user.id);
       const filteredUsers = existingUsers.filter((user: any) => !demoUserIds.includes(user.id));
       
       const updatedUsers = [...filteredUsers, ...demoUsers];
-      localStorage.setItem('cpscs_users', JSON.stringify(updatedUsers));
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedUsers));
       
       return true;
     } catch (error) {
@@ -86,9 +88,9 @@ export class AdminService {
 
   static async removeDemoUsers(): Promise<boolean> {
     try {
-      const existingUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+      const existingUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
       const filteredUsers = existingUsers.filter((user: any) => !user.isDemoUser);
-      localStorage.setItem('cpscs_users', JSON.stringify(filteredUsers));
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredUsers));
       return true;
     } catch (error) {
       console.error('Error removing demo users:', error);
@@ -98,7 +100,7 @@ export class AdminService {
 
   static async getDemoUsersCount(): Promise<number> {
     try {
-      const existingUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+      const existingUsers = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
       return existingUsers.filter((user: any) => user.isDemoUser).length;
     } catch (error) {
       console.error('Error getting demo users count:', error);

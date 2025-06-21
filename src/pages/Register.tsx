@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,9 +14,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, MapPin, Users, CreditCard, Eye, EyeOff } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Eye, EyeOff } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EventService, FeeBreakdown } from '@/services/eventService';
+import PaymentModal from '@/components/PaymentModal';
 
 // Generate year options from 1979 to 2025
 const generateYears = (start: number, end: number) => {
@@ -58,11 +59,13 @@ type FormValues = z.infer<typeof formSchema>;
 const Register = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [totalFee, setTotalFee] = useState(0);
-  const [baseFee, setBaseFee] = useState(0);
-  const [spouseFee, setSpouseFee] = useState(0);
-  const [kidsFee, setKidsFee] = useState(0);
-  const [parentsFee, setParentsFee] = useState(0);
+  const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown>({
+    baseFee: 0,
+    spouseFee: 0,
+    kidsFee: 0,
+    parentsFee: 0,
+    totalFee: 0
+  });
   const [showingPaymentModal, setShowingPaymentModal] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -102,31 +105,14 @@ const Register = () => {
 
   // Calculate fees when relevant form values change
   useEffect(() => {
-    // Calculate base fee based on SSC year
-    let base = 0;
-    if (watchSSCYear) {
-      const year = parseInt(watchSSCYear);
-      if (year <= 2000) base = 5000;
-      else if (year <= 2015) base = 3500;
-      else if (year <= 2022) base = 3000;
-      else base = 1000;
-    }
-    setBaseFee(base);
-
-    // Calculate spouse fee
-    const spouse = watchBringingSpouse ? 2000 : 0;
-    setSpouseFee(spouse);
-
-    // Calculate kids fee
-    const kids = watchNumberOfKids ? parseInt(watchNumberOfKids) * 1000 : 0;
-    setKidsFee(kids);
-
-    // Calculate parents fee
-    const parents = (watchBringingMother ? 1000 : 0) + (watchBringingFather ? 1000 : 0);
-    setParentsFee(parents);
-
-    // Set total fee
-    setTotalFee(base + spouse + kids + parents);
+    const fees = EventService.calculateReunionFees({
+      sscYear: watchSSCYear || '',
+      bringingSpouse: watchBringingSpouse,
+      numberOfKids: parseInt(watchNumberOfKids) || 0,
+      bringingMother: watchBringingMother,
+      bringingFather: watchBringingFather
+    });
+    setFeeBreakdown(fees);
   }, [watchSSCYear, watchBringingSpouse, watchNumberOfKids, watchBringingMother, watchBringingFather]);
 
   // Check if email already exists when email changes
@@ -234,31 +220,16 @@ const Register = () => {
     }
   };
 
-  // Simulate bKash payment process
-  const handleBkashPayment = () => {
-    // This would be replaced by actual bKash integration
-    toast({
-      title: "Payment Processing",
-      description: "Connecting to bKash...",
-    });
-    
-    // Simulate payment processing
-    setTimeout(() => {
-      toast({
-        title: "Payment Successful",
-        description: "Your payment has been processed successfully!",
-        variant: "default",
-      });
-      
-      setTimeout(() => {
-        navigate("/complete-profile");
-      }, 1500);
-    }, 2000);
+  const handlePaymentSuccess = () => {
+    setShowingPaymentModal(false);
+    navigate("/complete-profile");
   };
 
   const cancelPayment = () => {
     setShowingPaymentModal(false);
   };
+
+  const eventDetails = EventService.getEventDetails();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -267,7 +238,7 @@ const Register = () => {
       <div className="flex-grow pt-24 pb-16 bg-cpscs-light">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="mb-10">
-            <h1 className="text-4xl font-bold text-cpscs-blue mb-4">Grand Alumni Reunion 2025</h1>
+            <h1 className="text-4xl font-bold text-cpscs-blue mb-4">{eventDetails.title}</h1>
             
             <Card className="bg-gradient-to-r from-blue-800 via-cpscs-blue to-blue-900 text-white overflow-hidden mb-8">
               <CardContent className="p-6">
@@ -277,15 +248,15 @@ const Register = () => {
                     <div className="space-y-3">
                       <div className="flex items-center">
                         <Calendar size={20} className="mr-3 text-cpscs-gold" />
-                        <span>December 25, 2025</span>
+                        <span>{eventDetails.date}</span>
                       </div>
                       <div className="flex items-center">
                         <Clock size={20} className="mr-3 text-cpscs-gold" />
-                        <span>9:00 AM - 10:00 PM</span>
+                        <span>{eventDetails.time}</span>
                       </div>
                       <div className="flex items-center">
                         <MapPin size={20} className="mr-3 text-cpscs-gold" />
-                        <span>CPSCS Campus, Saidpur</span>
+                        <span>{eventDetails.venue}</span>
                       </div>
                       <div className="flex items-center">
                         <Users size={20} className="mr-3 text-cpscs-gold" />
@@ -297,12 +268,9 @@ const Register = () => {
                   <div>
                     <h2 className="text-2xl font-bold mb-4">Activities</h2>
                     <ul className="list-disc pl-5 space-y-1">
-                      <li>Campus Tour</li>
-                      <li>Cultural Program</li>
-                      <li>Alumni Dinner</li>
-                      <li>Guest Speeches</li>
-                      <li>Cultural Events</li>
-                      <li>Group Photos</li>
+                      {eventDetails.activities.map((activity, index) => (
+                        <li key={index}>{activity}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -722,29 +690,29 @@ const Register = () => {
                         <div className="bg-cpscs-light p-4 rounded-lg w-full mb-4">
                           <div className="flex justify-between text-sm mb-1">
                             <span>Base Registration Fee:</span>
-                            <span>৳{baseFee.toLocaleString()}</span>
+                            <span>৳{feeBreakdown.baseFee.toLocaleString()}</span>
                           </div>
-                          {spouseFee > 0 && (
+                          {feeBreakdown.spouseFee > 0 && (
                             <div className="flex justify-between text-sm mb-1">
                               <span>Spouse Fee:</span>
-                              <span>৳{spouseFee.toLocaleString()}</span>
+                              <span>৳{feeBreakdown.spouseFee.toLocaleString()}</span>
                             </div>
                           )}
-                          {kidsFee > 0 && (
+                          {feeBreakdown.kidsFee > 0 && (
                             <div className="flex justify-between text-sm mb-1">
                               <span>Children Fee ({watchNumberOfKids}):</span>
-                              <span>৳{kidsFee.toLocaleString()}</span>
+                              <span>৳{feeBreakdown.kidsFee.toLocaleString()}</span>
                             </div>
                           )}
-                          {parentsFee > 0 && (
+                          {feeBreakdown.parentsFee > 0 && (
                             <div className="flex justify-between text-sm mb-1">
                               <span>Parents Fee:</span>
-                              <span>৳{parentsFee.toLocaleString()}</span>
+                              <span>৳{feeBreakdown.parentsFee.toLocaleString()}</span>
                             </div>
                           )}
                           <div className="border-t border-gray-300 mt-2 pt-2 flex justify-between font-bold">
                             <span>Total Fee:</span>
-                            <span>৳{totalFee.toLocaleString()}</span>
+                            <span>৳{feeBreakdown.totalFee.toLocaleString()}</span>
                           </div>
                         </div>
                         
@@ -822,50 +790,12 @@ const Register = () => {
           
           {/* Payment Modal */}
           {showingPaymentModal && (
-            <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-              <Card className="w-full max-w-md animate-fade-in">
-                <CardHeader>
-                  <CardTitle>bKash Payment</CardTitle>
-                  <CardDescription>
-                    Complete your payment securely with bKash
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="bg-white p-4 rounded-lg border text-center">
-                    <p className="font-bold text-lg mb-2">Total Amount</p>
-                    <p className="text-3xl font-bold text-cpscs-blue">৳{totalFee.toLocaleString()}</p>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <p className="text-sm">Please follow these steps:</p>
-                    <ol className="list-decimal pl-5 text-sm space-y-1">
-                      <li>Open your bKash app</li>
-                      <li>Go to "Make Payment"</li>
-                      <li>Enter merchant number: 01XXXXXXXXX</li>
-                      <li>Enter the exact amount: ৳{totalFee}</li>
-                      <li>Use reference: "CPSCS Reunion"</li>
-                      <li>Complete payment with your PIN</li>
-                    </ol>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex flex-col gap-3">
-                  <Button 
-                    onClick={handleBkashPayment}
-                    className="w-full bg-[#E2136E] hover:bg-[#c11160] flex items-center justify-center gap-2 py-6"
-                  >
-                    <CreditCard size={18} />
-                    Pay with bKash
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    onClick={cancelPayment}
-                    className="w-full"
-                  >
-                    Cancel
-                  </Button>
-                </CardFooter>
-              </Card>
-            </div>
+            <PaymentModal
+              amount={feeBreakdown.totalFee}
+              description="Alumni Reunion Registration"
+              onSuccess={handlePaymentSuccess}
+              onCancel={cancelPayment}
+            />
           )}
         </div>
       </div>
