@@ -49,11 +49,12 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="font-poppins font-bold text-2xl text-cpscs-blue">
-            <span>CPSCS</span>
-            <span className="text-cpscs-gold"> Alumni</span>
-          </div>
+        <Link to="/" className="flex items-center">
+          <img 
+            src="/lovable-uploads/bd6e72b4-f5db-47e7-b477-71d8b8893647.png" 
+            alt="CPSCS Alumni Logo" 
+            className="h-10 w-auto md:h-12"
+          />
         </Link>
 
         {/* Desktop Navigation */}
