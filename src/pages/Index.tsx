@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import InteractiveStatsSection from '../components/InteractiveStatsSection';
 import AboutSection from '../components/AboutSection';
+import GoalsSection from '../components/GoalsSection';
 import EventsSection from '../components/EventsSection';
 import FeaturedAlumni from '../components/FeaturedAlumni';
 import CallToAction from '../components/CallToAction';
@@ -16,6 +17,7 @@ const Index = () => {
       <Hero />
       <InteractiveStatsSection />
       <AboutSection />
+      <GoalsSection />
       <EventsSection />
       <FeaturedAlumni />
       <CallToAction />
