@@ -9,57 +9,104 @@ interface Star {
   size: number;
   twinkleSpeed: number;
   isTwinkling: boolean;
+  lastTwinkle: number;
+}
+
+interface Connection {
+  id1: number;
+  id2: number;
+  opacity: number;
+  createdAt: number;
 }
 
 const TwinklingStars = () => {
   const [stars, setStars] = useState<Star[]>([]);
-  const [connections, setConnections] = useState<Array<{id1: number, id2: number, opacity: number}>>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [backgroundPhase, setBackgroundPhase] = useState(0);
 
   useEffect(() => {
-    // Generate stars
-    const newStars: Star[] = Array.from({ length: 80 }, (_, i) => ({
+    // Generate stars with better distribution
+    const newStars: Star[] = Array.from({ length: 120 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      opacity: 0.3 + Math.random() * 0.4,
-      size: 1 + Math.random() * 2,
-      twinkleSpeed: 2000 + Math.random() * 3000,
-      isTwinkling: false
+      opacity: 0.2 + Math.random() * 0.3,
+      size: 0.8 + Math.random() * 1.2, // Smaller, more distant
+      twinkleSpeed: 3000 + Math.random() * 4000, // Slower
+      isTwinkling: false,
+      lastTwinkle: 0
     }));
     setStars(newStars);
   }, []);
 
+  // Background gradient breathing animation
+  useEffect(() => {
+    const gradientInterval = setInterval(() => {
+      setBackgroundPhase(prev => (prev + 0.01) % (Math.PI * 2));
+    }, 100);
+
+    return () => clearInterval(gradientInterval);
+  }, []);
+
+  // Find nearby stars for connections
+  const findNearbyStars = (star: Star, allStars: Star[]) => {
+    return allStars
+      .filter(s => s.id !== star.id)
+      .map(s => ({
+        star: s,
+        distance: Math.sqrt(Math.pow(s.x - star.x, 2) + Math.pow(s.y - star.y, 2))
+      }))
+      .filter(({ distance }) => distance < 25) // Only nearby stars
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 2) // Max 2 connections per star
+      .map(({ star }) => star);
+  };
+
   useEffect(() => {
     const intervals = stars.map(star => {
       return setInterval(() => {
+        const now = Date.now();
+        
         setStars(prevStars => 
           prevStars.map(s => 
             s.id === star.id 
-              ? { ...s, isTwinkling: !s.isTwinkling }
+              ? { ...s, isTwinkling: !s.isTwinkling, lastTwinkle: now }
               : s
           )
         );
 
-        // Create temporary connections when twinkling
-        if (Math.random() < 0.3) {
-          const nearbyStars = stars.filter(s => 
-            s.id !== star.id && 
-            Math.abs(s.x - star.x) < 20 && 
-            Math.abs(s.y - star.y) < 20
-          );
+        // Create connections when star starts twinkling
+        if (Math.random() < 0.4) { // 40% chance to create connections
+          const nearbyStars = findNearbyStars(star, stars);
           
           if (nearbyStars.length > 0) {
-            const targetStar = nearbyStars[Math.floor(Math.random() * nearbyStars.length)];
-            const connectionId = `${star.id}-${targetStar.id}`;
-            
+            const newConnections = nearbyStars.map(targetStar => ({
+              id1: star.id,
+              id2: targetStar.id,
+              opacity: 0,
+              createdAt: now
+            }));
+
             setConnections(prev => [
               ...prev.filter(c => c.id1 !== star.id && c.id2 !== star.id),
-              { id1: star.id, id2: targetStar.id, opacity: 0.3 }
+              ...newConnections
             ]);
 
+            // Animate connection opacity
             setTimeout(() => {
-              setConnections(prev => prev.filter(c => !(c.id1 === star.id && c.id2 === targetStar.id)));
-            }, 1000);
+              setConnections(prev => prev.map(c => 
+                newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
+                  ? { ...c, opacity: 0.15 }
+                  : c
+              ));
+            }, 50);
+
+            // Remove connections after animation
+            setTimeout(() => {
+              setConnections(prev => prev.filter(c => 
+                !newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
+              ));
+            }, 2500);
           }
         }
       }, star.twinkleSpeed);
@@ -68,45 +115,83 @@ const TwinklingStars = () => {
     return () => intervals.forEach(clearInterval);
   }, [stars]);
 
+  // Clean up old connections
+  useEffect(() => {
+    const cleanup = setInterval(() => {
+      const now = Date.now();
+      setConnections(prev => prev.filter(c => now - c.createdAt < 3000));
+    }, 1000);
+
+    return () => clearInterval(cleanup);
+  }, []);
+
+  // Generate dynamic gradient colors based on phase
+  const getGradientStyle = () => {
+    const phase1 = Math.sin(backgroundPhase) * 0.3 + 0.7;
+    const phase2 = Math.sin(backgroundPhase + Math.PI / 3) * 0.3 + 0.7;
+    const phase3 = Math.sin(backgroundPhase + Math.PI * 2 / 3) * 0.3 + 0.7;
+    
+    return {
+      background: `radial-gradient(circle at 30% 20%, rgba(79, 70, 229, ${phase1 * 0.1}) 0%, transparent 50%), 
+                   radial-gradient(circle at 70% 60%, rgba(147, 51, 234, ${phase2 * 0.08}) 0%, transparent 50%), 
+                   radial-gradient(circle at 50% 80%, rgba(59, 130, 246, ${phase3 * 0.06}) 0%, transparent 50%)`
+    };
+  };
+
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Stars */}
+      {/* Breathing gradient background */}
+      <div 
+        className="absolute inset-0 transition-all duration-1000 ease-in-out"
+        style={getGradientStyle()}
+      />
+
+      {/* Star-shaped elements */}
       {stars.map(star => (
         <div
           key={star.id}
-          className="absolute rounded-full bg-white transition-all duration-500"
+          className="absolute transition-all duration-700 ease-in-out"
           style={{
             left: `${star.x}%`,
             top: `${star.y}%`,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
+            width: `${star.size * 2}px`,
+            height: `${star.size * 2}px`,
+            transform: `translate(-50%, -50%) scale(${star.isTwinkling ? 1.8 : 1})`,
             opacity: star.isTwinkling ? 1 : star.opacity,
-            transform: star.isTwinkling ? 'scale(1.5)' : 'scale(1)',
-            boxShadow: star.isTwinkling ? `0 0 10px rgba(255,255,255,0.8)` : 'none'
+            filter: star.isTwinkling ? 'drop-shadow(0 0 4px rgba(255,255,255,0.6))' : 'none',
+            clipPath: 'polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)',
+            backgroundColor: 'white',
+            willChange: 'transform, opacity'
           }}
         />
       ))}
 
-      {/* Connection lines */}
+      {/* Dynamic connection network */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none">
         {connections.map(connection => {
           const star1 = stars.find(s => s.id === connection.id1);
           const star2 = stars.find(s => s.id === connection.id2);
           if (!star1 || !star2) return null;
 
+          const x1 = (star1.x / 100) * window.innerWidth;
+          const y1 = (star1.y / 100) * window.innerHeight;
+          const x2 = (star2.x / 100) * window.innerWidth;
+          const y2 = (star2.y / 100) * window.innerHeight;
+
           return (
             <line
-              key={`${connection.id1}-${connection.id2}`}
-              x1={`${star1.x}%`}
-              y1={`${star1.y}%`}
-              x2={`${star2.x}%`}
-              y2={`${star2.y}%`}
-              stroke="rgba(255,255,255,0.2)"
-              strokeWidth="1"
-              strokeDasharray="2,3"
+              key={`${connection.id1}-${connection.id2}-${connection.createdAt}`}
+              x1={x1}
+              y1={y1}
+              x2={x2}
+              y2={y2}
+              stroke="rgba(255,255,255,0.3)"
+              strokeWidth="0.5"
+              strokeDasharray="1,2"
               style={{
                 opacity: connection.opacity,
-                animation: 'dashMove 2s linear infinite'
+                animation: 'dashMove 3s linear infinite',
+                transition: 'opacity 0.5s ease-in-out'
               }}
             />
           );
