@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Camera } from 'lucide-react';
 import { GalleryImage } from '@/services/galleryService';
 import ImageCard from './ImageCard';
 
