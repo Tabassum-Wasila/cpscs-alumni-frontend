@@ -339,3 +339,17 @@
     background-position: 0% 50%;
   }
 }
+
+/* Image Ticker Animation */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 60s linear infinite;
+}

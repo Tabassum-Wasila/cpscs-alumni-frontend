@@ -130,6 +130,14 @@ export default {
 					'50%': {
 						'background-position': '100% 50%'
 					}
+				},
+				'scroll-left': {
+					'0%': {
+						transform: 'translateX(0)'
+					},
+					'100%': {
+						transform: 'translateX(-33.333%)'
+					}
 				}
 			},
 			animation: {
@@ -139,6 +147,7 @@ export default {
 				'fade-out': 'fade-out 0.5s ease-out forwards',
 				'float': 'float 6s ease-in-out infinite',
 				'gradient-x': 'gradient-x 3s ease infinite',
+				'scroll-left': 'scroll-left 60s linear infinite',
 			}
 		}
 	},

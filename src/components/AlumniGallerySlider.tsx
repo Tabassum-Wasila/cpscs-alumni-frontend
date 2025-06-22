@@ -103,9 +103,8 @@ const AlumniGallerySlider: React.FC = () => {
             onMouseLeave={() => setIsPaused(false)}
           >
             <div 
-              className={`flex h-full ${isPaused ? '[animation-play-state:paused]' : ''}`}
+              className={`flex h-full animate-scroll-left ${isPaused ? '[animation-play-state:paused]' : ''}`}
               style={{
-                animation: 'scroll-left 60s linear infinite',
                 width: `${landscapeImages.length * 300}px`, // 300px per image
               }}
             >
@@ -155,18 +154,6 @@ const AlumniGallerySlider: React.FC = () => {
           </p>
         </div>
       </div>
-
-      {/* CSS Animation Styles */}
-      <style jsx>{`
-        @keyframes scroll-left {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-33.333%);
-          }
-        }
-      `}</style>
     </section>
   );
 };
