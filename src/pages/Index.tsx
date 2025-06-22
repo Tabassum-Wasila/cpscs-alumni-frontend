@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import InteractiveStatsSection from '../components/InteractiveStatsSection';
 import AboutSection from '../components/AboutSection';
+import AlumniGallerySlider from '../components/AlumniGallerySlider';
 import GoalsSection from '../components/GoalsSection';
 import EventsSection from '../components/EventsSection';
 import FeaturedAlumni from '../components/FeaturedAlumni';
@@ -17,6 +18,7 @@ const Index = () => {
       <Hero />
       <InteractiveStatsSection />
       <AboutSection />
+      <AlumniGallerySlider />
       <GoalsSection />
       <EventsSection />
       <FeaturedAlumni />
