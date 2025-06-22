@@ -114,7 +114,7 @@ const GoalsSection = () => {
           <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent mb-6 leading-tight">
             Our Goals
           </h2>
-          <p className="text-gray-300 text-xl font-light max-w-2xl mx-auto">Each alumni member is a star in our galaxy, connecting through dotted lines. Like planets in our alumni solar system, each goal orbits around our central mission.</p>
+          <p className="text-gray-300 text-xl font-light max-w-2xl mx-auto">Like planets in our alumni solar system, each goal orbits around our central mission.</p>
         </div>
 
         {/* Interactive Solar System */}
@@ -207,9 +207,7 @@ const GoalsSection = () => {
 
         {/* Interactive Instructions */}
         <div className="text-center mt-12">
-          <p className="text-gray-300 text-sm">
-            Hover over the orbiting goals to learn more about our mission
-          </p>
+          <p className="text-gray-300 text-sm">Each alumni member is a star in our galaxy, connecting through dotted lines. </p>
         </div>
       </div>
     </section>;
