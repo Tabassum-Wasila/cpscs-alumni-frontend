@@ -77,7 +77,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ images, onImageClick }) => {
     if (node) observerRef.current.observe(node);
   }, [isLoading, hasMore, visibleImages.length, images]);
 
-  // Smart image distribution algorithm with improved height calculation for portraits
+  // Enhanced smart image distribution algorithm with better portrait height calculation
   const distributeImages = () => {
     const columnHeights = new Array(columns).fill(0);
     const columnImages: GalleryImage[][] = Array.from({ length: columns }, () => []);
@@ -87,14 +87,15 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ images, onImageClick }) => {
       const shortestColumnIndex = columnHeights.indexOf(Math.min(...columnHeights));
       columnImages[shortestColumnIndex].push(image);
       
-      // Improved height calculation with portrait photo size limit
+      // Enhanced height calculation for better visual balance
       const aspectRatio = image.height / image.width;
       const isPortrait = aspectRatio > 1.2;
       
       let estimatedHeight;
       if (isPortrait) {
-        // Cap portrait photos to prevent them from being too tall
-        estimatedHeight = Math.min(aspectRatio * 280, 350) + 40;
+        // Significantly reduced portrait height for better visual balance
+        // Cap at 280px max height (same as landscape width) for proportional sizing
+        estimatedHeight = Math.min(aspectRatio * 220, 280) + 40;
       } else {
         // Standard calculation for landscape and square photos
         estimatedHeight = aspectRatio * 280 + 40;

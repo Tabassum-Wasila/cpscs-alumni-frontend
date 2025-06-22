@@ -60,6 +60,11 @@ const Gallery = () => {
     }
   };
 
+  const handleImageSelect = (index: number) => {
+    setCurrentIndex(index);
+    setSelectedImage(images[index]);
+  };
+
   const handleFiltersChange = (filters: SearchFilters) => {
     setSearchFilters(filters);
   };
@@ -147,7 +152,7 @@ const Gallery = () => {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Enhanced Lightbox */}
       {selectedImage && (
         <Lightbox
           image={selectedImage}
@@ -157,6 +162,7 @@ const Gallery = () => {
           onClose={handleCloseLightbox}
           onNext={handleNextImage}
           onPrevious={handlePreviousImage}
+          onImageSelect={handleImageSelect}
         />
       )}
       
