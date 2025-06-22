@@ -1,99 +1,68 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { galleryService, GalleryImage } from '@/services/galleryService';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import useEmblaCarousel from 'embla-carousel-react';
-import Autoplay from 'embla-carousel-autoplay';
+import { Images } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 const AlumniGallerySlider: React.FC = () => {
-  const [isPaused, setIsPaused] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [landscapeImages, setLandscapeImages] = useState<GalleryImage[]>([]);
+  const [isPaused, setIsPaused] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch gallery images
   const { data: allImages = [], isLoading } = useQuery({
-    queryKey: ['gallery-images-slider'],
+    queryKey: ['gallery-images-ticker'],
     queryFn: () => galleryService.getGalleryImages({ sortBy: 'newest' }),
   });
 
-  // Filter and randomize landscape images
+  // Filter and prepare landscape images for ticker
   useEffect(() => {
     if (allImages.length > 0) {
-      const filtered = allImages.filter(image => image.width > image.height);
-      // Randomize array using Fisher-Yates shuffle
-      const shuffled = [...filtered];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      console.log('Total images:', allImages.length);
+      
+      // Filter landscape images with stricter criteria
+      const filtered = allImages.filter(image => {
+        const aspectRatio = image.width / image.height;
+        const isLandscape = aspectRatio > 1.2; // More strict landscape requirement
+        console.log(`Image ${image.id}: ${image.width}x${image.height}, ratio: ${aspectRatio.toFixed(2)}, isLandscape: ${isLandscape}`);
+        return isLandscape;
+      });
+      
+      console.log('Filtered landscape images:', filtered.length);
+      
+      if (filtered.length > 0) {
+        // Shuffle the array
+        const shuffled = [...filtered];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+
+        // Duplicate images for seamless loop (need at least 2 sets for smooth infinite scroll)
+        const duplicatedImages = [...shuffled, ...shuffled, ...shuffled];
+        setLandscapeImages(duplicatedImages);
+      } else {
+        // Fallback: use all images if no landscapes found
+        console.log('No landscape images found, using all images as fallback');
+        const duplicatedImages = [...allImages, ...allImages, ...allImages];
+        setLandscapeImages(duplicatedImages);
       }
-      setLandscapeImages(shuffled);
     }
   }, [allImages]);
 
-  // Configure autoplay
-  const autoplay = React.useRef(
-    Autoplay({ 
-      delay: 4000, 
-      stopOnInteraction: false,
-      stopOnMouseEnter: true 
-    })
-  );
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { 
-      loop: true,
-      skipSnaps: false,
-      dragFree: false
-    },
-    [autoplay.current]
-  );
-
-  // Handle play/pause
-  const toggleAutoplay = useCallback(() => {
-    if (!emblaApi) return;
-    
-    if (isPaused) {
-      autoplay.current.play();
-      setIsPaused(false);
-    } else {
-      autoplay.current.stop();
-      setIsPaused(true);
-    }
-  }, [emblaApi, isPaused]);
-
-  // Track current slide - Fixed TypeScript error
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    const onSelect = () => {
-      setCurrentIndex(emblaApi.selectedScrollSnap());
-    };
-
-    emblaApi.on('select', onSelect);
-    
-    // Return cleanup function
-    return () => {
-      emblaApi.off('select', onSelect);
-    };
-  }, [emblaApi]);
-
-  // Manual navigation
-  const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
-  }, [emblaApi]);
-
-  const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
-  }, [emblaApi]);
+  const handleGalleryNavigation = () => {
+    navigate('/gallery');
+  };
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section className="py-12 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="container mx-auto px-4">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4"></div>
-            <div className="h-96 bg-gray-300 rounded-xl"></div>
+            <div className="h-6 bg-gray-300 rounded w-64 mx-auto mb-6"></div>
+            <div className="h-40 bg-gray-300 rounded-xl"></div>
           </div>
         </div>
       </section>
@@ -105,117 +74,99 @@ const AlumniGallerySlider: React.FC = () => {
   }
 
   return (
-    <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
+    <section className="py-12 bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-cpscs-blue mb-4">
-            Memories Through Time
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-cpscs-blue mb-3">
+            Memories in Motion
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Journey through our vibrant alumni community's most cherished moments and achievements
+          <p className="text-gray-600 max-w-xl mx-auto">
+            A flowing showcase of our vibrant alumni community's cherished moments
           </p>
         </div>
 
-        {/* Slider Container */}
-        <div className="relative max-w-6xl mx-auto">
+        {/* Image Ticker Container */}
+        <div className="relative mb-8">
+          {/* Fade edges */}
+          <div className="absolute left-0 top-0 w-20 h-full bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+          <div className="absolute right-0 top-0 w-20 h-full bg-gradient-to-l from-blue-50 to-transparent z-10 pointer-events-none"></div>
+          
+          {/* Film strip perforations */}
+          <div className="absolute top-0 left-0 right-0 h-2 bg-gray-800 opacity-10 z-10"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-800 opacity-10 z-10"></div>
+          
+          {/* Ticker Container */}
           <div 
-            className="overflow-hidden rounded-2xl shadow-2xl"
-            ref={emblaRef}
-            onMouseEnter={() => autoplay.current.stop()}
-            onMouseLeave={() => !isPaused && autoplay.current.play()}
+            className="relative h-48 overflow-hidden bg-black/5 rounded-lg"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
           >
-            <div className="flex">
+            <div 
+              className={`flex h-full ${isPaused ? '[animation-play-state:paused]' : ''}`}
+              style={{
+                animation: 'scroll-left 60s linear infinite',
+                width: `${landscapeImages.length * 300}px`, // 300px per image
+              }}
+            >
               {landscapeImages.map((image, index) => (
                 <div 
-                  key={image.id} 
-                  className="flex-[0_0_100%] relative group"
+                  key={`${image.id}-${index}`}
+                  className="flex-shrink-0 w-72 h-full mx-1 relative group cursor-pointer"
+                  onClick={() => navigate('/gallery')}
                 >
-                  <div className="relative h-96 md:h-[500px] overflow-hidden">
-                    {/* Ken Burns Effect Image */}
-                    <div className="absolute inset-0 scale-105 group-hover:scale-110 transition-transform duration-[8000ms] ease-out">
-                      <img
-                        src={image.url}
-                        alt={image.alt}
-                        className="w-full h-full object-cover"
-                        loading={index <= 2 ? 'eager' : 'lazy'}
-                      />
-                    </div>
+                  <div className="relative h-full overflow-hidden rounded-md shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <img
+                      src={image.url}
+                      alt={image.alt}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
                     
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                    {/* Hover overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                     
-                    {/* Content Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                      <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                        {image.caption && (
-                          <h3 className="text-2xl md:text-3xl font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-200">
-                            {image.caption}
-                          </h3>
-                        )}
-                        {image.uploadDate && (
-                          <p className="text-sm opacity-75 opacity-0 group-hover:opacity-75 transition-opacity duration-500 delay-300">
-                            {new Date(image.uploadDate).getFullYear()}
-                          </p>
-                        )}
+                    {/* Caption overlay */}
+                    {image.caption && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <p className="text-white text-sm font-medium truncate">
+                          {image.caption}
+                        </p>
                       </div>
-                    </div>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Navigation Controls */}
-          <button
-            onClick={scrollPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110"
-            aria-label="Previous image"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </button>
-
-          <button
-            onClick={scrollNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-110"
-            aria-label="Next image"
-          >
-            <ChevronRight className="h-6 w-6" />
-          </button>
-
-          {/* Play/Pause Control */}
-          <button
-            onClick={toggleAutoplay}
-            className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full backdrop-blur-sm transition-all duration-200"
-            aria-label={isPaused ? 'Resume slideshow' : 'Pause slideshow'}
-          >
-            {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
-          </button>
-
-          {/* Slide Indicators */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-            {landscapeImages.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => emblaApi?.scrollTo(index)}
-                className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                  index === currentIndex 
-                    ? 'bg-white scale-125' 
-                    : 'bg-white/50 hover:bg-white/75'
-                }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
         </div>
 
-        {/* Bottom Stats */}
-        <div className="text-center mt-8">
-          <p className="text-sm text-gray-500">
-            Showcasing {landscapeImages.length} memories from our alumni community
+        {/* Gallery Navigation Button */}
+        <div className="text-center">
+          <Button
+            onClick={handleGalleryNavigation}
+            className="bg-cpscs-blue hover:bg-cpscs-blue/90 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <Images className="w-5 h-5 mr-2" />
+            See the Gallery
+          </Button>
+          <p className="text-sm text-gray-500 mt-3">
+            Explore {Math.floor(landscapeImages.length / 3)} memories from our alumni community
           </p>
         </div>
       </div>
+
+      {/* CSS Animation Styles */}
+      <style jsx>{`
+        @keyframes scroll-left {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-33.333%);
+          }
+        }
+      `}</style>
     </section>
   );
 };
