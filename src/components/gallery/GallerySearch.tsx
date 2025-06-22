@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, Calendar, Tag } from 'lucide-react';
+import { Search, Filter, Calendar, Tag, Images } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,9 +9,10 @@ import { SearchFilters } from '@/services/galleryService';
 interface GallerySearchProps {
   onFiltersChange: (filters: SearchFilters) => void;
   availableTags: string[];
+  imageCount: number;
 }
 
-const GallerySearch: React.FC<GallerySearchProps> = ({ onFiltersChange, availableTags }) => {
+const GallerySearch: React.FC<GallerySearchProps> = ({ onFiltersChange, availableTags, imageCount }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSort, setSelectedSort] = useState<'newest' | 'oldest'>('newest');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -47,6 +48,12 @@ const GallerySearch: React.FC<GallerySearchProps> = ({ onFiltersChange, availabl
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
       <div className="flex flex-col md:flex-row gap-4 items-center">
+        {/* Image Count */}
+        <div className="flex items-center gap-2 text-gray-600 font-medium whitespace-nowrap">
+          <Images className="h-4 w-4 text-cpscs-blue" />
+          <span>{imageCount} photos</span>
+        </div>
+
         {/* Search Input */}
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />

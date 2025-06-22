@@ -103,24 +103,13 @@ const Gallery = () => {
               Celebrating memories, achievements, and the vibrant community of 
               Cantonment Public School and College, Saidpur alumni.
             </p>
-            
-            {/* Stats */}
-            <div className="flex justify-center gap-8 text-sm text-gray-500 mb-8">
-              <div className="text-center">
-                <div className="font-bold text-xl text-cpscs-blue">{images.length}</div>
-                <div>Photos</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-xl text-cpscs-blue">{availableTags.length}</div>
-                <div>Categories</div>
-              </div>
-            </div>
           </div>
 
           {/* Search and Filter Section */}
           <GallerySearch 
             onFiltersChange={handleFiltersChange}
             availableTags={availableTags}
+            imageCount={images.length}
           />
 
           {/* Loading State */}
