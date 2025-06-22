@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { galleryService, GalleryImage } from '@/services/galleryService';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -63,7 +62,7 @@ const AlumniGallerySlider: React.FC = () => {
     }
   }, [emblaApi, isPaused]);
 
-  // Track current slide
+  // Track current slide - Fixed TypeScript error
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -72,7 +71,11 @@ const AlumniGallerySlider: React.FC = () => {
     };
 
     emblaApi.on('select', onSelect);
-    return () => emblaApi.off('select', onSelect);
+    
+    // Return cleanup function
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
   }, [emblaApi]);
 
   // Manual navigation
