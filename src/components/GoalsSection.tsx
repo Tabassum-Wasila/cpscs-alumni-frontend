@@ -1,9 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sprout, Users, Lightbulb, Wrench, Network } from 'lucide-react';
+import { soundManager } from '../services/soundManager';
+import TwinklingStars from './TwinklingStars';
 
 const GoalsSection = () => {
   const [hoveredGoal, setHoveredGoal] = useState<string | null>(null);
+  const [hoveredSun, setHoveredSun] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
 
   // Animation loop for orbital movement
@@ -25,7 +28,8 @@ const GoalsSection = () => {
       orbitRadius: 120,
       speed: 1,
       size: 'w-16 h-16',
-      position: { angle: 0 }
+      position: { angle: 0 },
+      note: 'C4'
     },
     {
       id: 'strengthen-bonds',
@@ -36,7 +40,8 @@ const GoalsSection = () => {
       orbitRadius: 160,
       speed: 0.8,
       size: 'w-14 h-14',
-      position: { angle: Math.PI * 0.4 }
+      position: { angle: Math.PI * 0.4 },
+      note: 'D4'
     },
     {
       id: 'fuel-impact',
@@ -47,7 +52,8 @@ const GoalsSection = () => {
       orbitRadius: 200,
       speed: 0.6,
       size: 'w-18 h-18',
-      position: { angle: Math.PI * 0.8 }
+      position: { angle: Math.PI * 0.8 },
+      note: 'E4'
     },
     {
       id: 'build-together',
@@ -58,7 +64,8 @@ const GoalsSection = () => {
       orbitRadius: 240,
       speed: 0.4,
       size: 'w-16 h-16',
-      position: { angle: Math.PI * 1.2 }
+      position: { angle: Math.PI * 1.2 },
+      note: 'G4'
     },
     {
       id: 'evolve-forward',
@@ -69,7 +76,8 @@ const GoalsSection = () => {
       orbitRadius: 280,
       speed: 0.3,
       size: 'w-14 h-14',
-      position: { angle: Math.PI * 1.6 }
+      position: { angle: Math.PI * 1.6 },
+      note: 'A4'
     }
   ];
 
@@ -81,22 +89,21 @@ const GoalsSection = () => {
     return { x, y, angle };
   };
 
+  const handlePlanetHover = (goalId: string, note: string) => {
+    setHoveredGoal(goalId);
+    soundManager.playPlanetaryTone(note);
+  };
+
   return (
-    <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-purple-900 overflow-hidden relative">
-      {/* Animated starfield background */}
+    <section className="py-20 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 overflow-hidden relative">
+      {/* Twinkling stars background */}
+      <TwinklingStars />
+
+      {/* Galaxy nebula effects */}
       <div className="absolute inset-0">
-        {[...Array(100)].map((_, i) => (
-          <div
-            key={`star-${i}`}
-            className="absolute w-1 h-1 bg-white rounded-full animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              opacity: 0.3 + Math.random() * 0.7,
-            }}
-          />
-        ))}
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-600/10 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2" />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
@@ -117,7 +124,7 @@ const GoalsSection = () => {
             style={{ perspective: '1000px' }}
           >
             {/* Orbit rings */}
-            {goals.map((goal, index) => (
+            {goals.map((goal) => (
               <div
                 key={`orbit-${goal.id}`}
                 className="absolute top-1/2 left-1/2 border border-white/10 rounded-full"
@@ -131,16 +138,39 @@ const GoalsSection = () => {
             ))}
 
             {/* Central Sun - CPSCS-AA */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+            <div 
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer"
+              onMouseEnter={() => setHoveredSun(true)}
+              onMouseLeave={() => setHoveredSun(false)}
+            >
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl animate-pulse">
+                <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl">
                   <div className="text-white font-bold text-sm text-center leading-tight">
                     CPSCS<br/>AA
                   </div>
                 </div>
-                {/* Sun glow effect */}
-                <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-yellow-400/50 via-orange-500/50 to-red-500/50 rounded-full blur-lg animate-pulse" />
+                
+                {/* Multiple glow layers */}
+                <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full blur-lg animate-pulse" />
+                <div className="absolute inset-[-4px] w-28 h-28 bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full blur-xl animate-pulse" />
+                <div className="absolute inset-[-8px] w-36 h-36 bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse" />
+                
+                {/* Solar flares */}
+                <div className="absolute inset-0 w-20 h-20 rounded-full">
+                  <div className="absolute top-0 left-1/2 w-1 h-6 bg-gradient-to-t from-orange-400 to-transparent transform -translate-x-1/2 -translate-y-full animate-pulse" />
+                  <div className="absolute bottom-0 right-0 w-1 h-4 bg-gradient-to-b from-red-400 to-transparent transform translate-y-full animate-pulse" />
+                  <div className="absolute left-0 top-1/2 w-4 h-1 bg-gradient-to-l from-yellow-400 to-transparent transform -translate-x-full -translate-y-1/2 animate-pulse" />
+                </div>
               </div>
+
+              {/* Sun hover tooltip */}
+              {hoveredSun && (
+                <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-50">
+                  <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl whitespace-nowrap animate-fade-in">
+                    <p className="text-gray-800 font-semibold">CPSCS Alumni Association</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Connection lines between planets */}
@@ -183,7 +213,7 @@ const GoalsSection = () => {
                     top: `${320 + position.y}px`,
                     transform: `translate(-50%, -50%) scale(${isHovered ? 1.2 : 1})`,
                   }}
-                  onMouseEnter={() => setHoveredGoal(goal.id)}
+                  onMouseEnter={() => handlePlanetHover(goal.id, goal.note)}
                   onMouseLeave={() => setHoveredGoal(null)}
                 >
                   {/* Planet */}

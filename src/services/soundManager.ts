@@ -3,6 +3,15 @@ class SoundManager {
   private audioContext: AudioContext | null = null;
   private gainNode: GainNode | null = null;
 
+  // Musical note frequencies for planetary tones
+  private noteFrequencies: { [key: string]: number } = {
+    'C4': 261.63,
+    'D4': 293.66,
+    'E4': 329.63,
+    'G4': 392.00,
+    'A4': 440.00
+  };
+
   constructor() {
     this.initAudio();
   }
@@ -42,6 +51,11 @@ class SoundManager {
     } catch (error) {
       console.warn('Could not play sound:', error);
     }
+  }
+
+  playPlanetaryTone(note: string) {
+    const frequency = this.noteFrequencies[note] || 440;
+    this.playTone(frequency, 0.5);
   }
 
   playDiscoveryChime(step: number) {
