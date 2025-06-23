@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -9,7 +10,6 @@ import EventsSection from '../components/EventsSection';
 import FeaturedAlumni from '../components/FeaturedAlumni';
 import CallToAction from '../components/CallToAction';
 import Footer from '../components/Footer';
-import CommitteeSection from '../components/CommitteeSection';
 
 const Index = () => {
   return (
@@ -19,7 +19,6 @@ const Index = () => {
       <InteractiveStatsSection />
       <AboutSection />
       <AlumniGallerySlider />
-      <CommitteeSection />
       <GoalsSection />
       <EventsSection />
       <FeaturedAlumni />

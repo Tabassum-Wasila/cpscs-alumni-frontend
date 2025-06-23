@@ -1,11 +1,10 @@
-
 import { CommitteeData } from '@/types/committee';
 
 export const committeeData: CommitteeData = {
-  title: "Cantonment Public School and College, Saidpur Alumni Association",
+  title: "Current Committee of CPSCA Alumni Association",
   subtitle: "Executive Committee",
   term: "2024-2026",
-  members: [
+  executiveCommittee: [
     {
       "sequence": 1,
       "position": "President",
@@ -377,6 +376,128 @@ export const committeeData: CommitteeData = {
       "whatsapp": "01928825889",
       "email": "razoyanachaity@gmail.com",
       "photo": "https://i.postimg.cc/wj1XcWFn/31.jpg"
+    }
+  ],
+  advisorCouncil: [
+    {
+      "sequence": 32,
+      "position": "Chief Adviser",
+      "name": "Lt Col Syed Shafiul Islam Meraz",
+      "ssc_batch": "Not Applicable",
+      "hsc_batch": "Not Applicable",
+      "profession": "PSC, G, Principal",
+      "organization": "Cantonment Public School & College, Saidpur",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/ncyYHyvT/32.jpg"
+    },
+    {
+      "sequence": 33,
+      "position": "Adviser",
+      "name": "Wing Commander (Retd.) Shamiur Rahman",
+      "ssc_batch": "1983",
+      "hsc_batch": "1985",
+      "profession": "Immediate past President of CPSCS Alumni Association",
+      "organization": null,
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/kX6vPJtB/33.jpg"
+    },
+    {
+      "sequence": 34,
+      "position": "Adviser",
+      "name": "Mr. Ashit Kumar Sarker",
+      "ssc_batch": "Not Applicable",
+      "hsc_batch": "Not Applicable",
+      "profession": "Former Vice Principal, CPSCS; Principal",
+      "organization": "Karatoa Multimedia School & College, Rangpur",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/Bn25tmp3/34.jpg"
+    },
+    {
+      "sequence": 35,
+      "position": "Adviser",
+      "name": "Dr. Md. Abdul Alim",
+      "ssc_batch": "1986",
+      "hsc_batch": "1998",
+      "profession": "Head of the Urology Department",
+      "organization": "MAG Osmani Medical College Hospital, Sylhet",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/3w7XG2fv/35.jpg"
+    },
+    {
+      "sequence": 36,
+      "position": "Adviser",
+      "name": "Dr. Abusyed Tito",
+      "ssc_batch": "1989",
+      "hsc_batch": "1991",
+      "profession": "Managing Director",
+      "organization": "Prilink Securities Ltd., Dhaka",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/CKNjsd96/36.jpg"
+    },
+    {
+      "sequence": 37,
+      "position": "Adviser",
+      "name": "Md. Abdus Samad Masum",
+      "ssc_batch": "1989",
+      "hsc_batch": "1991",
+      "profession": "Musician and Composer; Senior Merchandiser",
+      "organization": "S. Oliver",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/zvLKN7v9/37.jpg"
+    },
+    {
+      "sequence": 38,
+      "position": "Adviser",
+      "name": "Abu Hena Md. Mostafa Jamal",
+      "ssc_batch": "1988",
+      "hsc_batch": "1990",
+      "profession": "Business",
+      "organization": "Sheefat Trading, Saidpur, Nilphamari",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/yd80QsH6/38.jpg"
+    },
+    {
+      "sequence": 39,
+      "position": "Adviser",
+      "name": "Md. Abul Kalam Azad, BCS Education",
+      "ssc_batch": "1992",
+      "hsc_batch": "1994",
+      "profession": "Acting Principal",
+      "organization": "Government Science College, Saidpur",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/QtY1vw8Q/39.jpg"
+    },
+    {
+      "sequence": 40,
+      "position": "Adviser",
+      "name": "Professor Md. Mehedi Islam",
+      "ssc_batch": "1996",
+      "hsc_batch": "1998",
+      "profession": "Faculty of Computer Science and Engineering",
+      "organization": "Hajee Mohammad Danesh University, Dinajpur",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/rsvWw4tz/40.jpg"
+    },
+    {
+      "sequence": 41,
+      "position": "Adviser",
+      "name": "Mostafiz Ahmed",
+      "ssc_batch": "2006",
+      "hsc_batch": "2008",
+      "profession": "Coordinator (South Asia)",
+      "organization": "PNND-IPU",
+      "whatsapp": null,
+      "email": null,
+      "photo": "https://i.postimg.cc/y650PMrB/41.jpg"
     }
   ]
 };
