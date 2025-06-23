@@ -6,10 +6,15 @@ import { committeeData } from '@/data/committeeData';
 import { CommitteeMember as CommitteeMemberType } from '@/types/committee';
 import CommitteeMember from '../components/committee/CommitteeMember';
 import CommitteeModal from '../components/committee/CommitteeModal';
+import { Button } from '@/components/ui/button';
+import { ExternalLink } from 'lucide-react';
 
 const Committee = () => {
   const [selectedMember, setSelectedMember] = useState<CommitteeMemberType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Sort members by sequence number
+  const sortedMembers = [...committeeData.members].sort((a, b) => a.sequence - b.sequence);
 
   const handleMemberClick = (member: CommitteeMemberType) => {
     setSelectedMember(member);
@@ -19,6 +24,10 @@ const Committee = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedMember(null);
+  };
+
+  const handlePreviousCommitteeClick = () => {
+    window.open('https://drive.google.com/drive/folders/1amaPm_pwG7IrJz1uF_neJEvSYt_6JF67?usp=sharing', '_blank');
   };
 
   return (
@@ -41,14 +50,32 @@ const Committee = () => {
           </div>
           
           {/* Committee Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {committeeData.members.map((member) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-16">
+            {sortedMembers.map((member) => (
               <CommitteeMember
                 key={member.sequence}
                 member={member}
                 onClick={handleMemberClick}
               />
             ))}
+          </div>
+
+          {/* Previous Committee Members Section */}
+          <div className="text-center bg-white/50 backdrop-blur-sm rounded-2xl p-12 border border-white/20">
+            <h2 className="text-3xl font-bold text-cpscs-blue mb-4">
+              Previous Committee Members
+            </h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              Here are all the people who contributed in the executive committee of CPSCS AA.
+            </p>
+            <Button
+              onClick={handlePreviousCommitteeClick}
+              size="lg"
+              className="bg-cpscs-blue hover:bg-cpscs-blue/90 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <ExternalLink className="w-5 h-5 mr-3" />
+              See All Committees
+            </Button>
           </div>
 
           {/* Member Detail Modal */}

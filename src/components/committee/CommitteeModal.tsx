@@ -26,7 +26,7 @@ const CommitteeModal: React.FC<CommitteeModalProps> = ({ member, isOpen, onClose
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-auto">
+      <DialogContent className="max-w-lg mx-auto bg-gradient-to-br from-blue-50/30 via-purple-50/20 to-white">
         <DialogHeader>
           <DialogTitle className="text-center text-xl font-bold text-cpscs-blue">
             Committee Member Details
@@ -57,7 +57,7 @@ const CommitteeModal: React.FC<CommitteeModalProps> = ({ member, isOpen, onClose
           {/* Details Grid */}
           <div className="w-full space-y-4">
             {/* Profession */}
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg backdrop-blur-sm">
               <User className="w-5 h-5 text-cpscs-blue mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-semibold text-gray-700">Profession</p>
@@ -66,7 +66,7 @@ const CommitteeModal: React.FC<CommitteeModalProps> = ({ member, isOpen, onClose
             </div>
 
             {/* Organization */}
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg backdrop-blur-sm">
               <Building2 className="w-5 h-5 text-cpscs-blue mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-semibold text-gray-700">Organization</p>
@@ -75,7 +75,7 @@ const CommitteeModal: React.FC<CommitteeModalProps> = ({ member, isOpen, onClose
             </div>
 
             {/* Education */}
-            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg backdrop-blur-sm">
               <GraduationCap className="w-5 h-5 text-cpscs-blue mt-0.5 flex-shrink-0" />
               <div>
                 <p className="font-semibold text-gray-700">Education</p>

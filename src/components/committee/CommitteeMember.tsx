@@ -9,33 +9,13 @@ interface CommitteeMemberProps {
 }
 
 const CommitteeMember: React.FC<CommitteeMemberProps> = ({ member, onClick }) => {
-  const getPositionColor = (position: string) => {
-    if (position.toLowerCase().includes('president')) {
-      return 'border-cpscs-gold bg-gradient-to-br from-yellow-50 to-orange-50';
-    }
-    if (position.toLowerCase().includes('secretary')) {
-      return 'border-cpscs-blue bg-gradient-to-br from-blue-50 to-indigo-50';
-    }
-    return 'border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50';
-  };
-
-  const getPositionBadge = (position: string) => {
-    if (position.toLowerCase().includes('president')) {
-      return 'bg-cpscs-gold text-cpscs-blue';
-    }
-    if (position.toLowerCase().includes('secretary')) {
-      return 'bg-cpscs-blue text-white';
-    }
-    return 'bg-gray-600 text-white';
-  };
-
   return (
     <div
-      className={`relative p-6 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl border-2 ${getPositionColor(member.position)} group`}
+      className="relative p-6 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-105 hover:shadow-xl border-2 border-gray-200 bg-gradient-to-br from-yellow-50/40 via-green-50/30 to-white group"
       onClick={() => onClick(member)}
     >
       {/* Position Badge */}
-      <div className={`absolute -top-3 left-4 px-3 py-1 rounded-full text-xs font-semibold ${getPositionBadge(member.position)}`}>
+      <div className="absolute -top-3 left-4 px-3 py-1 rounded-full text-xs font-semibold bg-cpscs-blue text-white">
         {member.position}
       </div>
 
@@ -69,7 +49,7 @@ const CommitteeMember: React.FC<CommitteeMemberProps> = ({ member, onClick }) =>
         </div>
 
         {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-cpscs-blue/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-100/20 via-green-100/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"></div>
         
         {/* Click Indicator */}
         <div className="absolute bottom-2 right-2 w-6 h-6 bg-cpscs-blue text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">

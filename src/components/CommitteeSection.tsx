@@ -25,7 +25,9 @@ const CommitteeSection: React.FC = () => {
     'Cultural Affairs Secretary'
   ];
 
-  const featuredMembers = committeeData.members.filter(member =>
+  // Sort all members by sequence first, then filter for featured members
+  const sortedMembers = [...committeeData.members].sort((a, b) => a.sequence - b.sequence);
+  const featuredMembers = sortedMembers.filter(member =>
     keyPositions.some(position => member.position.includes(position))
   ).slice(0, 8);
 
