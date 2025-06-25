@@ -32,9 +32,10 @@ export class AuthService {
         }
         
         const { password: _, ...userWithoutPassword } = user;
-        const authUser = {
+        const authUser: User = {
           ...userWithoutPassword,
-          isAuthenticated: true
+          isAuthenticated: true,
+          approvalStatus: user.approvalStatus as 'pending' | 'approved' | 'rejected'
         };
         
         localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(authUser));
@@ -61,7 +62,7 @@ export class AuthService {
         password: userData.password,
         hasMembership: true,
         dateJoined: new Date().toISOString(),
-        approvalStatus: adminSettings.manualApproval ? 'pending' : 'approved',
+        approvalStatus: (adminSettings.manualApproval ? 'pending' : 'approved') as 'pending' | 'approved' | 'rejected',
         socialProfileLink: userData.socialProfileLink || "",
         countryCode: userData.countryCode || "",
         phoneNumber: userData.phoneNumber || "",
@@ -88,9 +89,10 @@ export class AuthService {
       // Only set current user if automatically approved
       if (newUser.approvalStatus === 'approved') {
         const { password: _, ...userWithoutPassword } = newUser;
-        const authUser = {
+        const authUser: User = {
           ...userWithoutPassword,
-          isAuthenticated: true
+          isAuthenticated: true,
+          approvalStatus: newUser.approvalStatus as 'pending' | 'approved' | 'rejected'
         };
         
         localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(authUser));
