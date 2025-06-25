@@ -18,27 +18,44 @@ import FileUpload from '@/components/FileUpload';
 import CountryCodeSelect from '@/components/CountryCodeSelect';
 import ApprovalCountdown from '@/components/ApprovalCountdown';
 import PostApprovalLogin from '@/components/PostApprovalLogin';
+import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
+import ConfirmPasswordFeedback from '@/components/ConfirmPasswordFeedback';
+import HoverTooltip from '@/components/HoverTooltip';
 
 // Generate year options
 const generateYears = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => (end - i).toString());
 };
 
-// Enhanced validation schema
+// Enhanced validation schema with relaxed rules
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
   sscYear: z.string({ required_error: "Please select your SSC batch year." }),
   hscYear: z.string({ required_error: "Please select your HSC batch year." }),
   countryCode: z.string().min(1, { message: "Please select country code." }),
-  phoneNumber: z.string().min(7, { message: "Please enter a valid phone number." }),
+  phoneNumber: z.string()
+    .min(7, { message: "Please enter a valid phone number." })
+    .regex(/^[\d\s\-+()]*$/, { message: "Phone number can only contain numbers, spaces, dashes, and parentheses." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   password: z.string()
     .min(8, { message: "Password must be at least 8 characters." })
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-      message: "Password must contain at least one uppercase letter, one lowercase letter, and one number."
+    .regex(/^(?=.*[a-zA-Z])(?=.*\d)/, {
+      message: "Password must contain at least one letter and one number."
     }),
   confirmPassword: z.string(),
-  socialProfileLink: z.string().url({ message: "Please enter a valid URL." }),
+  socialProfileLink: z.string()
+    .min(1, { message: "Please enter your social profile link." })
+    .refine((url) => {
+      // More flexible URL validation
+      const cleanUrl = url.toLowerCase().trim();
+      return (
+        cleanUrl.includes('facebook.com') ||
+        cleanUrl.includes('linkedin.com') ||
+        cleanUrl.includes('twitter.com') ||
+        cleanUrl.includes('instagram.com') ||
+        /^(https?:\/\/)?(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
+      );
+    }, { message: "Please enter a valid social media profile URL." }),
   proofDocument: z.instanceof(File, { message: "Please upload a proof document." }),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
@@ -54,7 +71,7 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showApprovalProcess, setShowApprovalProcess] = useState(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
-  const [isManualApproval, setIsManualApproval] = useState(false); // This would come from admin settings
+  const [isManualApproval, setIsManualApproval] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
   const { signup, checkEmailExists } = useAuth();
 
@@ -73,19 +90,8 @@ const Signup = () => {
     }
   });
 
-  const validatePhoneNumber = (countryCode: string, phoneNumber: string): boolean => {
-    // Basic phone number validation for different countries
-    const phoneRegex = {
-      '+880': /^1[3-9]\d{8}$/, // Bangladesh
-      '+1': /^\d{10}$/, // USA/Canada
-      '+44': /^\d{10,11}$/, // UK
-      '+86': /^\d{11}$/, // China
-      '+91': /^\d{10}$/, // India
-    };
-
-    const regex = phoneRegex[countryCode as keyof typeof phoneRegex] || /^\d{7,15}$/;
-    return regex.test(phoneNumber.replace(/\s+/g, ''));
-  };
+  const watchedPassword = form.watch("password");
+  const watchedConfirmPassword = form.watch("confirmPassword");
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -95,16 +101,6 @@ const Signup = () => {
         toast({
           title: "Email Already Registered",
           description: "This email is already in use. Please try logging in instead.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Validate phone number
-      if (!validatePhoneNumber(data.countryCode, data.phoneNumber)) {
-        toast({
-          title: "Invalid Phone Number",
-          description: "Please enter a valid phone number for the selected country.",
           variant: "destructive",
         });
         return;
@@ -135,11 +131,12 @@ const Signup = () => {
         sscYear: formData.sscYear,
         hscYear: formData.hscYear,
         password: formData.password,
+        countryCode: formData.countryCode,
+        phoneNumber: formData.phoneNumber,
+        socialProfileLink: formData.socialProfileLink,
       });
       
-      if (success) {
-        // Don't show toast here, the ApprovalCountdown component handles the success message
-      } else {
+      if (!success) {
         toast({
           title: "Registration Failed",
           description: "Could not create your account. Please try again.",
@@ -307,12 +304,13 @@ const Signup = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email Address *</FormLabel>
-                        <FormControl>
-                          <Input type="email" placeholder="your.email@example.com" {...field} />
-                        </FormControl>
-                        <FormDescription className="text-orange-600 text-sm">
-                          সঠিক ইমেইল এড্রেস লিখুন। আপনার রেজিস্ট্রেশনের সকল তথ্য এখানেই ইমেইল করা হবে। তাই, পুনরায় চেক করুন।
-                        </FormDescription>
+                        <HoverTooltip 
+                          tooltip="সঠিক ইমেইল এড্রেস লিখুন। আপনার রেজিস্ট্রেশনের সকল তথ্য এখানেই ইমেইল করা হবে। তাই, পুনরায় চেক করুন।"
+                        >
+                          <FormControl>
+                            <Input type="email" placeholder="your.email@example.com" {...field} />
+                          </FormControl>
+                        </HoverTooltip>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -325,25 +323,27 @@ const Signup = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Create Password *</FormLabel>
-                          <div className="relative">
-                            <FormControl>
-                              <Input 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder="••••••••" 
-                                {...field} 
-                              />
-                            </FormControl>
-                            <button 
-                              type="button"
-                              className="absolute right-3 top-2.5 text-gray-500 focus:outline-none"
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                          </div>
-                          <FormDescription className="text-orange-600 text-sm">
-                            ভবিষ্যতে ব্যবহারের জন্য এই পাসওয়ার্ড-টি মনে রাখুন
-                          </FormDescription>
+                          <HoverTooltip 
+                            tooltip="ভবিষ্যতে ব্যবহারের জন্য এই পাসওয়ার্ড-টি মনে রাখুন"
+                          >
+                            <div className="relative">
+                              <FormControl>
+                                <Input 
+                                  type={showPassword ? "text" : "password"} 
+                                  placeholder="••••••••" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <button 
+                                type="button"
+                                className="absolute right-3 top-2.5 text-gray-500 focus:outline-none"
+                                onClick={() => setShowPassword(!showPassword)}
+                              >
+                                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                              </button>
+                            </div>
+                          </HoverTooltip>
+                          <PasswordStrengthIndicator password={watchedPassword} />
                           <FormMessage />
                         </FormItem>
                       )}
@@ -363,9 +363,13 @@ const Signup = () => {
                                 {...field} 
                               />
                             </FormControl>
+                            <ConfirmPasswordFeedback 
+                              password={watchedPassword}
+                              confirmPassword={watchedConfirmPassword}
+                            />
                             <button 
                               type="button"
-                              className="absolute right-3 top-2.5 text-gray-500 focus:outline-none"
+                              className="absolute right-10 top-2.5 text-gray-500 focus:outline-none"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             >
                               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -383,15 +387,16 @@ const Signup = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Social Profile Link (Facebook/LinkedIn) *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="https://facebook.com/yourprofile or https://linkedin.com/in/yourprofile" 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription className="text-orange-600 text-sm">
-                          আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।
-                        </FormDescription>
+                        <HoverTooltip 
+                          tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
+                        >
+                          <FormControl>
+                            <Input 
+                              placeholder="facebook.com/yourprofile or linkedin.com/in/yourprofile" 
+                              {...field} 
+                            />
+                          </FormControl>
+                        </HoverTooltip>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -413,10 +418,14 @@ const Signup = () => {
                             error={form.formState.errors.proofDocument?.message}
                           />
                         </FormControl>
-                        <FormDescription className="text-orange-600 text-sm">
-                          আমাদের কমিউনিটিকে সুরক্ষিত রাখার জন্য এই প্রমাণপত্র প্রয়োজন। এখানে আপনি আপনার SSC/HSC certificate, Mark Sheet, স্কুলের পুরনো আইডি কার্ডের ছবি, স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি, কিংবা যেকোনো ডকুমেন্ট দিতে পারেন - যা প্রমাণ করবে আপনি এই স্কুলের শিক্ষার্থী ছিলেন।
-                          আপনার দেয়া তথ্য ভেরিফাই করার আগে আপনার একাউন্ট এপ্রুভ করা হবে না।
-                        </FormDescription>
+                        <HoverTooltip 
+                          tooltip="আমাদের কমিউনিটিকে সুরক্ষিত রাখার জন্য এই প্রমাণপত্র প্রয়োজন। এখানে আপনি আপনার SSC/HSC certificate, Mark Sheet, স্কুলের পুরনো আইডি কার্ডের ছবি, স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি, কিংবা যেকোনো ডকুমেন্ট দিতে পারেন - যা প্রমাণ করবে আপনি এই স্কুলের শিক্ষার্থী ছিলেন। আপনার দেয়া তথ্য ভেরিফাই করার আগে আপনার একাউন্ট এপ্রুভ করা হবে না।"
+                          className="block"
+                        >
+                          <FormDescription className="text-sm text-gray-600 cursor-help">
+                            Click here for document guidelines
+                          </FormDescription>
+                        </HoverTooltip>
                         <FormMessage />
                       </FormItem>
                     )}
