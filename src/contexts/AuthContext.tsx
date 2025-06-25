@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { AuthService, LoginCredentials, SignupData } from '@/services/authService';
 import { AlumniService, SearchFilters } from '@/services/alumniService';
@@ -10,11 +11,15 @@ export type User = {
   sscYear: string;
   hscYear?: string;
   isAuthenticated: boolean;
-  isAdmin?: boolean; // Added isAdmin property
-  isDemoUser?: boolean; // Added isDemoUser property
+  isAdmin?: boolean;
+  isDemoUser?: boolean;
   profile?: UserProfile;
   hasMembership: boolean;
   dateJoined?: string;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  socialProfileLink?: string;
+  countryCode?: string;
+  phoneNumber?: string;
 };
 
 type AuthContextType = {
@@ -28,6 +33,11 @@ type AuthContextType = {
   searchAlumni: (query: string, filters?: Record<string, any>) => Promise<User[]>;
   requestMentorship: (mentorId: string, message: string) => Promise<boolean>;
   toggleContactVisibility: (contactType: 'email' | 'phone', userId: string) => Promise<void>;
+  getAdminSettings: () => { manualApproval: boolean };
+  setAdminSettings: (settings: { manualApproval: boolean }) => void;
+  getPendingApprovals: () => any[];
+  approveUser: (userId: string) => boolean;
+  rejectUser: (userId: string) => boolean;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -116,6 +126,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return await AuthService.checkEmailExists(email);
   };
 
+  const getAdminSettings = () => {
+    return AuthService.getAdminSettings();
+  };
+
+  const setAdminSettings = (settings: { manualApproval: boolean }) => {
+    AuthService.setAdminSettings(settings);
+  };
+
+  const getPendingApprovals = () => {
+    return AuthService.getPendingApprovals();
+  };
+
+  const approveUser = (userId: string): boolean => {
+    return AuthService.approveUser(userId);
+  };
+
+  const rejectUser = (userId: string): boolean => {
+    return AuthService.rejectUser(userId);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -128,7 +158,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateUserProfile,
         searchAlumni,
         requestMentorship,
-        toggleContactVisibility
+        toggleContactVisibility,
+        getAdminSettings,
+        setAdminSettings,
+        getPendingApprovals,
+        approveUser,
+        rejectUser
       }}
     >
       {children}

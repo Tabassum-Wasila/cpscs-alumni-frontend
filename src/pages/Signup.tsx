@@ -7,29 +7,39 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
-import { PaymentService } from '@/services/paymentService';
-import PaymentModal from '@/components/PaymentModal';
+import FileUpload from '@/components/FileUpload';
+import CountryCodeSelect from '@/components/CountryCodeSelect';
+import ApprovalCountdown from '@/components/ApprovalCountdown';
+import PostApprovalLogin from '@/components/PostApprovalLogin';
 
-// Generate year options from 1979 to 2025
+// Generate year options
 const generateYears = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => (end - i).toString());
 };
 
+// Enhanced validation schema
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
   sscYear: z.string({ required_error: "Please select your SSC batch year." }),
-  hscYear: z.string().optional(),
-  phone: z.string().min(11, { message: "Please enter a valid phone number." }),
+  hscYear: z.string({ required_error: "Please select your HSC batch year." }),
+  countryCode: z.string().min(1, { message: "Please select country code." }),
+  phoneNumber: z.string().min(7, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  password: z.string()
+    .min(8, { message: "Password must be at least 8 characters." })
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
+      message: "Password must contain at least one uppercase letter, one lowercase letter, and one number."
+    }),
   confirmPassword: z.string(),
+  socialProfileLink: z.string().url({ message: "Please enter a valid URL." }),
+  proofDocument: z.instanceof(File, { message: "Please upload a proof document." }),
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -42,19 +52,40 @@ const Signup = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showingPaymentModal, setShowingPaymentModal] = useState(false);
+  const [showApprovalProcess, setShowApprovalProcess] = useState(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [isManualApproval, setIsManualApproval] = useState(false); // This would come from admin settings
+  const [submittedEmail, setSubmittedEmail] = useState('');
   const { signup, checkEmailExists } = useAuth();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: "",
-      phone: "",
+      sscYear: "",
+      hscYear: "",
+      countryCode: "+880",
+      phoneNumber: "",
       email: "",
       password: "",
       confirmPassword: "",
+      socialProfileLink: "",
     }
   });
+
+  const validatePhoneNumber = (countryCode: string, phoneNumber: string): boolean => {
+    // Basic phone number validation for different countries
+    const phoneRegex = {
+      '+880': /^1[3-9]\d{8}$/, // Bangladesh
+      '+1': /^\d{10}$/, // USA/Canada
+      '+44': /^\d{10,11}$/, // UK
+      '+86': /^\d{11}$/, // China
+      '+91': /^\d{10}$/, // India
+    };
+
+    const regex = phoneRegex[countryCode as keyof typeof phoneRegex] || /^\d{7,15}$/;
+    return regex.test(phoneNumber.replace(/\s+/g, ''));
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -68,9 +99,23 @@ const Signup = () => {
         });
         return;
       }
-      
-      // Show payment modal before completing signup
-      setShowingPaymentModal(true);
+
+      // Validate phone number
+      if (!validatePhoneNumber(data.countryCode, data.phoneNumber)) {
+        toast({
+          title: "Invalid Phone Number",
+          description: "Please enter a valid phone number for the selected country.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Store the email for later use
+      setSubmittedEmail(data.email);
+
+      // Show approval process
+      setShowApprovalProcess(true);
+
     } catch (error) {
       toast({
         title: "Error",
@@ -80,40 +125,66 @@ const Signup = () => {
     }
   };
 
-  const handlePaymentSuccess = async () => {
-    const data = form.getValues();
-    
-    // Complete signup after payment
-    const success = await signup({
-      fullName: data.fullName,
-      email: data.email,
-      sscYear: data.sscYear,
-      hscYear: data.hscYear,
-      password: data.password,
-    });
-    
-    if (success) {
-      toast({
-        title: "Registration Successful",
-        description: "Your account has been created. Please complete your profile to access all features.",
-        variant: "default",
+  const handleApprovalComplete = async () => {
+    if (!isManualApproval) {
+      // Auto-approve the signup
+      const formData = form.getValues();
+      const success = await signup({
+        fullName: formData.fullName,
+        email: formData.email,
+        sscYear: formData.sscYear,
+        hscYear: formData.hscYear,
+        password: formData.password,
       });
       
-      navigate("/complete-profile");
-    } else {
-      toast({
-        title: "Registration Failed",
-        description: "Could not create your account. Please try again.",
-        variant: "destructive",
-      });
+      if (success) {
+        // Don't show toast here, the ApprovalCountdown component handles the success message
+      } else {
+        toast({
+          title: "Registration Failed",
+          description: "Could not create your account. Please try again.",
+          variant: "destructive",
+        });
+        setShowApprovalProcess(false);
+      }
     }
   };
 
-  const handlePaymentCancel = () => {
-    setShowingPaymentModal(false);
+  const handleShowLogin = () => {
+    setShowLoginForm(true);
   };
 
-  const membershipFee = PaymentService.getMembershipFee();
+  if (showLoginForm) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
+          <div className="container mx-auto px-4">
+            <PostApprovalLogin defaultEmail={submittedEmail} />
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (showApprovalProcess) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
+          <div className="container mx-auto px-4">
+            <ApprovalCountdown 
+              isManualApproval={isManualApproval}
+              onComplete={handleApprovalComplete}
+              onShowLogin={handleShowLogin}
+            />
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -136,9 +207,9 @@ const Signup = () => {
                     name="fullName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>Full Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your name" {...field} />
+                          <Input placeholder="Your full name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -151,7 +222,7 @@ const Signup = () => {
                       name="sscYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>SSC Batch Year</FormLabel>
+                          <FormLabel>SSC Batch Year *</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
@@ -162,7 +233,7 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {generateYears(1979, 2025).map((year) => (
+                              {generateYears(1979, 2040).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
@@ -177,7 +248,7 @@ const Signup = () => {
                       name="hscYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>HSC Batch Year (Optional)</FormLabel>
+                          <FormLabel>HSC Batch Year *</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
@@ -188,8 +259,7 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem key="not_applicable" value="not_applicable">Not Applicable</SelectItem>
-                              {generateYears(1981, 2027).map((year) => (
+                              {generateYears(1981, 2042).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
@@ -200,38 +270,53 @@ const Signup = () => {
                     />
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Phone Number</FormLabel>
+                  <FormField
+                    control={form.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number *</FormLabel>
+                        <div className="flex space-x-2">
+                          <FormField
+                            control={form.control}
+                            name="countryCode"
+                            render={({ field: countryField }) => (
+                              <CountryCodeSelect
+                                value={countryField.value}
+                                onValueChange={countryField.onChange}
+                                className="w-32"
+                              />
+                            )}
+                          />
                           <FormControl>
-                            <Input placeholder="01XXXXXXXXX" {...field} />
+                            <Input 
+                              placeholder="Enter phone number" 
+                              {...field}
+                              className="flex-1"
+                            />
                           </FormControl>
-                          <FormDescription>
-                            We'll use this for payment verification
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Email Address</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="your.email@example.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address *</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="your.email@example.com" {...field} />
+                        </FormControl>
+                        <FormDescription className="text-orange-600 text-sm">
+                          সঠিক ইমেইল এড্রেস লিখুন। আপনার রেজিস্ট্রেশনের সকল তথ্য এখানেই ইমেইল করা হবে। তাই, পুনরায় চেক করুন।
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
@@ -239,7 +324,7 @@ const Signup = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Create Password</FormLabel>
+                          <FormLabel>Create Password *</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input 
@@ -256,8 +341,8 @@ const Signup = () => {
                               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                           </div>
-                          <FormDescription>
-                            Password must be at least 8 characters
+                          <FormDescription className="text-orange-600 text-sm">
+                            ভবিষ্যতে ব্যবহারের জন্য এই পাসওয়ার্ড-টি মনে রাখুন
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -269,7 +354,7 @@ const Signup = () => {
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Confirm Password</FormLabel>
+                          <FormLabel>Confirm Password *</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input 
@@ -292,47 +377,58 @@ const Signup = () => {
                     />
                   </div>
                   
-                  <div className="bg-cpscs-light p-4 rounded-lg w-full mt-4">
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Membership Fee:</span>
-                      <span>৳{membershipFee}</span>
-                    </div>
-                    <p className="text-sm text-gray-600">
-                      This one-time fee gives you access to the Alumni Directory and all alumni benefits.
-                    </p>
-                  </div>
+                  <FormField
+                    control={form.control}
+                    name="socialProfileLink"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Social Profile Link (Facebook/LinkedIn) *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="https://facebook.com/yourprofile or https://linkedin.com/in/yourprofile" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-orange-600 text-sm">
+                          আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="proofDocument"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Upload Student Proof Document *</FormLabel>
+                        <FormControl>
+                          <FileUpload
+                            onFileSelect={(file) => {
+                              if (file) {
+                                field.onChange(file);
+                              }
+                            }}
+                            error={form.formState.errors.proofDocument?.message}
+                          />
+                        </FormControl>
+                        <FormDescription className="text-orange-600 text-sm">
+                          আমাদের কমিউনিটিকে সুরক্ষিত রাখার জন্য এই প্রমাণপত্র প্রয়োজন। এখানে আপনি আপনার SSC/HSC certificate, Mark Sheet, স্কুলের পুরনো আইডি কার্ডের ছবি, স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি, কিংবা যেকোনো ডকুমেন্ট দিতে পারেন - যা প্রমাণ করবে আপনি এই স্কুলের শিক্ষার্থী ছিলেন।
+                          আপনার দেয়া তথ্য ভেরিফাই করার আগে আপনার একাউন্ট এপ্রুভ করা হবে না।
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   
                   <Button type="submit" className="w-full bg-gradient-to-r from-cpscs-blue to-blue-700 py-6">
-                    Proceed to Payment
+                    Submit Request for Admin Approval
                   </Button>
                 </form>
               </Form>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
-              <div className="text-sm text-center text-gray-600">
-                Already have an account?{" "}
-                <Link to="/login" className="text-cpscs-blue font-medium hover:underline">
-                  Sign in
-                </Link>
-              </div>
-              <div className="text-sm text-center text-gray-600">
-                Attending the reunion?{" "}
-                <Link to="/register" className="text-cpscs-blue font-medium hover:underline">
-                  Register for reunion
-                </Link>
-              </div>
-            </CardFooter>
           </Card>
-          
-          {/* Payment Modal */}
-          {showingPaymentModal && (
-            <PaymentModal
-              amount={membershipFee}
-              description="CPSCS Alumni Membership"
-              onSuccess={handlePaymentSuccess}
-              onCancel={handlePaymentCancel}
-            />
-          )}
         </div>
       </div>
       
