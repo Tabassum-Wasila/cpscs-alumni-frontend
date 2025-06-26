@@ -1,11 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sprout, Users, Lightbulb, Wrench, Network } from 'lucide-react';
 import { soundManager } from '../services/soundManager';
+import { useIsMobile } from '../hooks/use-mobile';
 import TwinklingStars from './TwinklingStars';
+
 const GoalsSection = () => {
   const [hoveredGoal, setHoveredGoal] = useState<string | null>(null);
   const [hoveredSun, setHoveredSun] = useState(false);
   const [animationTime, setAnimationTime] = useState(0);
+  const isMobile = useIsMobile();
 
   // Animation loop for orbital movement
   useEffect(() => {
@@ -15,67 +19,77 @@ const GoalsSection = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Dynamic scaling based on device type
+  const scale = isMobile ? 0.5 : 1;
+  const containerSize = 640 * scale;
+  const sunSize = 80 * scale;
+  const sunSizeClass = isMobile ? 'w-10 h-10' : 'w-20 h-20';
+  const sunGlowClasses = isMobile 
+    ? ['w-10 h-10', 'w-14 h-14', 'w-18 h-18'] 
+    : ['w-20 h-20', 'w-28 h-28', 'w-36 h-36'];
+
   const goals = [{
     id: 'inspire-growth',
-    icon: <Sprout className="h-6 w-6" />,
+    icon: <Sprout className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />,
     title: "Inspire Growth",
     description: "For students, alumni, and the school.",
     color: "from-green-400 to-emerald-600",
-    orbitRadius: 120,
+    orbitRadius: 120 * scale,
     speed: 1,
-    size: 'w-16 h-16',
+    size: isMobile ? 'w-8 h-8' : 'w-16 h-16',
     position: {
       angle: 0
     },
     note: 'C4'
   }, {
     id: 'strengthen-bonds',
-    icon: <Users className="h-6 w-6" />,
+    icon: <Users className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />,
     title: "Strengthen Bonds",
     description: "Across batches, borders, and generations.",
     color: "from-blue-400 to-cyan-600",
-    orbitRadius: 160,
+    orbitRadius: 160 * scale,
     speed: 0.8,
-    size: 'w-14 h-14',
+    size: isMobile ? 'w-7 h-7' : 'w-14 h-14',
     position: {
       angle: Math.PI * 0.4
     },
     note: 'D4'
   }, {
     id: 'fuel-impact',
-    icon: <Lightbulb className="h-6 w-6" />,
+    icon: <Lightbulb className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />,
     title: "Fuel Impact",
     description: "Through knowledge, action, and giving.",
     color: "from-yellow-400 to-orange-600",
-    orbitRadius: 200,
+    orbitRadius: 200 * scale,
     speed: 0.6,
-    size: 'w-18 h-18',
+    size: isMobile ? 'w-9 h-9' : 'w-18 h-18',
     position: {
       angle: Math.PI * 0.8
     },
     note: 'E4'
   }, {
     id: 'build-together',
-    icon: <Wrench className="h-6 w-6" />,
+    icon: <Wrench className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />,
     title: "Build Together",
     description: "Infrastructure, opportunity, and legacy.",
     color: "from-orange-400 to-red-600",
-    orbitRadius: 240,
+    orbitRadius: 240 * scale,
     speed: 0.4,
-    size: 'w-16 h-16',
+    size: isMobile ? 'w-8 h-8' : 'w-16 h-16',
     position: {
       angle: Math.PI * 1.2
     },
     note: 'G4'
   }, {
     id: 'evolve-forward',
-    icon: <Network className="h-6 w-6" />,
+    icon: <Network className={`${isMobile ? 'h-4 w-4' : 'h-6 w-6'}`} />,
     title: "Evolve Forward",
     description: "Digitally, socially, and sustainably.",
     color: "from-purple-400 to-indigo-600",
-    orbitRadius: 280,
+    orbitRadius: 280 * scale,
     speed: 0.3,
-    size: 'w-14 h-14',
+    size: isMobile ? 'w-7 h-7' : 'w-14 h-14',
     position: {
       angle: Math.PI * 1.6
     },
@@ -93,11 +107,30 @@ const GoalsSection = () => {
       angle
     };
   };
+
   const handlePlanetHover = (goalId: string, note: string) => {
     setHoveredGoal(goalId);
     soundManager.playPlanetaryTone(note);
   };
-  return <section className="py-20 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 overflow-hidden relative">
+
+  // Smart tooltip positioning for mobile
+  const getTooltipPosition = (isHovered: boolean) => {
+    if (!isHovered) return {};
+    
+    return isMobile 
+      ? { 
+          position: 'fixed' as const,
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          zIndex: 60,
+          maxWidth: '280px'
+        }
+      : {};
+  };
+
+  return (
+    <section className="py-20 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 overflow-hidden relative">
       {/* Twinkling stars background */}
       <TwinklingStars />
 
@@ -111,78 +144,121 @@ const GoalsSection = () => {
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent mb-6 leading-tight">
+          <h2 className={`${isMobile ? 'text-3xl md:text-4xl' : 'text-5xl md:text-6xl'} font-bold bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent mb-6 leading-tight`}>
             Our Goals
           </h2>
-          <p className="text-gray-300 text-xl font-light max-w-2xl mx-auto">Like planets in our alumni solar system, each goal orbits around our central mission.</p>
+          <p className={`text-gray-300 ${isMobile ? 'text-lg' : 'text-xl'} font-light max-w-2xl mx-auto`}>
+            Like planets in our alumni solar system, each goal orbits around our central mission.
+          </p>
         </div>
 
         {/* Interactive Solar System */}
         <div className="flex justify-center">
-          <div className="relative w-[640px] h-[640px] mx-auto" style={{
-          perspective: '1000px'
-        }}>
+          <div 
+            className="relative mx-auto" 
+            style={{
+              width: `${containerSize}px`,
+              height: `${containerSize}px`,
+              perspective: '1000px'
+            }}
+          >
             {/* Orbit rings */}
-            {goals.map(goal => <div key={`orbit-${goal.id}`} className="absolute top-1/2 left-1/2 border border-white/10 rounded-full" style={{
-            width: `${goal.orbitRadius * 2}px`,
-            height: `${goal.orbitRadius * 2 * 0.6}px`,
-            transform: 'translate(-50%, -50%)',
-            zIndex: 1
-          }} />)}
+            {goals.map(goal => (
+              <div 
+                key={`orbit-${goal.id}`} 
+                className="absolute top-1/2 left-1/2 border border-white/10 rounded-full" 
+                style={{
+                  width: `${goal.orbitRadius * 2}px`,
+                  height: `${goal.orbitRadius * 2 * 0.6}px`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 1
+                }} 
+              />
+            ))}
 
             {/* Central Sun - CPSCS-AA */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer" onMouseEnter={() => setHoveredSun(true)} onMouseLeave={() => setHoveredSun(false)}>
+            <div 
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 cursor-pointer" 
+              onMouseEnter={() => setHoveredSun(true)} 
+              onMouseLeave={() => setHoveredSun(false)}
+              onClick={() => isMobile && setHoveredSun(!hoveredSun)}
+            >
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl">
-                  <div className="text-white font-bold text-sm text-center leading-tight">
+                <div className={`${sunSizeClass} bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl`}>
+                  <div className={`text-white font-bold ${isMobile ? 'text-xs' : 'text-sm'} text-center leading-tight`}>
                     CPSCS<br />AA
                   </div>
                 </div>
                 
-                {/* Multiple glow layers */}
-                <div className="absolute inset-0 w-20 h-20 bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full blur-lg animate-pulse" />
-                <div className="absolute inset-[-4px] w-28 h-28 bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full blur-xl animate-pulse" />
-                <div className="absolute inset-[-8px] w-36 h-36 bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse" />
+                {/* Multiple glow layers - scaled for mobile */}
+                <div className={`absolute inset-0 ${sunGlowClasses[0]} bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full blur-lg animate-pulse`} />
+                <div className={`absolute inset-[-${isMobile ? '2px' : '4px'}] ${sunGlowClasses[1]} bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full blur-xl animate-pulse`} />
+                <div className={`absolute inset-[-${isMobile ? '4px' : '8px'}] ${sunGlowClasses[2]} bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse`} />
                 
-                {/* Solar flares */}
-                <div className="absolute inset-0 w-20 h-20 rounded-full">
-                  <div className="absolute top-0 left-1/2 w-1 h-6 bg-gradient-to-t from-orange-400 to-transparent transform -translate-x-1/2 -translate-y-full animate-pulse" />
-                  <div className="absolute bottom-0 right-0 w-1 h-4 bg-gradient-to-b from-red-400 to-transparent transform translate-y-full animate-pulse" />
-                  <div className="absolute left-0 top-1/2 w-4 h-1 bg-gradient-to-l from-yellow-400 to-transparent transform -translate-x-full -translate-y-1/2 animate-pulse" />
+                {/* Solar flares - scaled for mobile */}
+                <div className={`absolute inset-0 ${sunSizeClass} rounded-full`}>
+                  <div className={`absolute top-0 left-1/2 w-1 ${isMobile ? 'h-3' : 'h-6'} bg-gradient-to-t from-orange-400 to-transparent transform -translate-x-1/2 -translate-y-full animate-pulse`} />
+                  <div className={`absolute bottom-0 right-0 w-1 ${isMobile ? 'h-2' : 'h-4'} bg-gradient-to-b from-red-400 to-transparent transform translate-y-full animate-pulse`} />
+                  <div className={`absolute left-0 top-1/2 ${isMobile ? 'w-2' : 'w-4'} h-1 bg-gradient-to-l from-yellow-400 to-transparent transform -translate-x-full -translate-y-1/2 animate-pulse`} />
                 </div>
               </div>
 
               {/* Sun hover tooltip */}
-              {hoveredSun && <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-50">
-                  <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl whitespace-nowrap animate-fade-in">
+              {hoveredSun && (
+                <div 
+                  className="absolute z-50 animate-fade-in" 
+                  style={isMobile ? getTooltipPosition(hoveredSun) : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }}
+                >
+                  <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl whitespace-nowrap">
                     <p className="text-gray-800 font-semibold">CPSCS Alumni Association</p>
                   </div>
-                </div>}
+                </div>
+              )}
             </div>
 
             {/* Connection lines between planets */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
               {goals.map((goal, i) => {
-              const pos1 = getPlanetPosition(goal);
-              return goals.slice(i + 1).map((otherGoal, j) => {
-                const pos2 = getPlanetPosition(otherGoal);
-                return <line key={`connection-${i}-${j}`} x1={320 + pos1.x} y1={320 + pos1.y} x2={320 + pos2.x} y2={320 + pos2.y} stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeDasharray="2,4" style={{
-                  animation: `dashMove 3s linear infinite`,
-                  opacity: hoveredGoal ? 0.3 : 0.1
-                }} />;
-              });
-            })}
+                const pos1 = getPlanetPosition(goal);
+                return goals.slice(i + 1).map((otherGoal, j) => {
+                  const pos2 = getPlanetPosition(otherGoal);
+                  return (
+                    <line 
+                      key={`connection-${i}-${j}`} 
+                      x1={containerSize/2 + pos1.x} 
+                      y1={containerSize/2 + pos1.y} 
+                      x2={containerSize/2 + pos2.x} 
+                      y2={containerSize/2 + pos2.y} 
+                      stroke="rgba(255,255,255,0.1)" 
+                      strokeWidth="1" 
+                      strokeDasharray="2,4" 
+                      style={{
+                        animation: `dashMove 3s linear infinite`,
+                        opacity: hoveredGoal ? 0.3 : 0.1
+                      }} 
+                    />
+                  );
+                });
+              })}
             </svg>
 
             {/* Orbiting Goals */}
             {goals.map(goal => {
-            const position = getPlanetPosition(goal);
-            const isHovered = hoveredGoal === goal.id;
-            return <div key={goal.id} className="absolute transition-all duration-300 cursor-pointer z-30" style={{
-              left: `${320 + position.x}px`,
-              top: `${320 + position.y}px`,
-              transform: `translate(-50%, -50%) scale(${isHovered ? 1.2 : 1})`
-            }} onMouseEnter={() => handlePlanetHover(goal.id, goal.note)} onMouseLeave={() => setHoveredGoal(null)}>
+              const position = getPlanetPosition(goal);
+              const isHovered = hoveredGoal === goal.id;
+              return (
+                <div 
+                  key={goal.id} 
+                  className="absolute transition-all duration-300 cursor-pointer z-30" 
+                  style={{
+                    left: `${containerSize/2 + position.x}px`,
+                    top: `${containerSize/2 + position.y}px`,
+                    transform: `translate(-50%, -50%) scale(${isHovered ? 1.2 : 1})`
+                  }} 
+                  onMouseEnter={() => handlePlanetHover(goal.id, goal.note)} 
+                  onMouseLeave={() => setHoveredGoal(null)}
+                  onClick={() => isMobile && handlePlanetHover(goal.id, goal.note)}
+                >
                   {/* Planet */}
                   <div className={`${goal.size} bg-gradient-to-r ${goal.color} rounded-full flex items-center justify-center shadow-xl transition-all duration-300 ${isHovered ? 'ring-4 ring-white/50 shadow-2xl' : ''}`}>
                     <div className="text-white">
@@ -194,22 +270,43 @@ const GoalsSection = () => {
                   <div className={`absolute inset-0 ${goal.size} bg-gradient-to-r ${goal.color} rounded-full blur-md opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-80' : 'opacity-30'}`} />
 
                   {/* Hover Description */}
-                  {isHovered && <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-50">
-                      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl max-w-xs text-center animate-fade-in">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">{goal.title}</h3>
-                        <p className="text-gray-600 text-sm leading-relaxed">{goal.description}</p>
+                  {isHovered && (
+                    <div 
+                      className="absolute z-50 animate-fade-in" 
+                      style={isMobile ? getTooltipPosition(isHovered) : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }}
+                    >
+                      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl max-w-xs text-center">
+                        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2`}>{goal.title}</h3>
+                        <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed`}>{goal.description}</p>
                       </div>
-                    </div>}
-                </div>;
-          })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
         {/* Interactive Instructions */}
         <div className="text-center mt-12">
-          <p className="text-gray-300 text-sm">Each alumni member is a star in our galaxy, connecting through dotted lines. </p>
+          <p className={`text-gray-300 ${isMobile ? 'text-xs' : 'text-sm'}`}>
+            Each alumni member is a star in our galaxy, connecting through dotted lines.
+          </p>
         </div>
       </div>
-    </section>;
+
+      {/* Mobile overlay backdrop for tooltips */}
+      {isMobile && (hoveredGoal || hoveredSun) && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-50"
+          onClick={() => {
+            setHoveredGoal(null);
+            setHoveredSun(false);
+          }}
+        />
+      )}
+    </section>
+  );
 };
+
 export default GoalsSection;
