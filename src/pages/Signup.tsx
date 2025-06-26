@@ -21,17 +21,18 @@ import PostApprovalLogin from '@/components/PostApprovalLogin';
 import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import ConfirmPasswordFeedback from '@/components/ConfirmPasswordFeedback';
 import HoverTooltip from '@/components/HoverTooltip';
+import SmartDocumentTooltip from '@/components/SmartDocumentTooltip';
 
 // Generate year options
 const generateYears = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => (end - i).toString());
 };
 
-// Enhanced validation schema with relaxed rules
+// Enhanced validation schema with all fields mandatory and relaxed rules
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  sscYear: z.string({ required_error: "Please select your SSC batch year." }),
-  hscYear: z.string({ required_error: "Please select your HSC batch year." }),
+  sscYear: z.string().min(1, { message: "Please select your SSC batch year." }),
+  hscYear: z.string().min(1, { message: "Please select your HSC batch year." }),
   countryCode: z.string().min(1, { message: "Please select country code." }),
   phoneNumber: z.string()
     .min(7, { message: "Please enter a valid phone number." })
@@ -42,18 +43,18 @@ const formSchema = z.object({
     .regex(/^(?=.*[a-zA-Z])(?=.*\d)/, {
       message: "Password must contain at least one letter and one number."
     }),
-  confirmPassword: z.string(),
+  confirmPassword: z.string().min(1, { message: "Please confirm your password." }),
   socialProfileLink: z.string()
     .min(1, { message: "Please enter your social profile link." })
     .refine((url) => {
-      // More flexible URL validation
       const cleanUrl = url.toLowerCase().trim();
+      // More relaxed validation - just check for basic URL structure
       return (
         cleanUrl.includes('facebook.com') ||
         cleanUrl.includes('linkedin.com') ||
         cleanUrl.includes('twitter.com') ||
         cleanUrl.includes('instagram.com') ||
-        /^(https?:\/\/)?(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
+        /^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
       );
     }, { message: "Please enter a valid social media profile URL." }),
   proofDocument: z.instanceof(File, { message: "Please upload a proof document." }),
@@ -73,10 +74,13 @@ const Signup = () => {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [isManualApproval, setIsManualApproval] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
+  const [socialProfileCompleted, setSocialProfileCompleted] = useState(false);
+  const [documentUploaded, setDocumentUploaded] = useState(false);
   const { signup, checkEmailExists } = useAuth();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onBlur', // Enable real-time validation
     defaultValues: {
       fullName: "",
       sscYear: "",
@@ -92,6 +96,35 @@ const Signup = () => {
 
   const watchedPassword = form.watch("password");
   const watchedConfirmPassword = form.watch("confirmPassword");
+  const watchedSocialProfile = form.watch("socialProfileLink");
+
+  // Check if social profile is completed
+  React.useEffect(() => {
+    if (watchedSocialProfile && watchedSocialProfile.trim().length > 10) {
+      setSocialProfileCompleted(true);
+    } else {
+      setSocialProfileCompleted(false);
+    }
+  }, [watchedSocialProfile]);
+
+  // Real-time email validation
+  const handleEmailBlur = async (email: string) => {
+    if (email && email.includes('@')) {
+      try {
+        const exists = await checkEmailExists(email);
+        if (exists) {
+          form.setError("email", {
+            type: "manual",
+            message: "This email is already registered. Please try logging in instead."
+          });
+        } else {
+          form.clearErrors("email");
+        }
+      } catch (error) {
+        // Handle error silently for better UX
+      }
+    }
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -190,25 +223,29 @@ const Signup = () => {
       <div className="flex-grow pt-24 pb-16 bg-cpscs-light">
         <div className="container mx-auto px-4 max-w-2xl">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center">Join the Alumni Community</CardTitle>
-              <CardDescription className="text-center">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-xl md:text-2xl font-bold text-center">Join the Alumni Community</CardTitle>
+              <CardDescription className="text-center text-sm md:text-base">
                 Create an account to connect with other CPSCS alumni
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 md:px-6">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
                   <FormField
                     control={form.control}
                     name="fullName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full Name *</FormLabel>
+                        <FormLabel className="text-sm md:text-base">Full Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Your full name" {...field} />
+                          <Input 
+                            placeholder="Your full name" 
+                            {...field} 
+                            className="h-10 md:h-12 text-sm md:text-base"
+                          />
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-xs md:text-sm" />
                       </FormItem>
                     )}
                   />
@@ -219,23 +256,23 @@ const Signup = () => {
                       name="sscYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>SSC Batch Year *</FormLabel>
+                          <FormLabel className="text-sm md:text-base">SSC Batch Year *</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-10 md:h-12">
                                 <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="max-h-48 md:max-h-60">
                               {generateYears(1979, 2040).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}
                     />
@@ -245,23 +282,23 @@ const Signup = () => {
                       name="hscYear"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>HSC Batch Year *</FormLabel>
+                          <FormLabel className="text-sm md:text-base">HSC Batch Year *</FormLabel>
                           <Select 
                             onValueChange={field.onChange} 
                             defaultValue={field.value}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className="h-10 md:h-12">
                                 <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent>
+                            <SelectContent className="max-h-48 md:max-h-60">
                               {generateYears(1981, 2042).map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}
                     />
@@ -272,7 +309,7 @@ const Signup = () => {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number *</FormLabel>
+                        <FormLabel className="text-sm md:text-base">Phone Number *</FormLabel>
                         <div className="flex space-x-2">
                           <FormField
                             control={form.control}
@@ -281,7 +318,7 @@ const Signup = () => {
                               <CountryCodeSelect
                                 value={countryField.value}
                                 onValueChange={countryField.onChange}
-                                className="w-32"
+                                className="w-24 md:w-32 h-10 md:h-12"
                               />
                             )}
                           />
@@ -289,11 +326,22 @@ const Signup = () => {
                             <Input 
                               placeholder="Enter phone number" 
                               {...field}
-                              className="flex-1"
+                              className="flex-1 h-10 md:h-12 text-sm md:text-base"
+                              onBlur={(e) => {
+                                field.onBlur();
+                                // Real-time validation for phone
+                                const value = e.target.value;
+                                if (value && !/^[\d\s\-+()]*$/.test(value)) {
+                                  form.setError("phoneNumber", {
+                                    type: "manual",
+                                    message: "Phone number can only contain numbers, spaces, dashes, and parentheses."
+                                  });
+                                }
+                              }}
                             />
                           </FormControl>
                         </div>
-                        <FormMessage />
+                        <FormMessage className="text-xs md:text-sm" />
                       </FormItem>
                     )}
                   />
@@ -303,15 +351,24 @@ const Signup = () => {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address *</FormLabel>
+                        <FormLabel className="text-sm md:text-base">Email Address *</FormLabel>
                         <HoverTooltip 
                           tooltip="সঠিক ইমেইল এড্রেস লিখুন। আপনার রেজিস্ট্রেশনের সকল তথ্য এখানেই ইমেইল করা হবে। তাই, পুনরায় চেক করুন।"
                         >
                           <FormControl>
-                            <Input type="email" placeholder="your.email@example.com" {...field} />
+                            <Input 
+                              type="email" 
+                              placeholder="your.email@example.com" 
+                              {...field} 
+                              className="h-10 md:h-12 text-sm md:text-base"
+                              onBlur={(e) => {
+                                field.onBlur();
+                                handleEmailBlur(e.target.value);
+                              }}
+                            />
                           </FormControl>
                         </HoverTooltip>
-                        <FormMessage />
+                        <FormMessage className="text-xs md:text-sm" />
                       </FormItem>
                     )}
                   />
@@ -322,7 +379,7 @@ const Signup = () => {
                       name="password"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Create Password *</FormLabel>
+                          <FormLabel className="text-sm md:text-base">Create Password *</FormLabel>
                           <HoverTooltip 
                             tooltip="ভবিষ্যতে ব্যবহারের জন্য এই পাসওয়ার্ড-টি মনে রাখুন"
                           >
@@ -332,11 +389,12 @@ const Signup = () => {
                                   type={showPassword ? "text" : "password"} 
                                   placeholder="••••••••" 
                                   {...field} 
+                                  className="h-10 md:h-12 text-sm md:text-base pr-10"
                                 />
                               </FormControl>
                               <button 
                                 type="button"
-                                className="absolute right-3 top-2.5 text-gray-500 focus:outline-none"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none touch-manipulation"
                                 onClick={() => setShowPassword(!showPassword)}
                               >
                                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -344,7 +402,7 @@ const Signup = () => {
                             </div>
                           </HoverTooltip>
                           <PasswordStrengthIndicator password={watchedPassword} />
-                          <FormMessage />
+                          <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}
                     />
@@ -354,13 +412,14 @@ const Signup = () => {
                       name="confirmPassword"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Confirm Password *</FormLabel>
+                          <FormLabel className="text-sm md:text-base">Confirm Password *</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input 
                                 type={showConfirmPassword ? "text" : "password"} 
                                 placeholder="••••••••" 
                                 {...field} 
+                                className="h-10 md:h-12 text-sm md:text-base pr-16"
                               />
                             </FormControl>
                             <ConfirmPasswordFeedback 
@@ -369,13 +428,13 @@ const Signup = () => {
                             />
                             <button 
                               type="button"
-                              className="absolute right-10 top-2.5 text-gray-500 focus:outline-none"
+                              className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-500 focus:outline-none touch-manipulation"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             >
                               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                           </div>
-                          <FormMessage />
+                          <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}
                     />
@@ -386,7 +445,7 @@ const Signup = () => {
                     name="socialProfileLink"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Social Profile Link (Facebook/LinkedIn) *</FormLabel>
+                        <FormLabel className="text-sm md:text-base">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
                         <HoverTooltip 
                           tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
                         >
@@ -394,10 +453,22 @@ const Signup = () => {
                             <Input 
                               placeholder="facebook.com/yourprofile or linkedin.com/in/yourprofile" 
                               {...field} 
+                              className="h-10 md:h-12 text-sm md:text-base"
+                              onBlur={(e) => {
+                                field.onBlur();
+                                // Real-time validation for social profile
+                                const value = e.target.value.toLowerCase().trim();
+                                if (value && !value.includes('facebook.com') && !value.includes('linkedin.com') && !value.includes('twitter.com') && !value.includes('instagram.com') && !/^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(value)) {
+                                  form.setError("socialProfileLink", {
+                                    type: "manual",
+                                    message: "Please enter a valid social media profile URL."
+                                  });
+                                }
+                              }}
                             />
                           </FormControl>
                         </HoverTooltip>
-                        <FormMessage />
+                        <FormMessage className="text-xs md:text-sm" />
                       </FormItem>
                     )}
                   />
@@ -407,31 +478,33 @@ const Signup = () => {
                     name="proofDocument"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Upload Student Proof Document *</FormLabel>
+                        <FormLabel className="text-sm md:text-base">Upload Student Proof Document *</FormLabel>
                         <FormControl>
                           <FileUpload
                             onFileSelect={(file) => {
                               if (file) {
                                 field.onChange(file);
+                                setDocumentUploaded(true);
+                              } else {
+                                setDocumentUploaded(false);
                               }
                             }}
                             error={form.formState.errors.proofDocument?.message}
                           />
                         </FormControl>
-                        <HoverTooltip 
-                          tooltip="আমাদের কমিউনিটিকে সুরক্ষিত রাখার জন্য এই প্রমাণপত্র প্রয়োজন। এখানে আপনি আপনার SSC/HSC certificate, Mark Sheet, স্কুলের পুরনো আইডি কার্ডের ছবি, স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি, কিংবা যেকোনো ডকুমেন্ট দিতে পারেন - যা প্রমাণ করবে আপনি এই স্কুলের শিক্ষার্থী ছিলেন। আপনার দেয়া তথ্য ভেরিফাই করার আগে আপনার একাউন্ট এপ্রুভ করা হবে না।"
-                          className="block"
-                        >
-                          <FormDescription className="text-sm text-gray-600 cursor-help">
-                            Click here for document guidelines
-                          </FormDescription>
-                        </HoverTooltip>
-                        <FormMessage />
+                        <SmartDocumentTooltip 
+                          show={socialProfileCompleted} 
+                          hasFile={documentUploaded}
+                        />
+                        <FormMessage className="text-xs md:text-sm" />
                       </FormItem>
                     )}
                   />
                   
-                  <Button type="submit" className="w-full bg-gradient-to-r from-cpscs-blue to-blue-700 py-6">
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-gradient-to-r from-cpscs-blue to-blue-700 h-12 md:h-14 text-sm md:text-base font-medium"
+                  >
                     Submit Request for Admin Approval
                   </Button>
                 </form>
