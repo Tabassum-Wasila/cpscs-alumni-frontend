@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sprout, Users, Lightbulb, Wrench, Network } from 'lucide-react';
 import { soundManager } from '../services/soundManager';
@@ -11,14 +10,14 @@ const GoalsSection = () => {
   const [animationTime, setAnimationTime] = useState(0);
   const isMobile = useIsMobile();
 
-  // Animation loop for orbital movement
+  // Animation loop for orbital movement - optimized for mobile
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnimationTime(prev => prev + 0.005);
-    }, 16); // ~60fps
+      setAnimationTime(prev => prev + (isMobile ? 0.003 : 0.005)); // Slower on mobile for better performance
+    }, isMobile ? 20 : 16); // Lower FPS on mobile
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isMobile]);
 
   // Dynamic scaling based on device type
   const scale = isMobile ? 0.5 : 1;
@@ -26,7 +25,7 @@ const GoalsSection = () => {
   const sunSize = 80 * scale;
   const sunSizeClass = isMobile ? 'w-10 h-10' : 'w-20 h-20';
   const sunGlowClasses = isMobile 
-    ? ['w-10 h-10', 'w-14 h-14', 'w-18 h-18'] 
+    ? ['w-10 h-10', 'w-12 h-12', 'w-14 h-14'] // Reduced glow for mobile performance
     : ['w-20 h-20', 'w-28 h-28', 'w-36 h-36'];
 
   const goals = [{
@@ -113,20 +112,22 @@ const GoalsSection = () => {
     soundManager.playPlanetaryTone(note);
   };
 
-  // Smart tooltip positioning for mobile
-  const getTooltipPosition = (isHovered: boolean) => {
+  // Smart tooltip positioning for mobile - without backdrop overlay
+  const getTooltipPosition = (isHovered: boolean, isForSun: boolean = false) => {
     if (!isHovered) return {};
     
     return isMobile 
       ? { 
           position: 'fixed' as const,
-          top: '50%',
+          top: '20%', // Higher positioning to avoid keyboard
           left: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: 'translate(-50%, 0)',
           zIndex: 60,
           maxWidth: '280px'
         }
-      : {};
+      : isForSun 
+        ? { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }
+        : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' };
   };
 
   return (
@@ -134,11 +135,11 @@ const GoalsSection = () => {
       {/* Twinkling stars background */}
       <TwinklingStars />
 
-      {/* Galaxy nebula effects */}
+      {/* Galaxy nebula effects - reduced on mobile */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-indigo-600/10 rounded-full blur-2xl transform -translate-x-1/2 -translate-y-1/2" />
+        <div className={`absolute top-1/4 left-1/4 ${isMobile ? 'w-48 h-48' : 'w-96 h-96'} bg-purple-600/10 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'}`} />
+        <div className={`absolute bottom-1/4 right-1/4 ${isMobile ? 'w-40 h-40' : 'w-80 h-80'} bg-blue-600/10 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'}`} />
+        <div className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-32 h-32' : 'w-64 h-64'} bg-indigo-600/10 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} transform -translate-x-1/2 -translate-y-1/2`} />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
@@ -185,15 +186,15 @@ const GoalsSection = () => {
             >
               <div className="relative">
                 <div className={`${sunSizeClass} bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl`}>
-                  <div className={`text-white font-bold ${isMobile ? 'text-xs' : 'text-sm'} text-center leading-tight`}>
+                  <div className={`text-white font-bold ${isMobile ? 'text-[8px]' : 'text-sm'} text-center leading-tight`}>
                     CPSCS<br />AA
                   </div>
                 </div>
                 
-                {/* Multiple glow layers - scaled for mobile */}
-                <div className={`absolute inset-0 ${sunGlowClasses[0]} bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full blur-lg animate-pulse`} />
-                <div className={`absolute inset-[-${isMobile ? '2px' : '4px'}] ${sunGlowClasses[1]} bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full blur-xl animate-pulse`} />
-                <div className={`absolute inset-[-${isMobile ? '4px' : '8px'}] ${sunGlowClasses[2]} bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full blur-2xl animate-pulse`} />
+                {/* Multiple glow layers - reduced for mobile performance */}
+                <div className={`absolute inset-0 ${sunGlowClasses[0]} bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full ${isMobile ? 'blur-sm' : 'blur-lg'} animate-pulse`} />
+                <div className={`absolute inset-[-${isMobile ? '1px' : '4px'}] ${sunGlowClasses[1]} bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full ${isMobile ? 'blur-md' : 'blur-xl'} animate-pulse`} />
+                <div className={`absolute inset-[-${isMobile ? '2px' : '8px'}] ${sunGlowClasses[2]} bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} animate-pulse`} />
                 
                 {/* Solar flares - scaled for mobile */}
                 <div className={`absolute inset-0 ${sunSizeClass} rounded-full`}>
@@ -207,7 +208,7 @@ const GoalsSection = () => {
               {hoveredSun && (
                 <div 
                   className="absolute z-50 animate-fade-in" 
-                  style={isMobile ? getTooltipPosition(hoveredSun) : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }}
+                  style={getTooltipPosition(hoveredSun, true)}
                 >
                   <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl whitespace-nowrap">
                     <p className="text-gray-800 font-semibold">CPSCS Alumni Association</p>
@@ -216,31 +217,33 @@ const GoalsSection = () => {
               )}
             </div>
 
-            {/* Connection lines between planets */}
-            <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
-              {goals.map((goal, i) => {
-                const pos1 = getPlanetPosition(goal);
-                return goals.slice(i + 1).map((otherGoal, j) => {
-                  const pos2 = getPlanetPosition(otherGoal);
-                  return (
-                    <line 
-                      key={`connection-${i}-${j}`} 
-                      x1={containerSize/2 + pos1.x} 
-                      y1={containerSize/2 + pos1.y} 
-                      x2={containerSize/2 + pos2.x} 
-                      y2={containerSize/2 + pos2.y} 
-                      stroke="rgba(255,255,255,0.1)" 
-                      strokeWidth="1" 
-                      strokeDasharray="2,4" 
-                      style={{
-                        animation: `dashMove 3s linear infinite`,
-                        opacity: hoveredGoal ? 0.3 : 0.1
-                      }} 
-                    />
-                  );
-                });
-              })}
-            </svg>
+            {/* Connection lines between planets - simplified for mobile */}
+            {!isMobile && (
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
+                {goals.map((goal, i) => {
+                  const pos1 = getPlanetPosition(goal);
+                  return goals.slice(i + 1).map((otherGoal, j) => {
+                    const pos2 = getPlanetPosition(otherGoal);
+                    return (
+                      <line 
+                        key={`connection-${i}-${j}`} 
+                        x1={containerSize/2 + pos1.x} 
+                        y1={containerSize/2 + pos1.y} 
+                        x2={containerSize/2 + pos2.x} 
+                        y2={containerSize/2 + pos2.y} 
+                        stroke="rgba(255,255,255,0.1)" 
+                        strokeWidth="1" 
+                        strokeDasharray="2,4" 
+                        style={{
+                          animation: `dashMove 3s linear infinite`,
+                          opacity: hoveredGoal ? 0.3 : 0.1
+                        }} 
+                      />
+                    );
+                  });
+                })}
+              </svg>
+            )}
 
             {/* Orbiting Goals */}
             {goals.map(goal => {
@@ -266,14 +269,14 @@ const GoalsSection = () => {
                     </div>
                   </div>
 
-                  {/* Planet glow */}
-                  <div className={`absolute inset-0 ${goal.size} bg-gradient-to-r ${goal.color} rounded-full blur-md opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-80' : 'opacity-30'}`} />
+                  {/* Planet glow - reduced on mobile */}
+                  <div className={`absolute inset-0 ${goal.size} bg-gradient-to-r ${goal.color} rounded-full ${isMobile ? 'blur-sm' : 'blur-md'} opacity-50 transition-opacity duration-300 ${isHovered ? 'opacity-80' : 'opacity-30'}`} />
 
                   {/* Hover Description */}
                   {isHovered && (
                     <div 
                       className="absolute z-50 animate-fade-in" 
-                      style={isMobile ? getTooltipPosition(isHovered) : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }}
+                      style={getTooltipPosition(isHovered)}
                     >
                       <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl max-w-xs text-center">
                         <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2`}>{goal.title}</h3>
@@ -294,17 +297,6 @@ const GoalsSection = () => {
           </p>
         </div>
       </div>
-
-      {/* Mobile overlay backdrop for tooltips */}
-      {isMobile && (hoveredGoal || hoveredSun) && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-50"
-          onClick={() => {
-            setHoveredGoal(null);
-            setHoveredSun(false);
-          }}
-        />
-      )}
     </section>
   );
 };
