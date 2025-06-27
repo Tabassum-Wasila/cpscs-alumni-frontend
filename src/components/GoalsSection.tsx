@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sprout, Users, Lightbulb, Wrench, Network } from 'lucide-react';
 import { soundManager } from '../services/soundManager';
@@ -112,34 +113,50 @@ const GoalsSection = () => {
     soundManager.playPlanetaryTone(note);
   };
 
-  // Smart tooltip positioning for mobile - without backdrop overlay
+  // Smart tooltip positioning for mobile
   const getTooltipPosition = (isHovered: boolean, isForSun: boolean = false) => {
     if (!isHovered) return {};
     
     return isMobile 
       ? { 
           position: 'fixed' as const,
-          top: '20%', // Higher positioning to avoid keyboard
+          top: '50%',
           left: '50%',
-          transform: 'translate(-50%, 0)',
+          transform: 'translate(-50%, -50%)',
           zIndex: 60,
-          maxWidth: '280px'
+          maxWidth: '90%',
+          width: 'auto'
         }
       : isForSun 
-        ? { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' }
-        : { top: 'full', left: '50%', transform: 'translate(-50%, 0)', marginTop: '1rem' };
+        ? { 
+            position: 'absolute' as const,
+            top: 'calc(100% + 1rem)', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            zIndex: 50,
+            whiteSpace: 'nowrap' as const
+          }
+        : { 
+            position: 'absolute' as const,
+            top: 'calc(100% + 1rem)', 
+            left: '50%', 
+            transform: 'translateX(-50%)',
+            zIndex: 50
+          };
   };
 
   return (
     <section className="py-20 bg-gradient-to-br from-indigo-950 via-purple-950 to-slate-950 overflow-hidden relative">
-      {/* Twinkling stars background */}
+      {/* Enhanced twinkling stars background */}
       <TwinklingStars />
 
-      {/* Galaxy nebula effects - reduced on mobile */}
+      {/* Enhanced galaxy nebula effects with more visible gradients */}
       <div className="absolute inset-0">
-        <div className={`absolute top-1/4 left-1/4 ${isMobile ? 'w-48 h-48' : 'w-96 h-96'} bg-purple-600/10 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'}`} />
-        <div className={`absolute bottom-1/4 right-1/4 ${isMobile ? 'w-40 h-40' : 'w-80 h-80'} bg-blue-600/10 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'}`} />
-        <div className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-32 h-32' : 'w-64 h-64'} bg-indigo-600/10 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} transform -translate-x-1/2 -translate-y-1/2`} />
+        <div className={`absolute top-1/4 left-1/4 ${isMobile ? 'w-48 h-48' : 'w-96 h-96'} bg-purple-600/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'} animate-pulse`} />
+        <div className={`absolute bottom-1/4 right-1/4 ${isMobile ? 'w-40 h-40' : 'w-80 h-80'} bg-blue-600/20 rounded-full ${isMobile ? 'blur-xl' : 'blur-3xl'} animate-pulse`} />
+        <div className={`absolute top-1/2 left-1/2 ${isMobile ? 'w-32 h-32' : 'w-64 h-64'} bg-indigo-600/20 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} transform -translate-x-1/2 -translate-y-1/2 animate-pulse`} />
+        <div className={`absolute top-1/3 right-1/3 ${isMobile ? 'w-24 h-24' : 'w-48 h-48'} bg-pink-600/15 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} animate-pulse`} />
+        <div className={`absolute bottom-1/3 left-1/3 ${isMobile ? 'w-28 h-28' : 'w-56 h-56'} bg-cyan-600/15 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} animate-pulse`} />
       </div>
 
       <div className="container mx-auto px-4 max-w-7xl relative z-10">
@@ -185,33 +202,36 @@ const GoalsSection = () => {
               onClick={() => isMobile && setHoveredSun(!hoveredSun)}
             >
               <div className="relative">
-                <div className={`${sunSizeClass} bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl`}>
-                  <div className={`text-white font-bold ${isMobile ? 'text-[8px]' : 'text-sm'} text-center leading-tight`}>
+                {/* Multiple glow layers - positioned BEHIND the sun */}
+                <div className={`absolute inset-0 ${sunGlowClasses[0]} bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full ${isMobile ? 'blur-sm' : 'blur-lg'} animate-pulse -z-10`} />
+                <div className={`absolute inset-[-${isMobile ? '1px' : '4px'}] ${sunGlowClasses[1]} bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full ${isMobile ? 'blur-md' : 'blur-xl'} animate-pulse -z-10`} />
+                <div className={`absolute inset-[-${isMobile ? '2px' : '8px'}] ${sunGlowClasses[2]} bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} animate-pulse -z-10`} />
+                
+                {/* Main sun body */}
+                <div className={`${sunSizeClass} bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 rounded-full flex items-center justify-center shadow-2xl relative z-10`}>
+                  <div className={`text-white font-bold ${isMobile ? 'text-[6px]' : 'text-xs'} text-center leading-tight`}>
                     CPSCS<br />AA
                   </div>
                 </div>
                 
-                {/* Multiple glow layers - reduced for mobile performance */}
-                <div className={`absolute inset-0 ${sunGlowClasses[0]} bg-gradient-to-r from-yellow-400/60 via-orange-500/60 to-red-500/60 rounded-full ${isMobile ? 'blur-sm' : 'blur-lg'} animate-pulse`} />
-                <div className={`absolute inset-[-${isMobile ? '1px' : '4px'}] ${sunGlowClasses[1]} bg-gradient-to-r from-yellow-400/30 via-orange-500/30 to-red-500/30 rounded-full ${isMobile ? 'blur-md' : 'blur-xl'} animate-pulse`} />
-                <div className={`absolute inset-[-${isMobile ? '2px' : '8px'}] ${sunGlowClasses[2]} bg-gradient-to-r from-yellow-400/20 via-orange-500/20 to-red-500/20 rounded-full ${isMobile ? 'blur-lg' : 'blur-2xl'} animate-pulse`} />
-                
                 {/* Solar flares - scaled for mobile */}
-                <div className={`absolute inset-0 ${sunSizeClass} rounded-full`}>
+                <div className={`absolute inset-0 ${sunSizeClass} rounded-full z-5`}>
                   <div className={`absolute top-0 left-1/2 w-1 ${isMobile ? 'h-3' : 'h-6'} bg-gradient-to-t from-orange-400 to-transparent transform -translate-x-1/2 -translate-y-full animate-pulse`} />
                   <div className={`absolute bottom-0 right-0 w-1 ${isMobile ? 'h-2' : 'h-4'} bg-gradient-to-b from-red-400 to-transparent transform translate-y-full animate-pulse`} />
                   <div className={`absolute left-0 top-1/2 ${isMobile ? 'w-2' : 'w-4'} h-1 bg-gradient-to-l from-yellow-400 to-transparent transform -translate-x-full -translate-y-1/2 animate-pulse`} />
                 </div>
               </div>
 
-              {/* Sun hover tooltip */}
+              {/* Sun hover tooltip - responsive */}
               {hoveredSun && (
                 <div 
-                  className="absolute z-50 animate-fade-in" 
+                  className="animate-fade-in" 
                   style={getTooltipPosition(hoveredSun, true)}
                 >
-                  <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl whitespace-nowrap">
-                    <p className="text-gray-800 font-semibold">CPSCS Alumni Association</p>
+                  <div className="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-2xl">
+                    <p className={`text-gray-800 font-semibold ${isMobile ? 'text-sm' : 'text-base'}`}>
+                      CPSCS Alumni Association
+                    </p>
                   </div>
                 </div>
               )}
@@ -275,7 +295,7 @@ const GoalsSection = () => {
                   {/* Hover Description */}
                   {isHovered && (
                     <div 
-                      className="absolute z-50 animate-fade-in" 
+                      className="animate-fade-in" 
                       style={getTooltipPosition(isHovered)}
                     >
                       <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl max-w-xs text-center">

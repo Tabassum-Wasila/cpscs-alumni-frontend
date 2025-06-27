@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface Star {
@@ -32,17 +31,17 @@ const TwinklingStars = () => {
       y: Math.random() * 100,
       opacity: 0.2 + Math.random() * 0.3,
       size: 1.5 + Math.random() * 1.5, // Increased from 0.8-2 to 1.5-3
-      twinkleSpeed: 3000 + Math.random() * 4000,
+      twinkleSpeed: 1500 + Math.random() * 2000, // Reduced from 3000-7000 to 1500-3500
       isTwinkling: false,
       lastTwinkle: 0
     }));
     setStars(newStars);
   }, []);
 
-  // Background gradient breathing animation
+  // Background gradient breathing animation - enhanced visibility
   useEffect(() => {
     const gradientInterval = setInterval(() => {
-      setBackgroundPhase(prev => (prev + 0.008) % (Math.PI * 2)); // Slower phase change
+      setBackgroundPhase(prev => (prev + 0.012) % (Math.PI * 2)); // Slightly faster phase change
     }, 100);
 
     return () => clearInterval(gradientInterval);
@@ -58,6 +57,76 @@ const TwinklingStars = () => {
     return shuffled.slice(0, connectionCount);
   };
 
+  // Enhanced star twinkling with more frequent group animations
+  useEffect(() => {
+    // Group twinkling effect - multiple stars twinkle together every 2 seconds
+    const groupTwinkleInterval = setInterval(() => {
+      const numberOfStars = 3 + Math.floor(Math.random() * 3); // 3-5 stars
+      const selectedStars = [...stars]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, numberOfStars);
+
+      selectedStars.forEach(star => {
+        const now = Date.now();
+        
+        setStars(prevStars => 
+          prevStars.map(s => 
+            s.id === star.id 
+              ? { ...s, isTwinkling: true, lastTwinkle: now }
+              : s
+          )
+        );
+
+        // Create connections for each twinkling star
+        const networkStars = selectNetworkStars(star, stars);
+        
+        if (networkStars.length > 0) {
+          const newConnections = networkStars.map(targetStar => ({
+            id1: star.id,
+            id2: targetStar.id,
+            opacity: 0,
+            createdAt: now
+          }));
+
+          setConnections(prev => [
+            ...prev.filter(c => c.id1 !== star.id && c.id2 !== star.id),
+            ...newConnections
+          ]);
+
+          // Animate connection opacity - make it more visible
+          setTimeout(() => {
+            setConnections(prev => prev.map(c => 
+              newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
+                ? { ...c, opacity: 0.3 } // Increased from 0.25 to 0.3
+                : c
+            ));
+          }, 50);
+
+          // Remove connections after animation
+          setTimeout(() => {
+            setConnections(prev => prev.filter(c => 
+              !newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
+            ));
+          }, 2500);
+        }
+
+        // Turn off twinkling after a short duration
+        setTimeout(() => {
+          setStars(prevStars => 
+            prevStars.map(s => 
+              s.id === star.id 
+                ? { ...s, isTwinkling: false }
+                : s
+            )
+          );
+        }, 700);
+      });
+    }, 2000); // Every 2 seconds
+
+    return () => clearInterval(groupTwinkleInterval);
+  }, [stars]);
+
+  // Individual star twinkling (keeping original behavior as well)
   useEffect(() => {
     const intervals = stars.map(star => {
       return setInterval(() => {
@@ -71,8 +140,8 @@ const TwinklingStars = () => {
           )
         );
 
-        // ALWAYS create connections when star starts twinkling
-        if (Math.random() < 0.7) { // 70% chance to create network connections
+        // Create individual connections occasionally
+        if (Math.random() < 0.3) { // Reduced from 0.7 to 0.3 since we have group twinkling now
           const networkStars = selectNetworkStars(star, stars);
           
           if (networkStars.length > 0) {
@@ -88,16 +157,14 @@ const TwinklingStars = () => {
               ...newConnections
             ]);
 
-            // Animate connection opacity - make it more visible
             setTimeout(() => {
               setConnections(prev => prev.map(c => 
                 newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
-                  ? { ...c, opacity: 0.25 } // Increased from 0.15 to 0.25
+                  ? { ...c, opacity: 0.25 }
                   : c
               ));
             }, 50);
 
-            // Remove connections after animation
             setTimeout(() => {
               setConnections(prev => prev.filter(c => 
                 !newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
@@ -121,23 +188,25 @@ const TwinklingStars = () => {
     return () => clearInterval(cleanup);
   }, []);
 
-  // Generate dynamic gradient colors based on phase with slower, more subtle changes
+  // Generate dynamic gradient colors with enhanced visibility
   const getGradientStyle = () => {
-    const phase1 = Math.sin(backgroundPhase) * 0.2 + 0.8; // Reduced variation
-    const phase2 = Math.sin(backgroundPhase + Math.PI / 2) * 0.2 + 0.8;
-    const phase3 = Math.sin(backgroundPhase + Math.PI) * 0.2 + 0.8;
+    const phase1 = Math.sin(backgroundPhase) * 0.3 + 0.9; // Increased variation from 0.2 to 0.3
+    const phase2 = Math.sin(backgroundPhase + Math.PI / 2) * 0.3 + 0.9;
+    const phase3 = Math.sin(backgroundPhase + Math.PI) * 0.3 + 0.9;
+    const phase4 = Math.sin(backgroundPhase + Math.PI * 1.5) * 0.25 + 0.85;
     
     return {
-      background: `radial-gradient(circle at 25% 25%, rgba(79, 70, 229, ${phase1 * 0.08}) 0%, transparent 50%), 
-                   radial-gradient(circle at 75% 50%, rgba(147, 51, 234, ${phase2 * 0.06}) 0%, transparent 50%), 
-                   radial-gradient(circle at 50% 75%, rgba(59, 130, 246, ${phase3 * 0.04}) 0%, transparent 50%),
-                   radial-gradient(circle at 80% 20%, rgba(168, 85, 247, ${phase1 * 0.05}) 0%, transparent 60%)`
+      background: `radial-gradient(circle at 25% 25%, rgba(79, 70, 229, ${phase1 * 0.12}) 0%, transparent 50%), 
+                   radial-gradient(circle at 75% 50%, rgba(147, 51, 234, ${phase2 * 0.10}) 0%, transparent 50%), 
+                   radial-gradient(circle at 50% 75%, rgba(59, 130, 246, ${phase3 * 0.08}) 0%, transparent 50%),
+                   radial-gradient(circle at 80% 20%, rgba(168, 85, 247, ${phase4 * 0.09}) 0%, transparent 60%),
+                   radial-gradient(circle at 20% 80%, rgba(236, 72, 153, ${phase1 * 0.07}) 0%, transparent 55%)`
     };
   };
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {/* Enhanced breathing gradient background */}
+      {/* Enhanced breathing gradient background with more visibility */}
       <div 
         className="absolute inset-0 transition-all duration-2000 ease-in-out"
         style={getGradientStyle()}
@@ -182,8 +251,8 @@ const TwinklingStars = () => {
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke="rgba(255,255,255,0.4)"
-              strokeWidth="1"
+              stroke="rgba(255,255,255,0.5)"
+              strokeWidth="1.2"
               strokeDasharray="3,6"
               style={{
                 opacity: connection.opacity,
