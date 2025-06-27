@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useIsMobile } from '../../hooks/use-mobile';
 
 interface SolarSystemTooltipProps {
@@ -16,18 +16,47 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
   position 
 }) => {
   const isMobile = useIsMobile();
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
+
+  useEffect(() => {
+    if (!isVisible || !isMobile) return;
+
+    // Smart mobile positioning with viewport detection
+    const updatePosition = () => {
+      const viewport = {
+        width: window.innerWidth,
+        height: window.innerHeight
+      };
+
+      const safeArea = {
+        top: 20,
+        bottom: 20,
+        left: 16,
+        right: 16
+      };
+
+      setTooltipPosition({
+        top: viewport.height * 0.15, // Position near top for better visibility
+        left: safeArea.left
+      });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    return () => window.removeEventListener('resize', updatePosition);
+  }, [isVisible, isMobile]);
 
   if (!isVisible) return null;
 
-  const getTooltipPosition = () => {
+  const getTooltipStyle = () => {
     if (isMobile) {
       return {
         position: 'fixed' as const,
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+        top: `${tooltipPosition.top}px`,
+        left: `${tooltipPosition.left}px`,
+        right: '16px',
         zIndex: 60,
-        maxWidth: '90%',
+        maxWidth: 'calc(100vw - 32px)',
         width: 'auto'
       };
     }
@@ -53,10 +82,14 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
   return (
     <div 
       className="animate-fade-in" 
-      style={getTooltipPosition()}
+      style={getTooltipStyle()}
     >
-      <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl max-w-xs text-center">
-        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2`}>
+      <div className={`bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl text-center ${
+        isMobile 
+          ? 'border border-white/30' 
+          : 'max-w-xs'
+      }`}>
+        <h3 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-800 mb-2`}>
           {title}
         </h3>
         {description && (
