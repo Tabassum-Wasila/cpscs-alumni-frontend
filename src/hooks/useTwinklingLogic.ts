@@ -10,6 +10,7 @@ interface Star {
   twinkleSpeed: number;
   isTwinkling: boolean;
   lastTwinkle: number;
+  cooldownUntil: number;
 }
 
 interface Connection {
@@ -17,6 +18,7 @@ interface Connection {
   id2: number;
   opacity: number;
   createdAt: number;
+  delay: number;
 }
 
 export const useTwinklingLogic = () => {
@@ -33,25 +35,35 @@ export const useTwinklingLogic = () => {
       size: 1.5 + Math.random() * 1.5,
       twinkleSpeed: 1500 + Math.random() * 2000,
       isTwinkling: false,
-      lastTwinkle: 0
+      lastTwinkle: 0,
+      cooldownUntil: 0
     }));
     setStars(newStars);
   }, []);
 
-  const selectNetworkStars = useCallback((currentStar: Star, allStars: Star[]) => {
-    const otherStars = allStars.filter(s => s.id !== currentStar.id);
-    const connectionCount = 3 + Math.floor(Math.random() * 3);
-    const shuffled = [...otherStars].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, connectionCount);
+  const getRandomStars = useCallback((excludeId: number, allStars: Star[], count: number) => {
+    const now = Date.now();
+    const availableStars = allStars.filter(s => 
+      s.id !== excludeId && 
+      now > s.cooldownUntil
+    );
+    
+    // Shuffle and take the requested count
+    const shuffled = [...availableStars].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, Math.min(count, shuffled.length));
   }, []);
 
-  const createConnections = useCallback((star: Star, networkStars: Star[]) => {
+  const createEnhancedConnections = useCallback((star: Star, targetStars: Star[]) => {
     const now = Date.now();
-    const newConnections = networkStars.map(targetStar => ({
+    const baseDelay = 0;
+    const delayIncrement = 100;
+
+    const newConnections = targetStars.map((targetStar, index) => ({
       id1: star.id,
       id2: targetStar.id,
       opacity: 0,
-      createdAt: now
+      createdAt: now,
+      delay: baseDelay + (index * delayIncrement)
     }));
 
     setConnections(prev => [
@@ -59,43 +71,116 @@ export const useTwinklingLogic = () => {
       ...newConnections
     ]);
 
-    setTimeout(() => {
-      setConnections(prev => prev.map(c => 
-        newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
-          ? { ...c, opacity: 0.3 }
-          : c
-      ));
-    }, 50);
+    // Animate connections with staggered timing
+    newConnections.forEach((connection, index) => {
+      setTimeout(() => {
+        setConnections(prev => prev.map(c => 
+          c.id1 === connection.id1 && c.id2 === connection.id2 && c.createdAt === connection.createdAt
+            ? { ...c, opacity: 0.4 + Math.random() * 0.2 }
+            : c
+        ));
+      }, connection.delay + 50);
+    });
 
+    // Remove connections after animation
     setTimeout(() => {
       setConnections(prev => prev.filter(c => 
-        !newConnections.some(nc => nc.id1 === c.id1 && nc.id2 === c.id2)
+        !newConnections.some(nc => 
+          nc.id1 === c.id1 && nc.id2 === c.id2 && nc.createdAt === c.createdAt
+        )
       ));
-    }, 2500);
+    }, 2800);
   }, []);
 
-  // Group twinkling effect
+  // Enhanced group twinkling with better randomization
   useEffect(() => {
     const groupTwinkleInterval = setInterval(() => {
-      const numberOfStars = 3 + Math.floor(Math.random() * 3);
-      const selectedStars = [...stars]
+      const now = Date.now();
+      const availableStars = stars.filter(s => now > s.cooldownUntil);
+      
+      if (availableStars.length === 0) return;
+
+      // Select 2-4 random stars for group twinkling
+      const numberOfStars = 2 + Math.floor(Math.random() * 3);
+      const selectedStars = [...availableStars]
         .sort(() => Math.random() - 0.5)
-        .slice(0, numberOfStars);
+        .slice(0, Math.min(numberOfStars, availableStars.length));
+
+      selectedStars.forEach((star, index) => {
+        // Stagger the twinkling start times
+        setTimeout(() => {
+          setStars(prevStars => 
+            prevStars.map(s => 
+              s.id === star.id 
+                ? { 
+                    ...s, 
+                    isTwinkling: true, 
+                    lastTwinkle: now,
+                    cooldownUntil: now + 3000 + Math.random() * 2000 // 3-5 second cooldown
+                  }
+                : s
+            )
+          );
+
+          // Create 4-7 connections for each twinkling star
+          const connectionCount = 4 + Math.floor(Math.random() * 4);
+          const targetStars = getRandomStars(star.id, stars, connectionCount);
+          
+          if (targetStars.length > 0) {
+            createEnhancedConnections(star, targetStars);
+          }
+
+          // Stop twinkling after animation
+          setTimeout(() => {
+            setStars(prevStars => 
+              prevStars.map(s => 
+                s.id === star.id 
+                  ? { ...s, isTwinkling: false }
+                  : s
+              )
+            );
+          }, 700);
+        }, index * 200); // Stagger group twinkling
+      });
+    }, 1800); // Slightly faster group twinkling
+
+    return () => clearInterval(groupTwinkleInterval);
+  }, [stars, getRandomStars, createEnhancedConnections]);
+
+  // Random individual star twinkling
+  useEffect(() => {
+    const randomTwinkleInterval = setInterval(() => {
+      const now = Date.now();
+      const availableStars = stars.filter(s => now > s.cooldownUntil && !s.isTwinkling);
+      
+      if (availableStars.length === 0) return;
+
+      // Randomly select 1-2 stars for individual twinkling
+      const selectedCount = Math.random() < 0.7 ? 1 : 2;
+      const selectedStars = [...availableStars]
+        .sort(() => Math.random() - 0.5)
+        .slice(0, selectedCount);
 
       selectedStars.forEach(star => {
-        const now = Date.now();
-        
         setStars(prevStars => 
           prevStars.map(s => 
             s.id === star.id 
-              ? { ...s, isTwinkling: true, lastTwinkle: now }
+              ? { 
+                  ...s, 
+                  isTwinkling: true, 
+                  lastTwinkle: now,
+                  cooldownUntil: now + 2500 + Math.random() * 1500
+                }
               : s
           )
         );
 
-        const networkStars = selectNetworkStars(star, stars);
-        if (networkStars.length > 0) {
-          createConnections(star, networkStars);
+        // Create 3-5 connections for individual twinkling
+        const connectionCount = 3 + Math.floor(Math.random() * 3);
+        const targetStars = getRandomStars(star.id, stars, connectionCount);
+        
+        if (targetStars.length > 0) {
+          createEnhancedConnections(star, targetStars);
         }
 
         setTimeout(() => {
@@ -106,44 +191,18 @@ export const useTwinklingLogic = () => {
                 : s
             )
           );
-        }, 700);
+        }, 600);
       });
-    }, 2000);
+    }, 1200); // Random individual twinkling
 
-    return () => clearInterval(groupTwinkleInterval);
-  }, [stars, selectNetworkStars, createConnections]);
-
-  // Individual star twinkling
-  useEffect(() => {
-    const intervals = stars.map(star => {
-      return setInterval(() => {
-        const now = Date.now();
-        
-        setStars(prevStars => 
-          prevStars.map(s => 
-            s.id === star.id 
-              ? { ...s, isTwinkling: !s.isTwinkling, lastTwinkle: now }
-              : s
-          )
-        );
-
-        if (Math.random() < 0.2) {
-          const networkStars = selectNetworkStars(star, stars);
-          if (networkStars.length > 0) {
-            createConnections(star, networkStars);
-          }
-        }
-      }, star.twinkleSpeed);
-    });
-
-    return () => intervals.forEach(clearInterval);
-  }, [stars, selectNetworkStars, createConnections]);
+    return () => clearInterval(randomTwinkleInterval);
+  }, [stars, getRandomStars, createEnhancedConnections]);
 
   // Cleanup old connections
   useEffect(() => {
     const cleanup = setInterval(() => {
       const now = Date.now();
-      setConnections(prev => prev.filter(c => now - c.createdAt < 3000));
+      setConnections(prev => prev.filter(c => now - c.createdAt < 3200));
     }, 1000);
 
     return () => clearInterval(cleanup);

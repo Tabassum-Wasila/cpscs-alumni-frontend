@@ -21,22 +21,22 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
   useEffect(() => {
     if (!isVisible || !isMobile) return;
 
-    // Smart mobile positioning with viewport detection
     const updatePosition = () => {
       const viewport = {
         width: window.innerWidth,
         height: window.innerHeight
       };
 
+      // Safe area for devices with notches/rounded corners
       const safeArea = {
-        top: 20,
+        top: Math.max(20, window.screen.height - window.innerHeight),
         bottom: 20,
         left: 16,
         right: 16
       };
 
       setTooltipPosition({
-        top: viewport.height * 0.15, // Position near top for better visibility
+        top: viewport.height * 0.12,
         left: safeArea.left
       });
     };
@@ -54,10 +54,10 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
         position: 'fixed' as const,
         top: `${tooltipPosition.top}px`,
         left: `${tooltipPosition.left}px`,
-        right: '16px',
+        width: `calc(100vw - 32px)`,
+        minWidth: '280px',
+        maxWidth: `calc(100vw - 32px)`,
         zIndex: 60,
-        maxWidth: 'calc(100vw - 32px)',
-        width: 'auto'
       };
     }
     
@@ -68,14 +68,17 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
           left: '50%', 
           transform: 'translateX(-50%)',
           zIndex: 50,
-          whiteSpace: 'nowrap' as const
+          whiteSpace: 'nowrap' as const,
+          minWidth: '200px'
         }
       : { 
           position: 'absolute' as const,
           top: 'calc(100% + 1rem)', 
           left: '50%', 
           transform: 'translateX(-50%)',
-          zIndex: 50
+          zIndex: 50,
+          maxWidth: '300px',
+          minWidth: '250px'
         };
   };
 
@@ -84,16 +87,16 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
       className="animate-fade-in" 
       style={getTooltipStyle()}
     >
-      <div className={`bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-2xl text-center ${
+      <div className={`bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl text-center border border-white/30 ${
         isMobile 
-          ? 'border border-white/30' 
-          : 'max-w-xs'
+          ? 'p-4 w-full' 
+          : 'p-4'
       }`}>
-        <h3 className={`${isMobile ? 'text-sm' : 'text-lg'} font-bold text-gray-800 mb-2`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2`}>
           {title}
         </h3>
         {description && (
-          <p className={`text-gray-600 ${isMobile ? 'text-xs' : 'text-sm'} leading-relaxed`}>
+          <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed`}>
             {description}
           </p>
         )}
