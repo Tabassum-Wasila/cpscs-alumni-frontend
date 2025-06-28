@@ -50,11 +50,19 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
 
   const getTooltipStyle = () => {
     if (isMobile) {
+      const viewport = window.innerWidth;
+      // Dynamic width based on screen size with optimal reading width
+      const maxWidth = Math.min(viewport - 32, 320); // Max 320px or viewport minus margins
+      const minWidth = Math.min(240, viewport - 32); // Min 240px or smaller for very small screens
+      
       return {
         position: 'fixed' as const,
         top: `${tooltipPosition.top}px`,
-        left: '16px',
-        right: '16px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: `${maxWidth}px`,
+        minWidth: `${minWidth}px`,
+        maxWidth: `${maxWidth}px`,
         zIndex: 60,
       };
     }
@@ -86,11 +94,11 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
       style={getTooltipStyle()}
     >
       <div className={`bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl text-center border border-white/30 p-4`}>
-        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2 ${isMobile ? 'break-words' : ''}`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2 ${isMobile ? 'hyphens-auto' : ''}`} style={isMobile ? { wordWrap: 'break-word', overflowWrap: 'break-word' } : {}}>
           {title}
         </h3>
         {description && (
-          <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed ${isMobile ? 'break-words' : ''}`}>
+          <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed ${isMobile ? 'hyphens-auto' : ''}`} style={isMobile ? { wordWrap: 'break-word', overflowWrap: 'break-word' } : {}}>
             {description}
           </p>
         )}
