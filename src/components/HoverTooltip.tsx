@@ -20,8 +20,8 @@ const HoverTooltip: React.FC<HoverTooltipProps> = ({ children, tooltip, classNam
     >
       {children}
       {isVisible && (
-        <div className="absolute z-10 px-3 py-2 text-sm bg-orange-100 border border-orange-200 rounded-lg shadow-lg -top-2 left-0 transform -translate-y-full min-w-max max-w-xs">
-          <div className="text-orange-800">{tooltip}</div>
+        <div className="absolute z-10 px-3 py-2 text-sm bg-orange-100 border border-orange-200 rounded-lg shadow-lg -top-2 left-0 transform -translate-y-full w-64 sm:w-72 md:w-80 max-w-[calc(100vw-2rem)]">
+          <div className="text-orange-800 whitespace-normal break-words leading-relaxed">{tooltip}</div>
           <div className="absolute top-full left-6 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-orange-200"></div>
         </div>
       )}
