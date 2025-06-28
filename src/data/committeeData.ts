@@ -358,7 +358,7 @@ export const committeeData: CommitteeData = {
       "position": "Executive Member",
       "name": "Al Mehraj Shahriar Mithun",
       "ssc_batch": "2018",
-      "hsc_batch": "2020",
+      "hsc_batch": "2020",  
       "profession": "Institute of Disaster Management Studies",
       "organization": "University of Dhaka",
       "whatsapp": "01744885406",
@@ -499,5 +499,6 @@ export const committeeData: CommitteeData = {
       "email": null,
       "photo": "https://i.postimg.cc/y650PMrB/41.jpg"
     }
-  ]
+  ],
+  ambassadors: []
 };

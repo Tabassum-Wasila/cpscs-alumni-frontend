@@ -18,4 +18,5 @@ export interface CommitteeData {
   term: string;
   executiveCommittee: CommitteeMember[];
   advisorCouncil: CommitteeMember[];
+  ambassadors: CommitteeMember[];
 }
