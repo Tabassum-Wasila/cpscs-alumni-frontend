@@ -53,10 +53,8 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
       return {
         position: 'fixed' as const,
         top: `${tooltipPosition.top}px`,
-        left: `${tooltipPosition.left}px`,
-        width: `calc(100vw - 32px)`,
-        minWidth: '280px',
-        maxWidth: `calc(100vw - 32px)`,
+        left: '16px',
+        right: '16px',
         zIndex: 60,
       };
     }
@@ -87,16 +85,12 @@ const SolarSystemTooltip: React.FC<SolarSystemTooltipProps> = ({
       className="animate-fade-in" 
       style={getTooltipStyle()}
     >
-      <div className={`bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl text-center border border-white/30 ${
-        isMobile 
-          ? 'p-4 w-full' 
-          : 'p-4'
-      }`}>
-        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2`}>
+      <div className={`bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl text-center border border-white/30 p-4`}>
+        <h3 className={`${isMobile ? 'text-base' : 'text-lg'} font-bold text-gray-800 mb-2 ${isMobile ? 'break-words' : ''}`}>
           {title}
         </h3>
         {description && (
-          <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed`}>
+          <p className={`text-gray-600 ${isMobile ? 'text-sm' : 'text-sm'} leading-relaxed ${isMobile ? 'break-words' : ''}`}>
             {description}
           </p>
         )}
