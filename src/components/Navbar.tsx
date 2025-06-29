@@ -16,6 +16,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [logoError, setLogoError] = useState(false);
+  const [isDarkBackground, setIsDarkBackground] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
@@ -31,6 +32,21 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Check if we're on a page with animated background
+    const hasAnimatedBg = document.querySelector('.animated-bg, .gradient-flow-bg');
+    if (hasAnimatedBg && !isScrolled) {
+      // Cycle through dark/light states to match the background animation
+      const interval = setInterval(() => {
+        setIsDarkBackground(prev => !prev);
+      }, 3000); // Adjust timing to match your background animation
+      
+      return () => clearInterval(interval);
+    } else {
+      setIsDarkBackground(false);
+    }
+  }, [isScrolled]);
+
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Gallery', path: '/gallery' },
@@ -39,7 +55,7 @@ const Navbar = () => {
     { name: 'Committee', path: '/committee' },
     { name: 'Sponsors', path: '/sponsors' },
     { name: 'Mentorship & Career', path: '/mentorship-career' },
-    { name: 'Blog', path: '/blog' },
+    { name: 'Magazine', path: '/magazine' },
     { name: 'Contact', path: '/contact' },
   ];
 
@@ -51,8 +67,32 @@ const Navbar = () => {
     setLogoError(true);
   };
 
+  // Dynamic text color classes based on background state
+  const getTextColorClass = () => {
+    if (isScrolled) {
+      return 'text-gray-900 dark:text-white';
+    }
+    return isDarkBackground ? 'text-white' : 'text-gray-900';
+  };
+
+  const getLinkColorClass = () => {
+    if (isScrolled) {
+      return 'text-gray-700 hover:text-cpscs-blue dark:text-gray-300 dark:hover:text-cpscs-gold';
+    }
+    return isDarkBackground 
+      ? 'text-white/90 hover:text-cpscs-gold' 
+      : 'text-gray-700 hover:text-cpscs-blue';
+  };
+
+  const getLogoTextColorClass = () => {
+    if (isScrolled) {
+      return 'text-cpscs-blue';
+    }
+    return isDarkBackground ? 'text-white' : 'text-cpscs-blue';
+  };
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <Link to="/" className="flex items-center">
           {!logoError ? (
@@ -64,7 +104,7 @@ const Navbar = () => {
               loading="eager"
             />
           ) : (
-            <div className="font-poppins font-bold text-2xl text-cpscs-blue">
+            <div className={`font-poppins font-bold text-2xl transition-colors duration-500 ${getLogoTextColorClass()}`}>
               <span>CPSCS</span>
               <span className="text-cpscs-gold"> Alumni</span>
             </div>
@@ -77,7 +117,7 @@ const Navbar = () => {
             <Link 
               key={link.path} 
               to={link.path} 
-              className="text-sm font-medium tracking-wide relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-cpscs-gold after:transition-all after:duration-300 hover:after:w-full"
+              className={`text-sm font-medium tracking-wide relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-cpscs-gold after:transition-all after:duration-300 hover:after:w-full transition-colors duration-500 ${getLinkColorClass()}`}
             >
               {link.name}
             </Link>
@@ -131,7 +171,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button 
-          className="md:hidden p-2 focus:outline-none" 
+          className={`md:hidden p-2 focus:outline-none transition-colors duration-500 ${getTextColorClass()}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? (
