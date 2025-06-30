@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -28,26 +27,26 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isMobile = false, isScrolled 
   if (isAuthenticated) {
     if (isMobile) {
       return (
-        <div className="flex gap-2 w-full mt-3">
+        <div className="flex gap-2 justify-end">
           <Button 
             variant="outline" 
             size="sm"
-            className="flex-1 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white"
+            className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white px-3 py-1.5 text-xs h-8"
             asChild
           >
             <Link to="/complete-profile">
-              <User size={14} />
-              <span className="text-xs">Profile</span>
+              <User size={12} />
+              <span>Profile</span>
             </Link>
           </Button>
           <Button 
             variant="outline" 
             size="sm"
-            className="flex-1 border-red-500 text-red-500 hover:bg-red-50"
+            className="border-red-500 text-red-500 hover:bg-red-50 px-3 py-1.5 text-xs h-8"
             onClick={handleLogout}
           >
-            <LogOut size={14} />
-            <span className="text-xs">Logout</span>
+            <LogOut size={12} />
+            <span>Logout</span>
           </Button>
         </div>
       );
@@ -84,28 +83,28 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({ isMobile = false, isScrolled 
 
   if (isMobile) {
     return (
-      <div className="flex gap-2 w-full mt-3">
+      <div className="flex gap-2 justify-end">
         <Button 
           variant="outline" 
           size="sm"
-          className="flex-1 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 group"
+          className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 group px-3 py-1.5 text-xs h-8"
           asChild
         >
           <Link to="/login">
-            <User size={14} className="transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-xs">Login</span>
+            <User size={12} className="transition-transform duration-300 group-hover:scale-110" />
+            <span>Login</span>
           </Link>
         </Button>
         <Button
           size="sm"
-          className="flex-1 bg-gradient-to-r from-cpscs-blue to-blue-700 hover:from-blue-700 hover:to-cpscs-blue transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 group relative overflow-hidden"
+          className="bg-gradient-to-r from-cpscs-blue to-blue-700 hover:from-blue-700 hover:to-cpscs-blue transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 group relative overflow-hidden px-3 py-1.5 text-xs h-8"
           asChild
         >
           <Link to="/signup">
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-            <Sparkles size={14} className="animate-pulse relative z-10" />
-            <span className="text-xs relative z-10">Join</span>
-            <ArrowRight size={14} className="transition-transform duration-300 group-hover:translate-x-1 relative z-10" />
+            <Sparkles size={12} className="animate-pulse relative z-10" />
+            <span className="relative z-10">Sign Up</span>
+            <ArrowRight size={12} className="transition-transform duration-300 group-hover:translate-x-1 relative z-10" />
           </Link>
         </Button>
       </div>
