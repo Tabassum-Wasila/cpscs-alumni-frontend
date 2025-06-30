@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +20,8 @@ import Signup from "./pages/Signup";
 import CompleteProfile from "./pages/CompleteProfile";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import HallOfFame from "./pages/HallOfFame";
+import NoticeBoard from "./pages/NoticeBoard";
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient());
@@ -43,9 +44,10 @@ const App = () => {
               } />
               <Route path="/committee" element={<Committee />} />
               <Route path="/sponsors" element={<Sponsors />} />
-              <Route path="/mentorship-career" element={<MentorshipCareer />} />
+              <Route path="/hall-of-fame" element={<HallOfFame />} />
               <Route path="/magazine" element={<Blog />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/notice-board" element={<NoticeBoard />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
