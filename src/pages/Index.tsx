@@ -15,8 +15,8 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      {/* Mobile top spacing to prevent navbar overlap */}
-      <div className="lg:hidden pt-32"></div>
+      {/* Mobile top spacing to prevent navbar overlap - increased for proper clearance */}
+      <div className="lg:hidden pt-40"></div>
       <Hero />
       <InteractiveStatsSection />
       <AboutSection />

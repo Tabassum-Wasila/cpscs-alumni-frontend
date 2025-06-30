@@ -8,7 +8,7 @@ const About = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow pt-24 pb-16 bg-cpscs-light">
+      <div className="flex-grow pt-40 lg:pt-24 pb-16 bg-cpscs-light">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl font-bold text-cpscs-blue mb-8">About CPSCS Alumni Association</h1>
           

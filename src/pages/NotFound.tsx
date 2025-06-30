@@ -19,7 +19,7 @@ const NotFound = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow flex items-center justify-center bg-cpscs-light py-16">
+      <div className="flex-grow flex items-center justify-center bg-cpscs-light py-40 lg:py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-md mx-auto text-center neumorphic-card p-8">
             <h1 className="text-9xl font-bold text-cpscs-blue mb-4">404</h1>

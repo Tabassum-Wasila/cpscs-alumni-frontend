@@ -12,7 +12,10 @@ const Navbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isNavbarVisible ? 'translate-y-0' : '-translate-y-full'
-    } ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 'bg-transparent'}`}>
+    } ${isScrolled ? 'bg-white/90 dark:bg-cpscs-dark/90 backdrop-blur-md shadow-md' : 
+      // Desktop: transparent on home, white on others. Mobile: always white
+      'lg:bg-transparent lg:dark:bg-transparent bg-white/95 backdrop-blur-md shadow-sm'
+    }`}>
       <div className="container mx-auto px-4 py-3">
         {/* Desktop Layout */}
         <div className="hidden lg:flex items-center justify-between">
@@ -26,20 +29,17 @@ const Navbar = () => {
           {/* Top Row: Logo and Auth Buttons */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex-shrink-0">
-              <NavbarLogo isScrolled={isScrolled} isHomePage={isHomePage} />
+              <NavbarLogo isScrolled={true} isHomePage={false} />
             </div>
             <div className="flex-shrink-0">
-              <AuthButtons isMobile={true} isScrolled={isScrolled} isHomePage={isHomePage} />
+              <AuthButtons isMobile={true} isScrolled={true} isHomePage={false} />
             </div>
           </div>
           
           {/* Mobile Navigation Pills */}
-          <MobileNavigation isScrolled={isScrolled} isHomePage={isHomePage} />
+          <MobileNavigation isScrolled={true} isHomePage={false} />
         </div>
       </div>
-      
-      {/* Mobile spacer to prevent content overlap */}
-      <div className="lg:hidden h-4"></div>
     </nav>
   );
 };

@@ -37,7 +37,7 @@ const CompleteProfile = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow py-24 bg-cpscs-light">
+      <div className="flex-grow py-40 lg:py-24 bg-cpscs-light">
         <div className="container mx-auto px-4">
           {isAuthenticated ? (
             <div className="max-w-4xl mx-auto">

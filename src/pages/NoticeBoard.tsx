@@ -9,7 +9,7 @@ const NoticeBoard = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow pt-24 pb-16 bg-gradient-to-br from-cpscs-light via-white to-yellow-50">
+      <div className="flex-grow pt-40 lg:pt-24 pb-16 bg-gradient-to-br from-cpscs-light via-white to-yellow-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="flex justify-center items-center gap-3 mb-4">

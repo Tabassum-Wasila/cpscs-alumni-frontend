@@ -65,7 +65,7 @@ const Committee = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow pt-24 pb-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="flex-grow pt-40 lg:pt-24 pb-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           {/* Page Header */}
           <div className="text-center mb-12">

@@ -8,6 +8,7 @@ import GallerySearch from '../components/gallery/GallerySearch';
 import WhatsAppContact from '../components/gallery/WhatsAppContact';
 import { galleryService, GalleryImage, SearchFilters } from '../services/galleryService';
 import { Loader2, Images } from 'lucide-react';
+
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -71,7 +72,7 @@ const Gallery = () => {
   if (error) {
     return <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div className="flex-grow pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
+        <div className="flex-grow pt-40 lg:pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Gallery</h2>
             <p className="text-gray-600 mb-4">Please try again later.</p>
@@ -83,10 +84,11 @@ const Gallery = () => {
         <Footer />
       </div>;
   }
-  return <div className="min-h-screen flex flex-col">
+  return (
+    <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="flex-grow pt-24 pb-16 bg-cpscs-light">
+      <div className="flex-grow pt-40 lg:pt-24 pb-16 bg-cpscs-light">
         <div className="container mx-auto px-4">
           {/* Hero Section */}
           <div className="text-center mb-12">
@@ -135,6 +137,8 @@ const Gallery = () => {
       {selectedImage && <Lightbox image={selectedImage} images={images} currentIndex={currentIndex} isOpen={isLightboxOpen} onClose={handleCloseLightbox} onNext={handleNextImage} onPrevious={handlePreviousImage} onImageSelect={handleImageSelect} />}
       
       <Footer />
-    </div>;
+    </div>
+  );
 };
+
 export default Gallery;
