@@ -1,35 +1,53 @@
 
 import React from 'react';
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { navLinks } from '@/utils/navbarUtils';
-import AuthButtons from './AuthButtons';
 
 interface MobileNavigationProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isScrolled: boolean;
+  isHomePage: boolean;
 }
 
-const MobileNavigation: React.FC<MobileNavigationProps> = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+const MobileNavigation: React.FC<MobileNavigationProps> = ({ isScrolled, isHomePage }) => {
+  const location = useLocation();
+
+  const getLinkClass = (path: string) => {
+    const isActive = location.pathname === path;
+    const baseClass = "px-3 py-2 text-xs font-medium rounded-full transition-all duration-300 hover:scale-105 whitespace-nowrap";
+    
+    if (isScrolled) {
+      return `${baseClass} ${isActive 
+        ? 'bg-cpscs-blue text-white shadow-md' 
+        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+      }`;
+    }
+    
+    if (isHomePage) {
+      return `${baseClass} ${isActive 
+        ? 'bg-white/20 text-white backdrop-blur-sm border border-white/30' 
+        : 'text-white/90 hover:bg-white/10 hover:backdrop-blur-sm'
+      }`;
+    }
+    
+    return `${baseClass} ${isActive 
+      ? 'bg-cpscs-blue text-white shadow-md' 
+      : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+    }`;
+  };
 
   return (
-    <div className="md:hidden bg-white/95 dark:bg-cpscs-dark/95 backdrop-blur-md shadow-lg border-t border-gray-200/50">
-      <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
+    <div className="lg:hidden mt-3">
+      <div className="flex flex-wrap gap-2 justify-center px-2">
         {navLinks.map((link, index) => (
           <Link 
             key={link.path} 
             to={link.path} 
-            className="py-2 border-b border-gray-100 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:text-cpscs-blue dark:hover:text-cpscs-gold transition-colors duration-300 animate-fade-in"
+            className={`${getLinkClass(link.path)} animate-fade-in`}
             style={{ animationDelay: `${index * 50}ms` }}
-            onClick={onClose}
           >
             {link.name}
           </Link>
         ))}
-        
-        <div className="pt-4 animate-fade-in" style={{ animationDelay: `${navLinks.length * 50}ms` }}>
-          <AuthButtons isMobile={true} closeMobileMenu={onClose} />
-        </div>
       </div>
     </div>
   );
