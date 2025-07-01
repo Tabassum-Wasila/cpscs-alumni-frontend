@@ -261,7 +261,7 @@ const Signup = () => {
                                 <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="max-h-48 md:max-h-60">
+                            <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
                               {getSSCYears().map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
@@ -287,7 +287,7 @@ const Signup = () => {
                                 <SelectValue placeholder="Select year" />
                               </SelectTrigger>
                             </FormControl>
-                            <SelectContent className="max-h-48 md:max-h-60">
+                            <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
                               {getHSCYears().map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
