@@ -19,11 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { EventService, FeeBreakdown } from '@/services/eventService';
 import PaymentModal from '@/components/PaymentModal';
-
-// Generate year options from 1979 to 2025
-const generateYears = (start: number, end: number) => {
-  return Array.from({ length: end - start + 1 }, (_, i) => (end - i).toString());
-};
+import { getSSCYears, getHSCYears } from '@/utils/yearUtils';
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -325,7 +321,7 @@ const Register = () => {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {generateYears(1979, 2025).map((year) => (
+                                    {getSSCYears().map((year) => (
                                       <SelectItem key={year} value={year}>{year}</SelectItem>
                                     ))}
                                   </SelectContent>
@@ -352,7 +348,7 @@ const Register = () => {
                                   </FormControl>
                                   <SelectContent>
                                     <SelectItem value="not_applicable">Not Applicable</SelectItem>
-                                    {generateYears(1981, 2027).map((year) => (
+                                    {getHSCYears().map((year) => (
                                       <SelectItem key={year} value={year}>{year}</SelectItem>
                                     ))}
                                   </SelectContent>

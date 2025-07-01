@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,11 +21,7 @@ import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import ConfirmPasswordFeedback from '@/components/ConfirmPasswordFeedback';
 import HoverTooltip from '@/components/HoverTooltip';
 import SmartDocumentTooltip from '@/components/SmartDocumentTooltip';
-
-// Generate year options
-const generateYears = (start: number, end: number) => {
-  return Array.from({ length: end - start + 1 }, (_, i) => (end - i).toString());
-};
+import { getSSCYears, getHSCYears } from '@/utils/yearUtils';
 
 // Enhanced validation schema with all fields mandatory and relaxed rules
 const formSchema = z.object({
@@ -267,7 +262,7 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="max-h-48 md:max-h-60">
-                              {generateYears(1979, 2040).map((year) => (
+                              {getSSCYears().map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
@@ -293,7 +288,7 @@ const Signup = () => {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent className="max-h-48 md:max-h-60">
-                              {generateYears(1981, 2042).map((year) => (
+                              {getHSCYears().map((year) => (
                                 <SelectItem key={year} value={year}>{year}</SelectItem>
                               ))}
                             </SelectContent>
