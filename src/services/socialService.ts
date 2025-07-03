@@ -17,7 +17,7 @@ export class SocialService {
     page: number = 1, 
     limit: number = 15, 
     filters: SocialFilters = { sortBy: 'newest' }
-  ): Promise<{ posts: SocialPost[]; hasMore: boolean; total: number }> {
+  ): Promise<{ items: SocialPost[]; hasMore: boolean; total: number }> {
     try {
       // Simulate API delay
       await this.delay(300);
@@ -43,7 +43,7 @@ export class SocialService {
       const paginatedPosts = posts.slice(startIndex, endIndex);
       
       return {
-        posts: paginatedPosts,
+        items: paginatedPosts,
         hasMore: endIndex < posts.length,
         total: posts.length
       };

@@ -47,7 +47,7 @@ const SocialFeed: React.FC = () => {
     hasMore,
     total,
     refresh
-  } = useInfiniteScroll({
+  } = useInfiniteScroll<SocialPost>({
     fetchMore: fetchPosts,
     enabled: isOnline
   });

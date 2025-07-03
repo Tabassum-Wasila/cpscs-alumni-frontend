@@ -91,10 +91,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({
         <div className="mb-4">
           <div className="flex space-x-3">
             <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-              {user.profilePhoto ? (
+              {user.profile?.profilePicture ? (
                 <img 
-                  src={user.profilePhoto} 
-                  alt={user.name}
+                  src={user.profile.profilePicture} 
+                  alt={user.firstName || 'User'}
                   className="w-full h-full object-cover"
                 />
               ) : (
