@@ -94,7 +94,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
               {user.profile?.profilePicture ? (
                 <img 
                   src={user.profile.profilePicture} 
-                  alt={user.firstName || 'User'}
+                  alt={user.fullName || 'User'}
                   className="w-full h-full object-cover"
                 />
               ) : (
