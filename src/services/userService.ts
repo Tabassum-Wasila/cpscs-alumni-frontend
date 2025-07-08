@@ -7,18 +7,50 @@ export type UserProfile = {
   bio?: string;
   profession?: string;
   organization?: string;
+  organizationWebsite?: string;
+  jobTitle?: string;
   city?: string;
   country?: string;
+  permanentAddress?: string;
+  sameAsCurrentAddress?: boolean;
   phoneNumber?: string;
   showPhone?: boolean;
+  dateOfBirth?: string;
   expertise?: string[];
   socialLinks?: {
     facebook?: string;
     linkedin?: string;
     youtube?: string;
+    twitter?: string;
+    instagram?: string;
+    website?: string;
   };
   willingToMentor?: boolean;
   mentorshipAreas?: string[];
+  aboutMe?: string;
+  hallOfFameOptIn?: boolean;
+  hallOfFameBio?: string;
+  education?: EducationEntry[];
+  workExperience?: WorkExperience[];
+  profileCompletionScore?: number;
+};
+
+export type EducationEntry = {
+  id: string;
+  degree: string;
+  institution: string;
+  graduationYear: string;
+  isDefault?: boolean;
+};
+
+export type WorkExperience = {
+  id: string;
+  title: string;
+  company: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description?: string;
 };
 
 export class UserService {
@@ -52,9 +84,13 @@ export class UserService {
       profile?.city,
       profile?.country,
       profile?.bio,
+      profile?.phoneNumber,
       (profile?.expertise && profile.expertise.length > 0)
     ];
     
-    return requiredFields.every(field => !!field);
+    const socialCount = Object.values(profile?.socialLinks || {}).filter(Boolean).length;
+    const hasSocialLinks = socialCount > 0;
+    
+    return requiredFields.every(field => !!field) && hasSocialLinks;
   }
 }
