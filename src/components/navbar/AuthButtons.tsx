@@ -64,7 +64,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
         <Button variant="outline" size="sm" className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 group px-3 py-1.5 text-xs h-8" asChild>
           <Link to="/login">
             <User size={12} className="transition-transform duration-300 group-hover:scale-110" />
-            <span>Login</span>
+            <span className="text-yellow-800">Log In</span>
           </Link>
         </Button>
         <Button size="sm" className="bg-gradient-to-r from-cpscs-blue to-blue-700 hover:from-blue-700 hover:to-cpscs-blue transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 group relative overflow-hidden px-3 py-1.5 text-xs h-8" asChild>
