@@ -282,7 +282,7 @@ ${profileData.phoneNumber ? `Phone: ${profileData.phoneNumber}` : ''}`;
                       <div className="flex space-x-2">
                         <CountryCodeSelect
                           value={countryCode}
-                          onChange={setCountryCode}
+                          onValueChange={setCountryCode}
                           className="w-24"
                         />
                         <Input
