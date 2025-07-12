@@ -292,16 +292,9 @@ Contact: ${user.email}`);
                     </AvatarFallback>
                   </Avatar>
                   <ImageCropUpload
-                    onImageSelect={(imageUrl) => updateField('profilePicture', imageUrl)}
-                    trigger={
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
-                      >
-                        <Camera className="h-4 w-4" />
-                      </Button>
-                    }
+                    currentImage={profileData.profilePicture}
+                    onImageUpdate={(imageUrl) => updateField('profilePicture', imageUrl)}
+                    className="absolute -bottom-2 -right-2"
                   />
                 </div>
 
@@ -329,8 +322,7 @@ Contact: ${user.email}`);
 
                   {/* Profile Progress */}
                   <ProfileProgress
-                    completionPercentage={UserService.calculateProfileCompletion(currentUser)}
-                    missingFields={UserService.getMissingFields(currentUser)}
+                    profile={currentUser.profile}
                     className="mt-4"
                   />
                 </div>
@@ -362,7 +354,7 @@ Contact: ${user.email}`);
                   <div className="space-y-2">
                     <Label htmlFor="bio">Bio *</Label>
                     <RichTextEditor
-                      content={profileData.bio}
+                      value={profileData.bio}
                       onChange={(content) => updateField('bio', content)}
                       placeholder="Tell us about yourself..."
                       className="min-h-[120px]"
