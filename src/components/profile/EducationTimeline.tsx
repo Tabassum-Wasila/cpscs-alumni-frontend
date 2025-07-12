@@ -33,7 +33,8 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
   const [newEntry, setNewEntry] = useState({
     degree: '',
     institution: '',
-    graduationYear: ''
+    graduationYear: '',
+    department: ''
   });
 
   // Initialize with default SSC and HSC entries if not present
@@ -78,7 +79,7 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
     );
     
     onChange(updatedEducation);
-    setNewEntry({ degree: '', institution: '', graduationYear: '' });
+    setNewEntry({ degree: '', institution: '', graduationYear: '', department: '' });
   };
 
   const removeEducation = (id: string) => {
@@ -125,7 +126,7 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
             <CardContent className="p-4">
               {editingId === edu.id ? (
                 <div className="space-y-3">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                     <Select 
                       value={edu.degree} 
                       onValueChange={(value) => updateEducation(edu.id, { degree: value })}
@@ -144,6 +145,12 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
                       value={edu.institution}
                       onChange={(e) => updateEducation(edu.id, { institution: e.target.value })}
                       placeholder="Institution name"
+                    />
+                    
+                    <Input
+                      value={edu.department || ''}
+                      onChange={(e) => updateEducation(edu.id, { department: e.target.value })}
+                      placeholder="Department/Other Details"
                     />
                     
                     <Select 
@@ -179,6 +186,9 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
                       <div>
                         <h4 className="font-medium">{edu.degree}</h4>
                         <p className="text-sm text-muted-foreground">{edu.institution}</p>
+                        {edu.department && (
+                          <p className="text-sm text-muted-foreground">{edu.department}</p>
+                        )}
                         <p className="text-xs text-muted-foreground">Graduated {edu.graduationYear}</p>
                       </div>
                     </div>
@@ -224,7 +234,7 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
           <div className="space-y-3">
             <Label className="text-sm font-medium text-primary">Add Education</Label>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               <Select value={newEntry.degree} onValueChange={(value) => setNewEntry({...newEntry, degree: value})}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select degree" />
@@ -240,6 +250,12 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
                 value={newEntry.institution}
                 onChange={(e) => setNewEntry({...newEntry, institution: e.target.value})}
                 placeholder="Institution name"
+              />
+              
+              <Input
+                value={newEntry.department}
+                onChange={(e) => setNewEntry({...newEntry, department: e.target.value})}
+                placeholder="Department/Other Details"
               />
               
               <Select 

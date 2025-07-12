@@ -18,6 +18,7 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import CompleteProfile from "./pages/CompleteProfile";
+import EnhancedProfilePage from "./components/profile/EnhancedProfilePage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HallOfFame from "./pages/HallOfFame";
@@ -53,6 +54,7 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/complete-profile" element={<CompleteProfile />} />
+              <Route path="/profile/:userId" element={<EnhancedProfilePage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

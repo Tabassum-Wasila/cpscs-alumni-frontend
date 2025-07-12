@@ -3,6 +3,7 @@ import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserService } from "@/services/userService";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ProfilePage from "@/components/alumni/ProfilePage";
@@ -15,22 +16,10 @@ const CompleteProfile = () => {
   // Get the return path from location state
   const from = location.state?.from || "/alumni-directory";
   
-  // Check if profile is complete
-  const isProfileComplete = () => {
-    if (!user || !user.profile) return false;
-    
-    const { profile } = user;
-    const requiredFields = [
-      profile.profilePicture,
-      profile.profession,
-      profile.organization,
-      profile.city,
-      profile.country,
-      profile.bio,
-      (profile.expertise && profile.expertise.length > 0)
-    ];
-    
-    return requiredFields.every(field => !!field);
+  const getProfileCompletion = (): { percentage: number; isComplete: boolean } => {
+    if (!user) return { percentage: 0, isComplete: false };
+    const percentage = UserService.calculateProfileCompletion(user);
+    return { percentage, isComplete: percentage >= 80 };
   };
 
   return (
@@ -42,24 +31,44 @@ const CompleteProfile = () => {
           {isAuthenticated ? (
             <div className="max-w-4xl mx-auto">
               <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h1 className="text-2xl font-bold text-cpscs-blue mb-2">Complete Your Profile</h1>
-                <p className="text-gray-600 mb-4">
-                  To access the Alumni Directory, please complete all required fields in your profile.
-                </p>
-                
-                {isProfileComplete() && (
-                  <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-green-700 font-medium">
-                      Your profile is complete! You can now access the Alumni Directory.
-                    </p>
-                    <Button 
-                      className="mt-3 bg-cpscs-blue hover:bg-blue-700"
-                      onClick={() => navigate(from)}
-                    >
-                      Go to Alumni Directory
-                    </Button>
-                  </div>
-                )}
+                {(() => {
+                  const { percentage, isComplete } = getProfileCompletion();
+                  
+                  if (isComplete) {
+                    return (
+                      <>
+                        <h1 className="text-2xl font-bold text-green-800 mb-2">Profile Complete! 🎉</h1>
+                        <p className="text-green-700 mb-4">
+                          Your profile is {percentage}% complete. You can now access the Alumni Directory.
+                        </p>
+                        <Button 
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => navigate(from)}
+                        >
+                          Go to Alumni Directory
+                        </Button>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <>
+                        <h1 className="text-2xl font-bold text-cpscs-blue mb-2">
+                          Complete Your Profile ({percentage}%)
+                        </h1>
+                        <p className="text-gray-600 mb-4">
+                          You need 80% completion to access the Alumni Directory. 
+                          Fill in the missing fields below to unlock full access.
+                        </p>
+                        <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
+                          <div 
+                            className="bg-cpscs-blue h-3 rounded-full transition-all duration-300"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                      </>
+                    );
+                  }
+                })()}
               </div>
               
               <ProfilePage />

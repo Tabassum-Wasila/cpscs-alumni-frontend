@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Users, MapPin, Briefcase, GraduationCap, BookOpen, Heart, MessageCircle, Filter, UserPlus, UserMinus } from "lucide-react";
+import { Search, Users, MapPin, Briefcase, GraduationCap, BookOpen, Heart, MessageCircle, Filter, UserPlus, UserMinus, User as UserIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -360,12 +360,12 @@ const AlumniDirectory = () => {
                       )}
                       
                       <Button 
-                        onClick={() => handleContactAlumni(user)}
+                        onClick={() => window.location.href = `/profile/${user.id}`}
                         className="w-full"
                         size="sm"
                       >
-                        <MessageCircle size={14} className="mr-2" />
-                        Connect
+                        <UserIcon size={14} className="mr-2" />
+                        View Profile
                       </Button>
                     </div>
                   </CardContent>

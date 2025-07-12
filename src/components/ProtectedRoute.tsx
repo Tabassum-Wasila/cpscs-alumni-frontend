@@ -29,12 +29,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (isAuthenticated && user) {
-    const isProfileComplete = UserService.isProfileComplete(user);
+    const completionPercentage = UserService.calculateProfileCompletion(user);
     
-    if (!isProfileComplete) {
+    if (completionPercentage < 80) {
+      const missingFields = UserService.getMissingFields(user);
       toast({
-        title: "Complete Your Profile",
-        description: "Please complete all required fields in your profile to access the Alumni Directory",
+        title: "Complete Your Profile (80% Required)",
+        description: `You need ${80 - completionPercentage}% more completion. Missing: ${missingFields.slice(0, 2).join(', ')}${missingFields.length > 2 ? ` and ${missingFields.length - 2} more` : ''}`,
+        variant: "destructive",
       });
       return <Navigate to="/complete-profile" state={{ from: location.pathname }} replace />;
     }
