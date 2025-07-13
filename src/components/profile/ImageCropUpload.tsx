@@ -146,26 +146,22 @@ const ImageCropUpload: React.FC<ImageCropUploadProps> = ({
   return (
     <div className={`flex flex-col items-center space-y-4 ${className}`}>
       <div className="relative group">
-        <Avatar className="w-32 h-32 border-4 border-primary/20 hover:border-primary/40 transition-all duration-300">
+        <Avatar className="w-24 h-24 border-4 border-primary/20 hover:border-primary/40 transition-all duration-300">
           <AvatarImage src={currentImage} className="object-cover" />
-          <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70">
-            <User className="h-12 w-12 text-white" />
+          <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-2xl">
+            <User className="h-8 w-8 text-white" />
           </AvatarFallback>
         </Avatar>
         
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full flex items-center justify-center">
-          <Camera className="h-8 w-8 text-white" />
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => fileInputRef.current?.click()}
+          className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 border-primary bg-background hover:bg-primary hover:text-white"
+        >
+          <Camera className="h-4 w-4" />
+        </Button>
       </div>
-
-      <Button
-        variant="outline"
-        onClick={() => fileInputRef.current?.click()}
-        className="border-primary text-primary hover:bg-primary hover:text-white transition-all duration-300"
-      >
-        <Upload className="h-4 w-4 mr-2" />
-        {currentImage ? 'Change Photo' : 'Upload Photo'}
-      </Button>
 
       <input
         ref={fileInputRef}

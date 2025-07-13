@@ -285,16 +285,9 @@ Contact: ${user.email}`);
             <CardContent className="pt-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
                 <div className="relative">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={profileData.profilePicture} alt={currentUser.fullName} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                      {getInitials(currentUser.fullName)}
-                    </AvatarFallback>
-                  </Avatar>
                   <ImageCropUpload
                     currentImage={profileData.profilePicture}
                     onImageUpdate={(imageUrl) => updateField('profilePicture', imageUrl)}
-                    className="absolute -bottom-2 -right-2"
                   />
                 </div>
 
@@ -322,7 +315,7 @@ Contact: ${user.email}`);
 
                   {/* Profile Progress */}
                   <ProfileProgress
-                    profile={currentUser.profile}
+                    profile={profileData}
                     className="mt-4"
                   />
                 </div>

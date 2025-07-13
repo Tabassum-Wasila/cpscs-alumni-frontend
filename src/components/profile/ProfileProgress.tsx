@@ -2,7 +2,7 @@ import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, AlertCircle, Star } from 'lucide-react';
-import { UserProfile } from '@/services/userService';
+import { UserProfile, UserService } from '@/services/userService';
 import { cn } from '@/lib/utils';
 
 interface ProfileProgressProps {
@@ -14,48 +14,37 @@ const ProfileProgress: React.FC<ProfileProgressProps> = ({ profile, className })
   const calculateCompletionScore = () => {
     if (!profile) return 0;
     
-    let score = 0;
-    const maxScore = 100;
+    // Create a temporary user object to use UserService calculation
+    const tempUser = {
+      id: '',
+      fullName: '',
+      email: '',
+      sscYear: '2000',
+      hscYear: '2002',
+      isAuthenticated: true,
+      hasMembership: false,
+      profile: profile
+    };
     
-    // Essential fields (60 points total)
-    if (profile.profilePicture) score += 15;
-    if (profile.bio) score += 10;
-    if (profile.profession) score += 10;
-    if (profile.organization) score += 10;
-    if (profile.city) score += 5;
-    if (profile.country) score += 5;
-    if (profile.expertise && profile.expertise.length > 0) score += 5;
-    
-    // Social links (15 points total)
-    const socialCount = Object.values(profile.socialLinks || {}).filter(Boolean).length;
-    score += Math.min(socialCount * 3, 15);
-    
-    // Additional details (25 points total)
-    if (profile.jobTitle) score += 5;
-    if (profile.phoneNumber) score += 3;
-    if (profile.aboutMe) score += 5;
-    if (profile.education && profile.education.length > 2) score += 4; // More than default entries
-    if (profile.workExperience && profile.workExperience.length > 0) score += 4;
-    if (profile.dateOfBirth) score += 2;
-    if (profile.organizationWebsite) score += 2;
-    
-    return Math.min(score, maxScore);
+    return UserService.calculateProfileCompletion(tempUser);
   };
 
   const getRequiredFields = () => {
-    const missing = [];
-    if (!profile?.profilePicture) missing.push('Profile Picture');
-    if (!profile?.bio) missing.push('Short Bio');
-    if (!profile?.profession) missing.push('Profession');
-    if (!profile?.organization) missing.push('Organization');
-    if (!profile?.city) missing.push('City');
-    if (!profile?.country) missing.push('Country');
-    if (!profile?.expertise || profile.expertise.length === 0) missing.push('Expertise');
+    if (!profile) return [];
     
-    const socialCount = Object.values(profile?.socialLinks || {}).filter(Boolean).length;
-    if (socialCount === 0) missing.push('At least one social link');
+    // Create a temporary user object to use UserService calculation
+    const tempUser = {
+      id: '',
+      fullName: '',
+      email: '',
+      sscYear: '2000',
+      hscYear: '2002',
+      isAuthenticated: true,
+      hasMembership: false,
+      profile: profile
+    };
     
-    return missing;
+    return UserService.getMissingFields(tempUser);
   };
 
   const completionScore = calculateCompletionScore();
