@@ -404,14 +404,6 @@ Contact: ${user.email}`);
                       />
                     </div>
                     
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="showPhone"
-                        checked={profileData.showPhone}
-                        onCheckedChange={(checked) => updateField('showPhone', checked)}
-                      />
-                      <Label htmlFor="showPhone">Show phone number in public profile</Label>
-                    </div>
                   </div>
 
                   {/* Date of Birth */}
@@ -622,44 +614,15 @@ Contact: ${user.email}`);
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* About Me */}
+                  {/* More About Me */}
                   <div className="space-y-2">
-                    <Label htmlFor="aboutMe">About Me</Label>
-                    <Textarea
-                      id="aboutMe"
+                    <Label htmlFor="aboutMe">More About Me</Label>
+                    <RichTextEditor
                       value={profileData.aboutMe}
-                      onChange={(e) => updateField('aboutMe', e.target.value)}
+                      onChange={(content) => updateField('aboutMe', content)}
                       placeholder="Tell us more about yourself, your interests, achievements..."
-                      rows={4}
+                      className="min-h-[120px]"
                     />
-                  </div>
-
-                  {/* Hall of Fame */}
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="hallOfFameOptIn"
-                        checked={profileData.hallOfFameOptIn}
-                        onCheckedChange={(checked) => updateField('hallOfFameOptIn', checked)}
-                      />
-                      <Label htmlFor="hallOfFameOptIn" className="flex items-center gap-2">
-                        <Award className="h-4 w-4" />
-                        Include me in the Hall of Fame
-                      </Label>
-                    </div>
-
-                    {profileData.hallOfFameOptIn && (
-                      <div className="space-y-2">
-                        <Label htmlFor="hallOfFameBio">Hall of Fame Bio</Label>
-                        <Textarea
-                          id="hallOfFameBio"
-                          value={profileData.hallOfFameBio}
-                          onChange={(e) => updateField('hallOfFameBio', e.target.value)}
-                          placeholder="Write a brief bio highlighting your achievements for the Hall of Fame..."
-                          rows={3}
-                        />
-                      </div>
-                    )}
                   </div>
 
                   {/* Permanent Address */}

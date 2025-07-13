@@ -154,7 +154,10 @@ const ProfileView: React.FC<ProfileViewProps> = ({
               {user.profile?.bio && (
                 <div>
                   <h4 className="font-medium mb-2">About</h4>
-                  <p className="text-muted-foreground">{user.profile.bio}</p>
+                  <div 
+                    className="text-muted-foreground prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: user.profile.bio }}
+                  />
                 </div>
               )}
 
@@ -162,7 +165,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                 {/* Email */}
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
-                  {isOwnProfile || verifiedContacts.has('email') ? (
+                  {verifiedContacts.has('email') ? (
                     <span className="text-sm">{user.email}</span>
                   ) : (
                     <Button
@@ -181,7 +184,7 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                 {user.profile?.phoneNumber && (
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-muted-foreground" />
-                    {isOwnProfile || verifiedContacts.has('phone') ? (
+                    {verifiedContacts.has('phone') ? (
                       <span className="text-sm">{user.profile.phoneNumber}</span>
                     ) : (
                       <Button
@@ -391,18 +394,6 @@ const ProfileView: React.FC<ProfileViewProps> = ({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h4 className="font-medium mb-1">SSC Year</h4>
-                  <p className="text-muted-foreground">Batch {user.sscYear}</p>
-                </div>
-
-                {user.hscYear && (
-                  <div>
-                    <h4 className="font-medium mb-1">HSC Year</h4>
-                    <p className="text-muted-foreground">Batch {user.hscYear}</p>
-                  </div>
-                )}
-
                 {user.dateJoined && (
                   <div>
                     <h4 className="font-medium mb-1">Member Since</h4>
@@ -416,6 +407,14 @@ const ProfileView: React.FC<ProfileViewProps> = ({
                     {user.hasMembership ? "Active Member" : "Basic Member"}
                   </Badge>
                 </div>
+
+                {/* Permanent Address */}
+                {user.profile?.permanentAddress && (
+                  <div>
+                    <h4 className="font-medium mb-1">Permanent Address</h4>
+                    <p className="text-muted-foreground">{user.profile.permanentAddress}</p>
+                  </div>
+                )}
               </div>
 
               {/* Hall of Fame */}
@@ -432,8 +431,11 @@ const ProfileView: React.FC<ProfileViewProps> = ({
               {/* About Me */}
               {user.profile?.aboutMe && (
                 <div>
-                  <h4 className="font-medium mb-2">About Me</h4>
-                  <p className="text-muted-foreground">{user.profile.aboutMe}</p>
+                  <h4 className="font-medium mb-2">More About Me</h4>
+                  <div 
+                    className="text-muted-foreground prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: user.profile.aboutMe }}
+                  />
                 </div>
               )}
             </CardContent>

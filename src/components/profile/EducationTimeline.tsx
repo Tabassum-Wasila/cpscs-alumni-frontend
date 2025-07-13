@@ -143,13 +143,25 @@ const EducationTimeline: React.FC<EducationTimelineProps> = ({
                     
                     <Input
                       value={edu.institution}
-                      onChange={(e) => updateEducation(edu.id, { institution: e.target.value })}
+                      onChange={(e) => {
+                        const updates = { institution: e.target.value };
+                        const updated = education.map(entry => 
+                          entry.id === edu.id ? { ...entry, ...updates } : entry
+                        );
+                        onChange(updated);
+                      }}
                       placeholder="Institution name"
                     />
                     
                     <Input
                       value={edu.department || ''}
-                      onChange={(e) => updateEducation(edu.id, { department: e.target.value })}
+                      onChange={(e) => {
+                        const updates = { department: e.target.value };
+                        const updated = education.map(entry => 
+                          entry.id === edu.id ? { ...entry, ...updates } : entry
+                        );
+                        onChange(updated);
+                      }}
                       placeholder="Department/Other Details"
                     />
                     

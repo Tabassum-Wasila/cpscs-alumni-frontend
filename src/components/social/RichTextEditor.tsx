@@ -31,10 +31,10 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   ];
 
   const headingButtons = [
-    { command: 'formatBlock', value: 'h1', label: 'H1' },
-    { command: 'formatBlock', value: 'h2', label: 'H2' },
-    { command: 'formatBlock', value: 'h3', label: 'H3' },
-    { command: 'formatBlock', value: 'p', label: 'P' },
+    { command: 'formatBlock', value: '<h1>', label: 'H1' },
+    { command: 'formatBlock', value: '<h2>', label: 'H2' },
+    { command: 'formatBlock', value: '<h3>', label: 'H3' },
+    { command: 'formatBlock', value: '<p>', label: 'P' },
   ];
 
   const colorButtons = [
