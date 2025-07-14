@@ -15,16 +15,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated && location.pathname !== '/alumni-directory') {
       toast({
         title: "Authentication Required",
-        description: "Please log in to access the Alumni Directory",
+        description: "Please log in to access this page",
         variant: "destructive",
       });
     }
-  }, [isAuthenticated, toast]);
+  }, [isAuthenticated, toast, location.pathname]);
 
   if (!isAuthenticated) {
+    // For alumni directory, show preview page instead of redirecting to login
+    if (location.pathname === '/alumni-directory') {
+      return <Navigate to="/alumni-directory-preview" replace />;
+    }
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 

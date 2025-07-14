@@ -5,15 +5,19 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Users, MapPin, Briefcase, GraduationCap, BookOpen, Heart, MessageCircle, Filter, UserPlus, UserMinus, User as UserIcon } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Search, Users, MapPin, Briefcase, GraduationCap, Heart, User as UserIcon, Mail, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { User } from '@/contexts/AuthContext';
-import { AdminService } from '@/services/adminService';
 
 const AlumniDirectory = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,83 +25,67 @@ const AlumniDirectory = () => {
   const [selectedProfession, setSelectedProfession] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('all');
   const [showOnlyMentors, setShowOnlyMentors] = useState(false);
-  const [demoUsersCount, setDemoUsersCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadUsers();
-    loadDemoUsersCount();
   }, []);
 
   const loadUsers = () => {
-    const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-    setUsers(storedUsers);
-  };
-
-  const loadDemoUsersCount = async () => {
-    const count = await AdminService.getDemoUsersCount();
-    setDemoUsersCount(count);
-  };
-
-  const handleAddDemoUsers = async () => {
-    const success = await AdminService.addDemoUsers();
-    if (success) {
-      toast({
-        title: "Demo Users Added",
-        description: "Sample alumni profiles have been added to the directory.",
-      });
-      loadUsers();
-      loadDemoUsersCount();
-    } else {
+    try {
+      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+      // Filter out demo users and current user
+      const realUsers = storedUsers.filter((user: User) => 
+        !user.isDemoUser && user.id !== currentUser?.id
+      );
+      setUsers(realUsers);
+    } catch (error) {
+      console.error('Error loading users:', error);
       toast({
         title: "Error",
-        description: "Failed to add demo users.",
+        description: "Failed to load alumni directory",
         variant: "destructive",
       });
-    }
-  };
-
-  const handleRemoveDemoUsers = async () => {
-    const success = await AdminService.removeDemoUsers();
-    if (success) {
-      toast({
-        title: "Demo Users Removed",
-        description: "All demo users have been removed from the directory.",
-      });
-      loadUsers();
-      loadDemoUsersCount();
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to remove demo users.",
-        variant: "destructive",
-      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     let filtered = users;
 
-    if (searchTerm) {
+    // Search filter
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(user =>
-        user.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.profile?.profession && user.profile.profession.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (user.profile?.organization && user.profile.organization.toLowerCase().includes(searchTerm.toLowerCase()))
+        user.fullName.toLowerCase().includes(searchLower) ||
+        user.email.toLowerCase().includes(searchLower) ||
+        (user.profile?.profession && user.profile.profession.toLowerCase().includes(searchLower)) ||
+        (user.profile?.organization && user.profile.organization.toLowerCase().includes(searchLower)) ||
+        (user.profile?.city && user.profile.city.toLowerCase().includes(searchLower)) ||
+        (user.profile?.country && user.profile.country.toLowerCase().includes(searchLower)) ||
+        (user.profile?.expertise && user.profile.expertise.some(skill => 
+          skill.toLowerCase().includes(searchLower)
+        ))
       );
     }
 
+    // Batch filter
     if (selectedBatch !== 'all') {
       filtered = filtered.filter(user => user.sscYear === selectedBatch);
     }
 
+    // Profession filter
     if (selectedProfession !== 'all') {
       filtered = filtered.filter(user => user.profile?.profession === selectedProfession);
     }
 
+    // Location filter
     if (selectedLocation !== 'all') {
       filtered = filtered.filter(user => user.profile?.country === selectedLocation);
     }
 
+    // Mentors filter
     if (showOnlyMentors) {
       filtered = filtered.filter(user => user.profile?.willingToMentor);
     }
@@ -114,12 +102,33 @@ const AlumniDirectory = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
-  const handleContactAlumni = (user: User) => {
+  const handleContactAlumni = (contactUser: User, contactType: 'email' | 'phone') => {
+    if (contactType === 'email') {
+      window.location.href = `mailto:${contactUser.email}`;
+    } else if (contactType === 'phone' && contactUser.profile?.phoneNumber) {
+      window.location.href = `tel:${contactUser.profile.phoneNumber}`;
+    }
+    
     toast({
-      title: "Contact Feature",
-      description: "This feature will be available in the full version of the platform.",
+      title: "Contact Initiated",
+      description: `Opening ${contactType} client for ${contactUser.fullName}`,
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cpscs-blue mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading Alumni Directory...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -133,36 +142,6 @@ const AlumniDirectory = () => {
               Connect with fellow CPSCS alumni from around the world
             </p>
           </div>
-
-          {/* Demo Controls */}
-          <Card className="mb-6 bg-yellow-50 border-yellow-200">
-            <CardHeader>
-              <CardTitle className="text-yellow-800">Demo Mode</CardTitle>
-              <CardDescription className="text-yellow-700">
-                Add sample profiles to explore the directory features ({demoUsersCount} demo users currently loaded)
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex gap-4">
-              <Button 
-                onClick={handleAddDemoUsers}
-                variant="outline"
-                className="border-yellow-400 text-yellow-800 hover:bg-yellow-100"
-              >
-                <UserPlus size={16} className="mr-2" />
-                Add Demo Users
-              </Button>
-              {demoUsersCount > 0 && (
-                <Button 
-                  onClick={handleRemoveDemoUsers}
-                  variant="outline"
-                  className="border-red-400 text-red-800 hover:bg-red-100"
-                >
-                  <UserMinus size={16} className="mr-2" />
-                  Remove Demo Users
-                </Button>
-              )}
-            </CardContent>
-          </Card>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -229,7 +208,7 @@ const AlumniDirectory = () => {
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <Input
-                    placeholder="Search by name, email, profession, or organization..."
+                    placeholder="Search by name, email, profession, organization, location, or skills..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full"
@@ -274,14 +253,12 @@ const AlumniDirectory = () => {
               </div>
               
               <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="mentors-only"
                   checked={showOnlyMentors}
-                  onChange={(e) => setShowOnlyMentors(e.target.checked)}
-                  className="rounded border-gray-300"
+                  onCheckedChange={(checked) => setShowOnlyMentors(checked === true)}
                 />
-                <label htmlFor="mentors-only" className="text-sm font-medium">
+                <label htmlFor="mentors-only" className="text-sm font-medium cursor-pointer">
                   Show only mentors
                 </label>
               </div>
@@ -296,7 +273,7 @@ const AlumniDirectory = () => {
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No Alumni Found</h3>
                 <p className="text-gray-500">
                   {users.length === 0 
-                    ? "No alumni profiles available. Add some demo users to get started!" 
+                    ? "No alumni profiles available. More alumni will appear as they join the platform." 
                     : "Try adjusting your search criteria to find more alumni."}
                 </p>
               </CardContent>
@@ -359,14 +336,36 @@ const AlumniDirectory = () => {
                         </Badge>
                       )}
                       
-                      <Button 
-                        onClick={() => window.location.href = `/profile/${user.id}`}
-                        className="w-full"
-                        size="sm"
-                      >
-                        <UserIcon size={14} className="mr-2" />
-                        View Profile
-                      </Button>
+                      <div className="flex gap-2 w-full">
+                        <Button 
+                          onClick={() => navigate(`/profile/${user.id}`)}
+                          className="flex-1"
+                          size="sm"
+                        >
+                          <UserIcon size={14} className="mr-2" />
+                          View Profile
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => handleContactAlumni(user, 'email')}
+                          variant="outline"
+                          size="sm"
+                          className="px-3"
+                        >
+                          <Mail size={14} />
+                        </Button>
+                        
+                        {user.profile?.phoneNumber && user.profile?.showPhone && (
+                          <Button 
+                            onClick={() => handleContactAlumni(user, 'phone')}
+                            variant="outline"
+                            size="sm"
+                            className="px-3"
+                          >
+                            <Phone size={14} />
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

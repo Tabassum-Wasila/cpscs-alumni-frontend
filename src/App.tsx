@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
 import AlumniDirectory from "./pages/AlumniDirectory";
+import AlumniDirectoryLanding from "./pages/AlumniDirectoryLanding";
 import Committee from "./pages/Committee";
 import Sponsors from "./pages/Sponsors";
 import MentorshipCareer from "./pages/MentorshipCareer";
@@ -43,6 +44,7 @@ const App = () => {
                   <AlumniDirectory />
                 </ProtectedRoute>
               } />
+              <Route path="/alumni-directory-preview" element={<AlumniDirectoryLanding />} />
               <Route path="/committee" element={<Committee />} />
               <Route path="/sponsors" element={<Sponsors />} />
               <Route path="/hall-of-fame" element={<HallOfFame />} />

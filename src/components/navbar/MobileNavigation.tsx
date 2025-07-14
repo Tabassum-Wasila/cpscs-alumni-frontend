@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { navLinks } from '@/utils/navbarUtils';
+import SmartNavLink from './SmartNavLink';
 
 interface MobileNavigationProps {
   isScrolled: boolean;
@@ -12,7 +13,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ isScrolled, isHomeP
   const location = useLocation();
 
   const getLinkClass = (path: string) => {
-    const isActive = location.pathname === path;
+    const isActive = location.pathname === path || (path === '/alumni-directory' && location.pathname === '/alumni-directory-preview');
     const baseClass = "px-3 py-2 text-xs font-medium rounded-full transition-all duration-300 hover:scale-105 whitespace-nowrap";
     
     if (isScrolled) {
@@ -39,14 +40,16 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ isScrolled, isHomeP
     <div className="lg:hidden mt-3">
       <div className="flex flex-wrap gap-2 justify-center px-2">
         {navLinks.map((link, index) => (
-          <Link 
-            key={link.path} 
-            to={link.path} 
+          <SmartNavLink
+            key={link.path}
+            to={link.path}
+            protectedRoute={link.path === '/alumni-directory'}
+            previewRoute="/alumni-directory-preview"
             className={`${getLinkClass(link.path)} animate-fade-in`}
             style={{ animationDelay: `${index * 50}ms` }}
           >
             {link.name}
-          </Link>
+          </SmartNavLink>
         ))}
       </div>
     </div>

@@ -85,7 +85,7 @@ const FeaturedAlumni = () => {
           </div>
           
           <Button className="mt-4 md:mt-0 bg-cpscs-blue text-white hover:bg-cpscs-blue/90">
-            <Link to="/directory">Browse Alumni Directory</Link>
+            <Link to="/alumni-directory-preview">Browse Alumni Directory</Link>
           </Button>
         </div>
         
