@@ -57,7 +57,7 @@ const Events = () => {
     });
 
     setFilteredEvents(filtered);
-  }, [events, searchTerm, statusFilter, categoryFilter]);
+  }, [events, searchTerm, statusFilter]);
 
   const upcomingCount = events.filter(e => e.status === 'upcoming').length;
   const pastCount = events.filter(e => e.status === 'past').length;
@@ -118,7 +118,7 @@ const Events = () => {
               <div className="text-6xl mb-4">📅</div>
               <h3 className="text-xl font-semibold mb-2">No events found</h3>
               <p className="text-muted-foreground">
-                {searchTerm || statusFilter !== 'all' || categoryFilter !== 'all'
+                {searchTerm || statusFilter !== 'all'
                   ? 'Try adjusting your search or filters'
                   : 'Check back soon for upcoming events!'}
               </p>

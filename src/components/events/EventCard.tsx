@@ -51,7 +51,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
     return (
       <Link to={`/events/${event.id}`}>
         <Button 
-          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary transition-all duration-300 shadow-lg hover:shadow-xl animate-glow"
+          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300 shadow-md hover:shadow-lg"
         >
           Register Now
           {event.registrationUrl && <ExternalLink size={16} className="ml-2" />}
@@ -117,14 +117,12 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             <span className="truncate">{event.venue}</span>
           </div>
 
-          {event.capacity && (
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Users size={16} className="mr-2 text-primary" />
-              <span>
-                {event.currentRegistrations || 0} / {event.capacity} registered
-              </span>
-            </div>
-          )}
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Users size={16} className="mr-2 text-primary" />
+            <span>
+              {event.currentRegistrations || 0} people registered
+            </span>
+          </div>
 
           <div className="text-sm font-medium text-muted-foreground">
             Registration Deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
