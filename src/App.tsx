@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 import AlumniDirectory from "./pages/AlumniDirectory";
 import AlumniDirectoryLanding from "./pages/AlumniDirectoryLanding";
 import Committee from "./pages/Committee";
@@ -38,7 +39,8 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/gallery" element={<Gallery />} />
-              <Route path="/events" element={<Events />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<EventDetail />} />
               <Route path="/alumni-directory" element={
                 <ProtectedRoute>
                   <AlumniDirectory />

@@ -15,8 +15,7 @@ const Events = () => {
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'past'>('all');
-  const [categoryFilter, setCategoryFilter] = useState<'all' | Event['category']>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  // Removed category filter and view mode - always grid view
 
   // Load events (will be replaced with API call)
   useEffect(() => {
@@ -48,10 +47,7 @@ const Events = () => {
       filtered = filtered.filter(event => event.status === statusFilter);
     }
 
-    // Category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(event => event.category === categoryFilter);
-    }
+    // Category filter removed
 
     // Sort by date (upcoming first, then past)
     filtered.sort((a, b) => {
@@ -90,7 +86,7 @@ const Events = () => {
 
           {/* Search and Filters */}
           <div className="mb-8 bg-card rounded-lg p-6 border shadow-sm">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 md:grid-cols-2">
               {/* Search */}
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -113,44 +109,6 @@ const Events = () => {
                   <SelectItem value="past">Past Events</SelectItem>
                 </SelectContent>
               </Select>
-
-              {/* Category Filter */}
-              <Select value={categoryFilter} onValueChange={(value: any) => setCategoryFilter(value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Categories</SelectItem>
-                  <SelectItem value="reunion">Reunion</SelectItem>
-                  <SelectItem value="workshop">Workshop</SelectItem>
-                  <SelectItem value="sports">Sports</SelectItem>
-                  <SelectItem value="cultural">Cultural</SelectItem>
-                  <SelectItem value="networking">Networking</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* View Mode Toggle */}
-              <div className="flex gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className="flex-1"
-                >
-                  <Grid size={16} className="mr-2" />
-                  Grid
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="flex-1"
-                >
-                  <List size={16} className="mr-2" />
-                  List
-                </Button>
-              </div>
             </div>
           </div>
 
@@ -166,11 +124,7 @@ const Events = () => {
               </p>
             </div>
           ) : (
-            <div className={
-              viewMode === 'grid' 
-                ? "grid gap-6 md:grid-cols-2 lg:grid-cols-3" 
-                : "space-y-6"
-            }>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredEvents.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}
