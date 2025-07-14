@@ -87,9 +87,32 @@ const EnhancedProfilePage = () => {
     }
   }, [userId, isOwnProfile]);
 
+  // Helper function to detect social platform from URL
+  const detectSocialPlatform = (url: string): string | null => {
+    if (!url) return null;
+    const lowerUrl = url.toLowerCase();
+    if (lowerUrl.includes('facebook.com')) return 'facebook';
+    if (lowerUrl.includes('linkedin.com')) return 'linkedin';
+    if (lowerUrl.includes('instagram.com')) return 'instagram';
+    if (lowerUrl.includes('twitter.com') || lowerUrl.includes('x.com')) return 'twitter';
+    if (lowerUrl.includes('youtube.com')) return 'youtube';
+    return 'website'; // Default to website for other URLs
+  };
+
   // Sync profile data when current user changes
   useEffect(() => {
     if (currentUser?.profile) {
+      let socialLinks = currentUser.profile.socialLinks || {};
+      
+      // Auto-migrate socialProfileLink from signup if socialLinks is empty
+      if (Object.keys(socialLinks).length === 0 && (currentUser as any).socialProfileLink) {
+        const socialProfileLink = (currentUser as any).socialProfileLink;
+        const platform = detectSocialPlatform(socialProfileLink);
+        if (platform) {
+          socialLinks = { [platform]: socialProfileLink };
+        }
+      }
+      
       setProfileData({
         profilePicture: currentUser.profile.profilePicture || '',
         bio: currentUser.profile.bio || '',
@@ -105,7 +128,7 @@ const EnhancedProfilePage = () => {
         showPhone: currentUser.profile.showPhone ?? true,
         dateOfBirth: currentUser.profile.dateOfBirth || '',
         expertise: currentUser.profile.expertise || [],
-        socialLinks: currentUser.profile.socialLinks || {},
+        socialLinks: socialLinks,
         willingToMentor: currentUser.profile.willingToMentor || false,
         mentorshipAreas: currentUser.profile.mentorshipAreas || [],
         aboutMe: currentUser.profile.aboutMe || '',
