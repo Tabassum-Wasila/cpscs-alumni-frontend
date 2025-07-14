@@ -1,0 +1,148 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Event, EventService } from '@/services/eventService';
+import DefaultEventBanner from './DefaultEventBanner';
+
+interface EventCardProps {
+  event: Event;
+}
+
+const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const isRegistrationOpen = EventService.isRegistrationOpen(event);
+  const isEventFull = EventService.isEventFull(event);
+  const colorScheme = EventService.getCategoryColorScheme(event.category);
+
+  const getStatusBadge = () => {
+    if (event.status === 'past') {
+      return <Badge variant="secondary">Past Event</Badge>;
+    }
+    if (isEventFull) {
+      return <Badge variant="destructive">Full</Badge>;
+    }
+    if (!isRegistrationOpen) {
+      return <Badge variant="outline">Registration Closed</Badge>;
+    }
+    return <Badge className="bg-green-600 hover:bg-green-700">Open for Registration</Badge>;
+  };
+
+  const getActionButton = () => {
+    if (event.status === 'past') {
+      return (
+        <Button variant="outline" className="w-full" disabled>
+          Event Concluded
+        </Button>
+      );
+    }
+
+    if (!isRegistrationOpen || isEventFull) {
+      return (
+        <Link to={`/events/${event.id}`}>
+          <Button variant="outline" className="w-full">
+            View Details
+          </Button>
+        </Link>
+      );
+    }
+
+    return (
+      <Link to={`/events/${event.id}`}>
+        <Button 
+          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary transition-all duration-300 shadow-lg hover:shadow-xl animate-glow"
+        >
+          Register Now
+          {event.registrationUrl && <ExternalLink size={16} className="ml-2" />}
+        </Button>
+      </Link>
+    );
+  };
+
+  return (
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl group">
+      {/* Event Banner */}
+      <div className="relative h-48">
+        {event.image ? (
+          <img 
+            src={event.image} 
+            alt={event.title} 
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <DefaultEventBanner event={event} />
+        )}
+        
+        {/* Status and Type badges */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          <Badge 
+            variant="secondary" 
+            className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+          >
+            {event.type}
+          </Badge>
+          {getStatusBadge()}
+        </div>
+      </div>
+      
+      <CardContent className="p-6">
+        <div className="flex items-start justify-between mb-3">
+          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+            {event.title}
+          </h3>
+          <Badge variant="outline" className="capitalize ml-2">
+            {event.category}
+          </Badge>
+        </div>
+        
+        <div className="space-y-2 mb-4">
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Calendar size={16} className="mr-2 text-primary" />
+            <span>{new Date(event.date).toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</span>
+          </div>
+          
+          <div className="flex items-center text-sm text-muted-foreground">
+            <Clock size={16} className="mr-2 text-primary" />
+            <span>{event.time}</span>
+          </div>
+          
+          <div className="flex items-center text-sm text-muted-foreground">
+            <MapPin size={16} className="mr-2 text-primary" />
+            <span className="truncate">{event.venue}</span>
+          </div>
+
+          {event.capacity && (
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Users size={16} className="mr-2 text-primary" />
+              <span>
+                {event.currentRegistrations || 0} / {event.capacity} registered
+              </span>
+            </div>
+          )}
+
+          <div className="text-sm font-medium text-muted-foreground">
+            Registration Deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
+          </div>
+        </div>
+        
+        {/* Description preview */}
+        <div 
+          className="text-sm text-muted-foreground mb-4 line-clamp-2"
+          dangerouslySetInnerHTML={{ 
+            __html: event.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...'
+          }}
+        />
+        
+        {getActionButton()}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default EventCard;

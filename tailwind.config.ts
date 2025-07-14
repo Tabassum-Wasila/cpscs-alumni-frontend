@@ -27,7 +27,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -138,7 +139,53 @@ export default {
 					'100%': {
 						transform: 'translateX(-33.333%)'
 					}
-				}
+				},
+
+        // Event-specific animations
+        "gradient-flow": {
+          "0%, 100%": { 
+            backgroundPosition: "0% 50%",
+            backgroundSize: "200% 200%"
+          },
+          "50%": { 
+            backgroundPosition: "100% 50%",
+            backgroundSize: "200% 200%"
+          }
+        },
+        
+        "title-glow": {
+          "0%": { 
+            textShadow: "0 0 20px rgba(255, 255, 255, 0.3)"
+          },
+          "100%": { 
+            textShadow: "0 0 30px rgba(255, 255, 255, 0.6), 0 0 40px rgba(255, 255, 255, 0.4)"
+          }
+        },
+        
+        "float-horizontal": {
+          "0%, 100%": { 
+            transform: "translateX(-100px) translateY(0px)",
+            opacity: "0"
+          },
+          "10%": { 
+            opacity: "1"
+          },
+          "90%": { 
+            opacity: "1"
+          },
+          "50%": { 
+            transform: "translateX(calc(100vw + 100px)) translateY(-20px)"
+          }
+        },
+
+        "glow": {
+          "0%": {
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.5)"
+          },
+          "100%": {
+            boxShadow: "0 0 30px hsl(var(--primary) / 0.8), 0 0 40px hsl(var(--primary) / 0.3)"
+          }
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
@@ -148,6 +195,12 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'gradient-x': 'gradient-x 3s ease infinite',
 				'scroll-left': 'scroll-left 60s linear infinite',
+        
+        // Event animations
+        "gradient-flow": "gradient-flow 6s ease-in-out infinite",
+        "title-glow": "title-glow 2s ease-in-out infinite alternate",
+        "float-horizontal": "float-horizontal 8s ease-in-out infinite",
+        "glow": "glow 2s ease-in-out infinite alternate",
 			}
 		}
 	},

@@ -18,6 +18,7 @@
 
     --primary: 215 64% 22%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 74% 35%;
 
     --secondary: 45 100% 50%;
     --secondary-foreground: 220 13% 10%;
@@ -59,6 +60,7 @@
 
     --primary: 215 64% 22%;
     --primary-foreground: 0 0% 100%;
+    --primary-glow: 215 74% 35%;
 
     --secondary: 45 100% 50%;
     --secondary-foreground: 220 13% 10%;
