@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import ForgotPasswordModal from '@/components/auth/ForgotPasswordModal';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -26,6 +27,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { login } = useAuth();
   
   // Get the return path from location state, or default to alumni-directory
@@ -128,6 +130,16 @@ const Login = () => {
                   <Button type="submit" className="w-full bg-gradient-to-r from-cpscs-blue to-blue-700">
                     Sign In
                   </Button>
+                  
+                  <div className="text-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-sm text-cpscs-blue hover:underline focus:outline-none"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
                 </form>
               </Form>
             </CardContent>
@@ -138,16 +150,15 @@ const Login = () => {
                   Sign up here
                 </Link>
               </div>
-              <div className="text-sm text-center text-gray-600">
-                Attending the reunion?{" "}
-                <Link to="/register" className="text-cpscs-blue font-medium hover:underline">
-                  Register for reunion
-                </Link>
-              </div>
             </CardFooter>
           </Card>
         </div>
       </div>
+      
+      <ForgotPasswordModal 
+        open={showForgotPassword} 
+        onClose={() => setShowForgotPassword(false)}
+      />
       
       <Footer />
     </div>

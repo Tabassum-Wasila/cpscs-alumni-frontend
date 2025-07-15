@@ -205,4 +205,93 @@ export class AuthService {
       return false;
     }
   }
+
+  // Password Reset Methods
+  static async sendPasswordResetOTP(email: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const users = this.getStoredUsers();
+      const user = users.find((u: any) => u.email === email);
+      
+      if (!user) {
+        return {
+          success: false,
+          message: 'No account found with this email address'
+        };
+      }
+
+      // Import OTPService dynamically to avoid circular dependency
+      const { OTPService } = await import('./otpService');
+      return await OTPService.sendPasswordResetOTP(email);
+    } catch (error) {
+      console.error("Send password reset OTP error:", error);
+      return {
+        success: false,
+        message: 'Failed to send password reset OTP. Please try again.'
+      };
+    }
+  }
+
+  static async verifyPasswordResetOTP(email: string, otp: string): Promise<{ success: boolean; message: string }> {
+    try {
+      const { OTPService } = await import('./otpService');
+      const isValid = OTPService.verifyOTP(email, otp, 'password-reset');
+      
+      if (isValid) {
+        return {
+          success: true,
+          message: 'OTP verified successfully'
+        };
+      } else {
+        return {
+          success: false,
+          message: 'Invalid or expired OTP. Please try again.'
+        };
+      }
+    } catch (error) {
+      console.error("Verify password reset OTP error:", error);
+      return {
+        success: false,
+        message: 'Failed to verify OTP. Please try again.'
+      };
+    }
+  }
+
+  static async resetPassword(email: string, otp: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    try {
+      // Verify OTP first
+      const otpVerification = await this.verifyPasswordResetOTP(email, otp);
+      if (!otpVerification.success) {
+        return otpVerification;
+      }
+
+      // Update password
+      const users = this.getStoredUsers();
+      const userIndex = users.findIndex((u: any) => u.email === email);
+      
+      if (userIndex === -1) {
+        return {
+          success: false,
+          message: 'User not found'
+        };
+      }
+
+      users[userIndex].password = newPassword;
+      localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
+
+      // Remove OTP after successful password reset
+      const { OTPService } = await import('./otpService');
+      OTPService.removeOTP(email, 'password-reset');
+
+      return {
+        success: true,
+        message: 'Password reset successfully'
+      };
+    } catch (error) {
+      console.error("Reset password error:", error);
+      return {
+        success: false,
+        message: 'Failed to reset password. Please try again.'
+      };
+    }
+  }
 }
