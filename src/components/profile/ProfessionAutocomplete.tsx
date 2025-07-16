@@ -108,6 +108,9 @@ const ProfessionAutocomplete: React.FC<ProfessionAutocompleteProps> = ({
 
   const allProfessions = [...DEFAULT_PROFESSIONS, ...customProfessions].sort();
   
+  // Check if current input is a new profession not in the list
+  const isNewProfession = value && !allProfessions.includes(value);
+  
   const handleSelect = (selectedValue: string) => {
     onChange(selectedValue);
     saveCustomProfession(selectedValue);
@@ -118,6 +121,13 @@ const ProfessionAutocomplete: React.FC<ProfessionAutocompleteProps> = ({
     if (customValue && customValue !== value) {
       onChange(customValue);
       saveCustomProfession(customValue);
+    }
+  };
+
+  const handleAddNew = () => {
+    if (value && !allProfessions.includes(value)) {
+      saveCustomProfession(value);
+      setOpen(false);
     }
   };
 

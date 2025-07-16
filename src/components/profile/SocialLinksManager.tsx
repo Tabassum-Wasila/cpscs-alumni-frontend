@@ -34,26 +34,8 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
     if (!url) return true; // Allow empty URLs
     
     try {
-      const urlObj = new URL(url);
-      
-      // Basic URL validation
-      if (!urlObj.protocol.startsWith('http')) return false;
-      
-      // Platform-specific validation
-      switch (platform) {
-        case 'facebook':
-          return urlObj.hostname.includes('facebook.com');
-        case 'linkedin':
-          return urlObj.hostname.includes('linkedin.com');
-        case 'youtube':
-          return urlObj.hostname.includes('youtube.com') || urlObj.hostname.includes('youtu.be');
-        case 'twitter':
-          return urlObj.hostname.includes('twitter.com') || urlObj.hostname.includes('x.com');
-        case 'instagram':
-          return urlObj.hostname.includes('instagram.com');
-        default:
-          return true; // For website, allow any valid URL
-      }
+      new URL(url); // Basic URL validation
+      return true; // If URL is valid, accept it regardless of platform
     } catch {
       return false;
     }

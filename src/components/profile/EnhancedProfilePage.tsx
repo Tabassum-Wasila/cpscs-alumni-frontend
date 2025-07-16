@@ -32,6 +32,7 @@ import CountryCodeSelect from '../CountryCodeSelect';
 import { countryCodes } from '@/data/countryCodes';
 import ProfileProgress from './ProfileProgress';
 import ProfileView from './ProfileView';
+import FuturisticProfileView from './FuturisticProfileView';
 import { User as UserType } from '@/contexts/AuthContext';
 
 const EnhancedProfilePage = () => {
@@ -282,16 +283,12 @@ Contact: ${user.email}`);
   // Show read-only profile view if not editing or viewing someone else's profile
   if (!isEditing || !isOwnProfile) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8">
-          <ProfileView 
-            user={currentUser} 
-            isOwnProfile={isOwnProfile}
-            onEdit={() => setIsEditing(true)}
-            onMentorshipRequest={handleMentorshipRequest}
-          />
-        </div>
-      </div>
+      <FuturisticProfileView 
+        user={currentUser} 
+        isOwnProfile={isOwnProfile}
+        onEdit={() => setIsEditing(true)}
+        onMentorshipRequest={handleMentorshipRequest}
+      />
     );
   }
 

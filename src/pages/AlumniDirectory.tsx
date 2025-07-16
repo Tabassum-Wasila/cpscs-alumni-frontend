@@ -346,16 +346,8 @@ const AlumniDirectory = () => {
                           View Profile
                         </Button>
                         
-                        <Button 
-                          onClick={() => handleContactAlumni(user, 'email')}
-                          variant="outline"
-                          size="sm"
-                          className="px-3"
-                        >
-                          <Mail size={14} />
-                        </Button>
                         
-                        {user.profile?.phoneNumber && user.profile?.showPhone && (
+                        {user.profile?.phoneNumber && user.profile?.showPhone !== false && (
                           <Button 
                             onClick={() => handleContactAlumni(user, 'phone')}
                             variant="outline"
