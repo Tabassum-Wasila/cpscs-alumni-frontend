@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { MockBkashService } from '@/services/mockBkashService';
 
 // This lets TypeScript know that the 'bKash' object will be available on the window
 declare const bKash: any;
@@ -38,34 +39,41 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
   }, []);
 
   const initiatePayment = async () => {
-    if (!isScriptLoaded || typeof bKash === 'undefined') {
-      alert('bKash payment system is not ready. Please try again.');
-      return;
-    }
-
     setIsLoading(true);
     try {
-      // 1. Call your own backend to create a payment session
-      const createResponse = await fetch('/api/bkash/create-payment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, invoice }),
-      });
+      // For testing: Use mock service until backend is ready
+      // TODO: Replace with real backend calls when ready
+      console.log('Creating payment with mock service for testing...');
+      const paymentData = await MockBkashService.createPayment(amount, invoice);
       
-      if (!createResponse.ok) {
-        throw new Error('Failed to create payment session');
-      }
+      console.log('Mock payment created:', paymentData);
       
-      const paymentData = await createResponse.json();
-
-      // Check if payment creation was successful and we have a paymentID
-      if (paymentData && paymentData.paymentID) {
-        initializeBkash(paymentData);
-      } else {
-        throw new Error(paymentData.statusMessage || 'Failed to initialize payment.');
-      }
+      // For testing: Simulate bKash modal interaction
+      // In production, this would use the real bKash library
+      setTimeout(async () => {
+        try {
+          console.log('Executing payment with mock service...');
+          const executeResult = await MockBkashService.executePayment(paymentData.paymentID);
+          
+          console.log('Mock payment executed:', executeResult);
+          
+          if (executeResult && executeResult.statusCode === '0000') {
+            onSuccess({
+              paymentID: executeResult.paymentID,
+              trxID: executeResult.trxID
+            });
+          } else {
+            alert(executeResult.statusMessage || 'Payment execution failed.');
+          }
+        } catch (error) {
+          console.error('Mock payment execution error:', error);
+          alert('Payment execution failed. Please try again.');
+        }
+        setIsLoading(false);
+      }, 2000); // Simulate user interaction time
+      
     } catch (error) {
-      console.error('bKash create payment error:', error);
+      console.error('Mock payment creation error:', error);
       alert('Payment initialization failed. Please try again.');
       setIsLoading(false);
     }
