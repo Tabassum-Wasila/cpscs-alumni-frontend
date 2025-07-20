@@ -65,46 +65,68 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
   };
 
   const initializeBkash = (paymentData: any) => {
-    bKash.init({
-      paymentMode: 'checkout',
-      paymentRequest: paymentData,
-
-      // This function is called by bKash after the user authorizes the payment
-      executeRequestOnAuthorization: async () => {
-        try {
-          // Use mock service for testing until backend is ready
-          console.log('Executing payment with mock service...');
-          const executeResult = await MockBkashService.executePayment(paymentData.paymentID);
-          
-          console.log('Mock payment executed:', executeResult);
-
-          if (executeResult && executeResult.statusCode === '0000') {
-            // Payment is successful
-            bKash.execute().onSuccess(executeResult);
-            onSuccess({
-              paymentID: executeResult.paymentID,
-              trxID: executeResult.trxID
-            });
-          } else {
-            alert(executeResult.statusMessage || 'Payment execution failed.');
+    try {
+      // Initialize bKash with the correct API structure
+      bKash.init({
+        paymentMode: 'checkout',
+        paymentRequest: {
+          amount: paymentData.amount,
+          intent: paymentData.intent,
+          currency: paymentData.currency,
+          merchantInvoiceNumber: paymentData.merchantInvoiceNumber
+        },
+        createRequest: function(request: any) {
+          console.log('bKash createRequest called:', request);
+          // This is automatically handled by the init
+        },
+        executeRequestOnAuthorization: function() {
+          console.log('bKash executeRequestOnAuthorization called');
+          // Execute the payment using mock service
+          MockBkashService.executePayment(paymentData.paymentID).then(executeResult => {
+            console.log('Mock payment executed:', executeResult);
+            
+            if (executeResult && executeResult.statusCode === '0000') {
+              // Call bKash success callback
+              bKash.execute().onSuccess(executeResult);
+              setIsLoading(false);
+              onSuccess({
+                paymentID: executeResult.paymentID,
+                trxID: executeResult.trxID
+              });
+            } else {
+              bKash.execute().onError();
+              setIsLoading(false);
+              alert(executeResult.statusMessage || 'Payment execution failed.');
+            }
+          }).catch(error => {
+            console.error('Mock payment execution error:', error);
             bKash.execute().onError();
-          }
-        } catch (error) {
-          console.error('Mock payment execution error:', error);
-          alert('Payment execution failed. Please try again.');
-          bKash.execute().onError();
+            setIsLoading(false);
+            alert('Payment execution failed. Please try again.');
+          });
+        },
+        onClose: function() {
+          console.log('bKash modal closed');
+          setIsLoading(false);
+          onClose();
         }
-        setIsLoading(false);
-      },
-      
-      onClose: () => {
+      });
+
+      // Create and trigger the checkout
+      bKash.create().onSuccess(function(data: any) {
+        console.log('bKash checkout success:', data);
+        // This will trigger executeRequestOnAuthorization
+      }).onClose(function() {
+        console.log('bKash checkout closed');
         setIsLoading(false);
         onClose();
-      },
-    });
-
-    // All setup is done, now trigger the bKash modal
-    bKash.create().onClick();
+      }).onClick();
+      
+    } catch (error) {
+      console.error('bKash initialization error:', error);
+      setIsLoading(false);
+      alert('Failed to initialize bKash payment. Please try again.');
+    }
   };
 
   const isButtonDisabled = disabled || isLoading || !isScriptLoaded || !amount || amount <= 0;
