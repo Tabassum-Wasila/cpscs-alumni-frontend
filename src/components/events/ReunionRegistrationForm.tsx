@@ -443,12 +443,31 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                   <p className="text-center text-muted-foreground">
                     Complete your payment below to confirm registration
                   </p>
-                  <BkashPaymentButton
-                    amount={feeBreakdown.totalFee}
-                    invoice={`CPSCS-R25-${Date.now()}`}
-                    onSuccess={handlePaymentSuccess}
-                    onClose={() => setShowPaymentModal(false)}
-                  />
+                  
+                  <div className="flex flex-col gap-3">
+                    {/* Production bKash button - will only work with live backend */}
+                    <BkashPaymentButton
+                      amount={feeBreakdown.totalFee}
+                      invoice={`CPSCS-R25-${Date.now()}`}
+                      onSuccess={handlePaymentSuccess}
+                      onClose={() => setShowPaymentModal(false)}
+                    />
+                    
+                    {/* Development bypass button */}
+                    <Button 
+                      onClick={() => {
+                        console.log('--- DEVELOPMENT: Bypassing bKash payment ---');
+                        handlePaymentSuccess({
+                          paymentID: 'mock-payment-id',
+                          trxID: 'mock-transaction-id'
+                        });
+                      }}
+                      variant="outline"
+                      className="w-full border-orange-500 text-orange-600 hover:bg-orange-50"
+                    >
+                      🚧 Bypass Payment (Dev Only)
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardContent>
