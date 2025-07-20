@@ -1,11 +1,8 @@
-
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Mail, MapPin, Facebook, MessageCircle } from "lucide-react";
-
 const Footer = () => {
-  return (
-    <footer className="bg-gradient-animated relative overflow-hidden">
+  return <footer className="bg-gradient-animated relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
         <div className="absolute top-10 left-10 w-40 h-40 rounded-full bg-white/5"></div>
@@ -28,24 +25,13 @@ const Footer = () => {
             
             {/* Social Actions */}
             <div className="space-y-4">
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 w-full sm:w-auto group"
-                onClick={() => window.open('https://www.facebook.com/groups/CPSCSAlumni', '_blank')}
-              >
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white border-0 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 w-full sm:w-auto group" onClick={() => window.open('https://www.facebook.com/groups/CPSCSAlumni', '_blank')}>
                 <Facebook className="mr-2 h-5 w-5 group-hover:animate-pulse" />
                 Join our Facebook group
               </Button>
               
               <div className="flex justify-center lg:justify-start">
-                <a 
-                  href="https://wa.me/8801718787515" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-white/90 hover:text-white transition-colors duration-300 group"
-                >
-                  <MessageCircle className="mr-2 h-5 w-5 text-green-400 group-hover:animate-bounce" />
-                  WhatsApp: +8801718787515
-                </a>
+                
               </div>
             </div>
           </div>
@@ -67,22 +53,14 @@ const Footer = () => {
               
               <div className="flex items-center justify-center lg:justify-start group">
                 <MessageCircle className="mr-4 text-green-400 h-6 w-6 group-hover:animate-bounce" />
-                <a 
-                  href="https://wa.me/8801718787515" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-white/90 hover:text-white text-lg transition-colors duration-300"
-                >
+                <a href="https://wa.me/8801718787515" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white text-lg transition-colors duration-300">
                   +8801718787515
                 </a>
               </div>
               
               <div className="flex items-center justify-center lg:justify-start group">
                 <Mail className="mr-4 text-cpscs-gold h-6 w-6 group-hover:animate-pulse" />
-                <a 
-                  href="mailto:cpscsalumniassociation@gmail.com"
-                  className="text-white/90 hover:text-white text-lg transition-colors duration-300"
-                >
+                <a href="mailto:cpscsalumniassociation@gmail.com" className="text-white/90 hover:text-white text-lg transition-colors duration-300">
                   cpscsalumniassociation@gmail.com
                 </a>
               </div>
@@ -91,18 +69,11 @@ const Footer = () => {
         </div>
         
         <div className="pt-8 border-t border-white/20 text-center">
-          <a 
-            href="https://tinkers.ltd/" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-white/80 hover:text-white text-sm transition-colors duration-300 hover:underline"
-          >
+          <a href="https://tinkers.ltd/" target="_blank" rel="noopener noreferrer" className="text-white/80 hover:text-white text-sm transition-colors duration-300 hover:underline">
             © Developed & maintained by Tinkers Technologies Ltd
           </a>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
