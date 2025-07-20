@@ -10,7 +10,7 @@ import AlumniGallerySlider from '../components/AlumniGallerySlider';
 import GoalsSection from '../components/GoalsSection';
 import EventsSection from '../components/EventsSection';
 import FeaturedAlumni from '../components/FeaturedAlumni';
-import CallToAction from '../components/CallToAction';
+
 import Footer from '../components/Footer';
 import VipSponsorBanner from '../components/VipSponsorBanner';
 import { bannerService } from '../services/bannerService';
@@ -36,7 +36,6 @@ const Index = () => {
       <GoalsSection />
       <EventsSection />
       <FeaturedAlumni />
-      <CallToAction />
       
       {/* VIP Sponsor Banner - Above Footer */}
       <VipSponsorBanner 
