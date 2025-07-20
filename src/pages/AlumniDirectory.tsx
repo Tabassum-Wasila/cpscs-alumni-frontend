@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Filter, Users, MapPin, Heart, GraduationCap, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserType } from '@/contexts/AuthContext';
+import Navbar from '@/components/Navbar';
+
 const AlumniDirectory = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserType[]>([]);
@@ -62,8 +65,12 @@ const AlumniDirectory = () => {
     });
     return filtered;
   }, [users, searchTerm, filters]);
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
-      <div className="container mx-auto px-4 py-8">
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
+      <Navbar />
+      
+      <div className="container mx-auto px-4 py-8 pt-24">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">Alumni Directory</h1>
@@ -238,6 +245,8 @@ const AlumniDirectory = () => {
             </p>
           </div>}
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default AlumniDirectory;
