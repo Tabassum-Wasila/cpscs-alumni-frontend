@@ -142,66 +142,100 @@ export class EventService {
       {
         id: "grand-reunion-2025",
         title: "Grand Alumni Reunion 2025: Back to Our Roots! 🌳",
-        description: `<div style="text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
-    <h1>Grand Alumni Reunion 2025: Back to Our Roots! 🌳</h1>
-    <h2>এসো প্রাণে প্রাণে মিলি সবাই (Let's all unite in spirit)</h2>
-    <p>Get ready for the most anticipated event of the year! It's time to walk down memory lane, reconnect with lifelong friends, and celebrate the legacy of Cantonment Public School and College, Saidpur. This isn't just an event; it's a homecoming. A day filled with laughter, memories, and the joy of togetherness.</p>
-</div>
+        description: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1f2937; background-color: #f9fafb; padding: 2rem; border-radius: 12px;">
 
-<h3>✨ What to Expect</h3>
-<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
-    <div style="flex: 1; min-width: 250px; text-align: center;">
-        <h4>🤝 Reconnect & Reminisce</h4>
-        <p>Meet your batchmates, catch up with your favorite teachers, and share stories from the good old days.</p>
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.75rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #4f46e5, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">এসো প্রাণে প্রাণে মিলি সবাই</h1>
+        <p style="font-size: 1.25rem; color: #6b7280; margin-top: 0.5rem;">Let's all unite in spirit</p>
     </div>
-    <div style="flex: 1; min-width: 250px; text-align: center;">
-        <h4>🎉 Fun & Festivities</h4>
-        <p>Enjoy exciting games, a grand rally, and a spectacular cultural program to light up the evening.</p>
-    </div>
-    <div style="flex: 1; min-width: 250px; text-align: center;">
-        <h4>🍽️ Delicious Cuisine</h4>
-        <p>From morning snacks to a grand dinner, treat your taste buds to a delightful culinary journey.</p>
-    </div>
-</div>
 
-<h3>⏰ Full Day Itinerary</h3>
-<ul style="list-style: none; padding: 0;">
-    <li><strong>☀️ Morning Session (8:00 AM - 12:30 PM)</strong>
-        <ul>
-            <li><strong>8:00 AM:</strong> Gate Opens! Welcome & Registration Kit Distribution.</li>
-            <li><strong>9:00 AM:</strong> Grand Inauguration & Rally Preparation.</li>
-            <li><strong>9:30 AM:</strong> Batch-wise Campus Procession & Nostalgia Walk.</li>
-            <li><strong>10:40 AM:</strong> Welcome speeches & heartfelt reminiscence session.</li>
-        </ul>
-    </li>
-    <li><strong>🌙 Afternoon Session (12:30 PM - 6:00 PM)</strong>
-        <ul>
-            <li><strong>12:30 PM:</strong> Prayer & Grand Lunch Break.</li>
-            <li><strong>2:30 PM:</strong> Batch-wise Photo Sessions, Adda & Networking.</li>
-            <li><strong>3:30 PM:</strong> Fun Sports, Games & Prize Giving Ceremony.</li>
-        </ul>
-    </li>
-    <li><strong>✨ Evening Gala (6:00 PM - 11:00 PM)</strong>
-        <ul>
-            <li><strong>6:00 PM:</strong> Honoring Our Legends: Crests for Teachers & Donors.</li>
-            <li><strong>7:00 PM:</strong> Mesmerizing Cultural Program & Raffle Draw.</li>
-            <li><strong>9:00 PM:</strong> Grand Reunion Dinner.</li>
-        </ul>
-    </li>
-</ul>
+    <p style="font-size: 1.1rem; text-align: center; max-width: 750px; margin: 0 auto 3rem; line-height: 1.7;">
+        The moment we've all been waiting for is finally here! It's time to walk down memory lane, reconnect with lifelong friends, and celebrate the legacy of <strong>Cantonment Public School and College, Saidpur</strong>. This isn't just an event; it's a homecoming. A day filled with laughter, memories, and the joy of togetherness.
+    </p>
 
-<h3>🎟️ Registration & Fees</h3>
-<div style="background: #f1f5f9; padding: 20px; border-radius: 8px; text-align: center;">
-    <h4>Don't miss out! Secure your spot today.</h4>
-    <p>Registration is mandatory for all attendees, including guests.</p>
-    <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
-        <li><strong>Early Birds (Until Nov 26, 2025):</strong> 2000 BDT</li>
-        <li><strong>Late Owls (After Nov 26, 2025):</strong> 3000 BDT</li>
-        <li><strong>Alumni (SSC 2020 - 2025):</strong> 1500 BDT</li>
-        <li><strong>Current Students:</strong> 1000 BDT</li>
-        <li><strong>Guests (Spouse/Parent/Child over 5):</strong> 1000 BDT each</li>
-    </ul>
-    <p><em><strong>Note:</strong> Children under 5 are free but will not receive a separate food pack.</em></p>
+    <div>
+        <h2 style="font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2.5rem; color: #111827;">A Day to Remember: The Official Schedule</h2>
+        
+        <div style="border-left: 3px solid #d1d5db; margin-left: 1.5rem; padding-left: 2rem;">
+
+            <div style="position: relative; margin-bottom: 2rem;">
+                <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">☀️</div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">8:00 AM - 8:30 AM</p>
+                <p style="margin: 0; color: #6b7280;">Arrival, Gift Bag & Token Distribution.</p>
+            </div>
+
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">8:30 AM - 9:00 AM</p>
+                <p style="margin: 0; color: #6b7280;">Former Teachers & Guests Arrive and are Seated.</p>
+            </div>
+            
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">9:00 AM - 9:30 AM</p>
+                <p style="margin: 0; color: #6b7280;">Assembly, Rally Preparation, Inauguration & 1 Minute of Silence.</p>
+            </div>
+
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">9:30 AM - 10:15 AM</p>
+                <p style="margin: 0; color: #6b7280;">Grand Rally & Batch-wise Campus Procession.</p>
+            </div>
+            
+             <div style="position: relative; margin-bottom: 2rem;">
+                <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">☕</div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">10:15 AM - 12:30 PM</p>
+                <p style="margin: 0; color: #6b7280;">Snacks Break, followed by Welcome Speeches & a Heartfelt Reminiscence Session.</p>
+            </div>
+            
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🍽️</div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">12:30 PM - 3:30 PM</p>
+                <p style="margin: 0; color: #6b7280;">Prayer & Lunch Break, followed by Batch-wise Discussions & Photo Sessions.</p>
+            </div>
+            
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🏆</div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">3:30 PM - 6:30 PM</p>
+                <p style="margin: 0; color: #6b7280;">Fun & Games, Prize Distribution, and Speeches by Honored Guests.</p>
+            </div>
+            
+            <div style="position: relative; margin-bottom: 2rem;">
+                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🌙</div>
+                <p style="margin: 0; font-weight: 600; color: #374151;">6:30 PM - 11:00 PM</p>
+                <p style="margin: 0; color: #6b7280;">Crest Presentation, spectacular Cultural Program, Raffle Draw, and Grand Dinner.</p>
+            </div>
+
+        </div>
+    </div>
+    
+    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; margin-top: 3rem;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: #111827; text-align:center; margin-bottom: 1.5rem;">🎟️ Registration Fees & Deadlines</h2>
+        <ul style="list-style: none; padding: 0; max-width: 550px; margin: 0 auto;">
+            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #4b5563;">Early Birds <em style="font-style: normal; color: #6b7280;">(Until Nov 26, 2025)</em></span>
+                <strong style="color: #16a34a;">2000 BDT</strong>
+            </li>
+            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #4b5563;">Late Owls <em style="font-style: normal; color: #6b7280;">(Until Dec 16, 2025)</em></span>
+                <strong style="color: #f97316;">3000 BDT</strong>
+            </li>
+            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #4b5563;">Young Alumni <em style="font-style: normal; color: #6b7280;">(SSC 2020-2025)</em></span>
+                <strong style="color: #4f46e5;">1500 BDT</strong>
+            </li>
+            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
+                <span style="color: #4b5563;">Current Students</span>
+                <strong>1000 BDT</strong>
+            </li>
+            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
+                <span style="color: #4b5563;">Guests & Children (5+)</span>
+                <strong>1000 BDT</strong>
+            </li>
+        </ul>
+        <p style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 1.5rem;"><em><strong>Note:</strong> Children under 5 are welcome free of charge but will not receive a separate food pack. Guests include spouse, parents, or children over 5.</em></p>
+    </div>
+
 </div>`,
         date: "2025-12-26",
         time: "8:00 AM - 11:00 PM",
