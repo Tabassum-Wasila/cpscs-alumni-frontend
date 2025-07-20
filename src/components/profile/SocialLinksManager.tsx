@@ -30,23 +30,9 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
   const [newPlatform, setNewPlatform] = useState('');
   const [newUrl, setNewUrl] = useState('');
 
-  const validateUrl = (url: string, platform: string) => {
-    if (!url) return true; // Allow empty URLs
-    
-    try {
-      new URL(url); // Basic URL validation
-      return true; // If URL is valid, accept it regardless of platform
-    } catch {
-      return false;
-    }
-  };
 
   const addSocialLink = () => {
     if (!newPlatform || !newUrl) return;
-    
-    if (!validateUrl(newUrl, newPlatform)) {
-      return; // Could show error toast here
-    }
 
     const updated = {
       ...socialLinks,
@@ -106,9 +92,6 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
                     placeholder={platformConfig?.placeholder}
                     className="mt-1 text-sm"
                   />
-                  {url && !validateUrl(url, platform) && (
-                    <p className="text-xs text-red-500 mt-1">Please enter a valid URL</p>
-                  )}
                 </div>
               </div>
               <Button
@@ -158,7 +141,7 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
             
             <Button
               onClick={addSocialLink}
-              disabled={!newPlatform || !newUrl || !validateUrl(newUrl, newPlatform)}
+              disabled={!newPlatform || !newUrl}
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-1" />
