@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Filter, Users, MapPin, Heart, GraduationCap } from 'lucide-react';
+import { Search, Filter, Users, MapPin, Heart, GraduationCap, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserType } from '@/contexts/AuthContext';
 

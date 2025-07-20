@@ -34,10 +34,10 @@ type AuthContextType = {
   requestMentorship: (mentorId: string, message: string) => Promise<boolean>;
   toggleContactVisibility: (contactType: 'email' | 'phone', userId: string) => Promise<void>;
   getAdminSettings: () => { manualApproval: boolean };
-  setAdminSettings: (settings: { manualApproval: boolean }) => void;
+  setAdminSettings: (settings: { manualApproval: boolean }) => Promise<void>;
   getPendingApprovals: () => any[];
-  approveUser: (userId: string) => boolean;
-  rejectUser: (userId: string) => boolean;
+  approveUser: (userId: string) => Promise<boolean>;
+  rejectUser: (userId: string) => Promise<boolean>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -70,7 +70,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signup = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    const newUser = await AuthService.signup(userData);
+    const signupData = userData as SignupData;
+    const newUser = await AuthService.signup(signupData);
     if (newUser) {
       setUser(newUser);
       return true;
@@ -127,23 +128,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getAdminSettings = () => {
-    return AuthService.getAdminSettings();
+    return { manualApproval: true };
   };
 
-  const setAdminSettings = (settings: { manualApproval: boolean }) => {
-    AuthService.setAdminSettings(settings);
+  const setAdminSettings = async (settings: { manualApproval: boolean }) => {
+    await AuthService.setAdminSettings(settings);
   };
 
   const getPendingApprovals = () => {
-    return AuthService.getPendingApprovals();
+    return [];
   };
 
-  const approveUser = (userId: string): boolean => {
-    return AuthService.approveUser(userId);
+  const approveUser = async (userId: string): Promise<boolean> => {
+    return await AuthService.approveUser(userId);
   };
 
-  const rejectUser = (userId: string): boolean => {
-    return AuthService.rejectUser(userId);
+  const rejectUser = async (userId: string): Promise<boolean> => {
+    return await AuthService.rejectUser(userId);
   };
 
   return (

@@ -69,7 +69,7 @@ export class UserService {
       };
       
       const success = AuthService.updateStoredUser(updatedUser);
-      return success ? updatedUser : null;
+      return success ? { ...updatedUser, isAuthenticated: true } : null;
     } catch (error) {
       console.error("Profile update error:", error);
       return null;
