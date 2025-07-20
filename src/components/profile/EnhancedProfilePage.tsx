@@ -9,7 +9,7 @@ import ProfileView from './ProfileView';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const EnhancedProfilePage = () => {
-  const { user, updateUser } = useAuth();
+  const { user, updateUserProfile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isEditing, setIsEditing] = useState(false);
@@ -86,7 +86,7 @@ const EnhancedProfilePage = () => {
         updatedUser.profile.showPhone = true;
       }
 
-      await updateUser(updatedUser);
+      await updateUserProfile(updatedUser.profile || {});
       setIsEditing(false);
       setHasUnsavedChanges(false);
       toast.success('Profile updated successfully!');
@@ -94,7 +94,7 @@ const EnhancedProfilePage = () => {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile. Please try again.');
     }
-  }, [updateUser]);
+  }, [updateUserProfile]);
 
   const handleCancel = useCallback(() => {
     if (hasUnsavedChanges) {
@@ -133,15 +133,14 @@ const EnhancedProfilePage = () => {
       {isEditing ? (
         <FuturisticProfileView
           user={user}
-          onSave={handleSave}
-          onCancel={handleCancel}
-          onFieldChange={handleFieldChange}
+          isOwnProfile={true}
+          onEdit={handleCancel}
         />
       ) : (
         <ProfileView
           user={user}
-          profileCompletion={profileCompletion}
-          onEditClick={handleEditToggle}
+          isOwnProfile={true}
+          onEdit={handleEditToggle}
         />
       )}
 
