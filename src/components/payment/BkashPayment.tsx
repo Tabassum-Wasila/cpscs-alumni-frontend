@@ -5,6 +5,11 @@ import { MockBkashService } from '@/services/mockBkashService';
 
 // This lets TypeScript know that the 'bKash' object will be available on the window
 declare const bKash: any;
+declare global {
+  interface Window {
+    bKash: any;
+  }
+}
 
 interface BkashPaymentProps {
   amount: number;
@@ -25,21 +30,44 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
   useEffect(() => {
+    let attempts = 0;
+    const maxAttempts = 50; // Wait up to 5 seconds
+    
     // Check if bKash script is loaded
     const checkBkashLoaded = () => {
-      if (typeof bKash !== 'undefined') {
+      attempts++;
+      console.log(`Attempt ${attempts}: Checking bKash loaded...`);
+      console.log('- typeof bKash:', typeof bKash);
+      console.log('- window.bKash:', typeof window.bKash);
+      console.log('- Available window properties:', Object.keys(window).filter(key => key.toLowerCase().includes('bkash')));
+      
+      if (typeof bKash !== 'undefined' || typeof window.bKash !== 'undefined') {
+        console.log('✅ bKash is loaded successfully');
         setIsScriptLoaded(true);
-      } else {
-        // If not loaded, check again after a short delay
+        return;
+      }
+      
+      if (attempts < maxAttempts) {
+        console.log('❌ bKash not loaded yet, retrying...');
         setTimeout(checkBkashLoaded, 100);
+      } else {
+        console.error('❌ bKash script failed to load after maximum attempts');
+        setIsScriptLoaded(false);
       }
     };
     
+    // Start checking immediately
     checkBkashLoaded();
   }, []);
 
   const initiatePayment = async () => {
+    console.log('=== BKASH PAYMENT INITIALIZATION ===');
+    console.log('Script loaded:', isScriptLoaded);
+    console.log('bKash object:', typeof bKash !== 'undefined');
+    console.log('window.bKash:', typeof window.bKash !== 'undefined');
+    
     if (!isScriptLoaded || typeof bKash === 'undefined') {
+      console.error('bKash script not loaded');
       alert('bKash payment system is not ready. Please try again.');
       return;
     }
@@ -53,6 +81,7 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
       console.log('Mock payment created:', paymentData);
       
       if (paymentData && paymentData.paymentID) {
+        console.log('Initializing bKash with payment data...');
         initializeBkash(paymentData);
       } else {
         throw new Error(paymentData.statusMessage || 'Failed to initialize payment.');
