@@ -1,7 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import { Bell } from 'lucide-react';
 import NoticeCard from '../components/notice/NoticeCard';
 import NoticeModal from '../components/notice/NoticeModal';
@@ -10,11 +14,18 @@ import { Notice, NoticeFilters } from '../types/notice';
 import { sampleNotices } from '../data/noticesData';
 
 const NoticeBoard = () => {
+  const location = useLocation();
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState<NoticeFilters>({
     searchQuery: '',
     sortBy: 'date-desc',
+  });
+
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
   // Filter and sort notices
@@ -114,6 +125,12 @@ const NoticeBoard = () => {
           </div>
         </div>
       </div>
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
 

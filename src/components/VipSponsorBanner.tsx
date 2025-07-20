@@ -28,7 +28,7 @@ const VipSponsorBanner: React.FC<VipSponsorBannerProps> = ({
         className={cn(
           "vip-banner-container",
           `size-${bannerSize}`,
-          "block max-w-[1200px] mx-auto my-8 no-underline transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg overflow-hidden"
+          "block max-w-[1200px] mx-auto no-underline transition-transform duration-300 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         )}
         aria-label="VIP Sponsor Banner"
       >

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import MasonryGrid from '../components/gallery/MasonryGrid';
 import Lightbox from '../components/gallery/Lightbox';
 import GallerySearch from '../components/gallery/GallerySearch';
@@ -10,6 +13,7 @@ import { galleryService, GalleryImage, SearchFilters } from '../services/gallery
 import { Loader2, Images } from 'lucide-react';
 
 const Gallery = () => {
+  const location = useLocation();
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLightboxOpen, setIsLightbox] = useState(false);
@@ -17,6 +21,12 @@ const Gallery = () => {
     sortBy: 'newest'
   });
   const [availableTags, setAvailableTags] = useState<string[]>([]);
+
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
+  });
 
   // Fetch gallery images with filters
   const {
@@ -135,6 +145,12 @@ const Gallery = () => {
 
       {/* Enhanced Lightbox */}
       {selectedImage && <Lightbox image={selectedImage} images={images} currentIndex={currentIndex} isOpen={isLightboxOpen} onClose={handleCloseLightbox} onNext={handleNextImage} onPrevious={handlePreviousImage} onImageSelect={handleImageSelect} />}
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
     </div>

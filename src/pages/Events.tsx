@@ -1,7 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -11,11 +15,18 @@ import { Event, EventService } from '@/services/eventService';
 import EventCard from '../components/events/EventCard';
 
 const Events = () => {
+  const location = useLocation();
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'past'>('all');
   // Removed category filter and view mode - always grid view
+
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
+  });
 
   // Load events (will be replaced with API call)
   useEffect(() => {
@@ -132,6 +143,12 @@ const Events = () => {
           )}
         </div>
       </div>
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
     </div>

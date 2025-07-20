@@ -1,11 +1,23 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import SocialFeed from '../components/social/SocialFeed';
 import { BookOpen, Users, Heart, TrendingUp } from 'lucide-react';
 
 const Blog = () => {
+  const location = useLocation();
+  
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
+  });
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-cpscs-light via-white to-cpscs-light/50">
       <Navbar />
@@ -62,6 +74,12 @@ const Blog = () => {
         {/* Social Feed */}
         <SocialFeed />
       </div>
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
     </div>

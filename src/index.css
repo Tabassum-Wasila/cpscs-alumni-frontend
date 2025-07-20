@@ -375,7 +375,7 @@
 .vip-banner-container {
   display: block;
   max-width: 1200px;
-  margin: 2rem auto; /* Centers the banner and adds space */
+  margin: 0 auto; /* Centers the banner with no vertical margins */
   text-decoration: none;
 }
 
@@ -397,14 +397,14 @@
 /* Responsive adjustments for mobile */
 @media (max-width: 768px) {
   .vip-banner-container {
-    margin: 1rem auto;
-    max-width: calc(100% - 2rem);
+    margin: 0 auto;
+    max-width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .vip-banner-container {
-    margin: 0.5rem auto;
-    max-width: calc(100% - 1rem);
+    margin: 0 auto;
+    max-width: 100%;
   }
 }

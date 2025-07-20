@@ -4,10 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { AuthProvider } from "./contexts/AuthContext";
-import { bannerService } from "./services/bannerService";
-import VipSponsorBanner from "./components/VipSponsorBanner";
 import Index from "./pages/Index";
 import Gallery from "./pages/Gallery";
 import Events from "./pages/Events";
@@ -30,14 +27,6 @@ import HallOfFame from "./pages/HallOfFame";
 import NoticeBoard from "./pages/NoticeBoard";
 
 const AppContent = () => {
-  const location = useLocation();
-  
-  // Fetch banner data based on current path
-  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
-    queryKey: ['vip-banner', location.pathname],
-    queryFn: () => bannerService.getBannerByPath(location.pathname)
-  });
-
   return (
     <>
       <Routes>
@@ -66,12 +55,6 @@ const AppContent = () => {
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      
-      {/* VIP Sponsor Banner - Positioned above Footer */}
-      <VipSponsorBanner 
-        bannerData={bannerResponse?.banner || null} 
-        isLoading={bannerLoading}
-      />
     </>
   );
 };

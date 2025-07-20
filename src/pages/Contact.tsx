@@ -1,10 +1,22 @@
 
 import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import { Mail, Phone, MapPin, Clock } from 'lucide-react';
 
 const Contact = () => {
+  const location = useLocation();
+  
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
+  });
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -77,6 +89,12 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
     </div>

@@ -1,7 +1,11 @@
 
 import React, { useState, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import VipSponsorBanner from '../components/VipSponsorBanner';
+import { bannerService } from '../services/bannerService';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SponsorCard from '../components/sponsors/SponsorCard';
 import SponsorModal from '../components/sponsors/SponsorModal';
@@ -11,11 +15,18 @@ import { Sponsor, SponsorFilters } from '@/types/sponsors';
 import { Heart, Building2, Users, Star, Trophy } from 'lucide-react';
 
 const Sponsors = () => {
+  const location = useLocation();
   const [selectedSponsor, setSelectedSponsor] = useState<Sponsor | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'organizations' | 'patrons'>('organizations');
   const [filters, setFilters] = useState<SponsorFilters>({
     sortBy: 'newest'
+  });
+
+  // Fetch banner data based on current path
+  const { data: bannerResponse, isLoading: bannerLoading } = useQuery({
+    queryKey: ['vip-banner', location.pathname],
+    queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
   const handleSponsorClick = (sponsor: Sponsor) => {
@@ -233,6 +244,12 @@ const Sponsors = () => {
           />
         </div>
       </div>
+      
+      {/* VIP Sponsor Banner - Above Footer */}
+      <VipSponsorBanner 
+        bannerData={bannerResponse?.banner || null} 
+        isLoading={bannerLoading}
+      />
       
       <Footer />
     </div>
