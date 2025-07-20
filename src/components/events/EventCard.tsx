@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Clock, MapPin, Users, ExternalLink } from 'lucide-react';
@@ -15,6 +14,7 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const isRegistrationOpen = EventService.isRegistrationOpen(event);
   const isEventFull = EventService.isEventFull(event);
+  const colorScheme = EventService.getCategoryColorScheme(event.category);
 
   const getStatusBadge = () => {
     if (event.status === 'past') {
@@ -38,12 +38,22 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
       );
     }
 
+    if (!isRegistrationOpen || isEventFull) {
+      return (
+        <Link to={`/events/${event.id}`}>
+          <Button variant="outline" className="w-full">
+            View Details
+          </Button>
+        </Link>
+      );
+    }
+
     return (
       <Link to={`/events/${event.id}`}>
         <Button 
           className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300 shadow-md hover:shadow-lg"
         >
-          {isRegistrationOpen && !isEventFull ? 'Register Now' : 'View Details'}
+          Register Now
           {event.registrationUrl && <ExternalLink size={16} className="ml-2" />}
         </Button>
       </Link>
@@ -51,9 +61,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl group h-full flex flex-col">
-      {/* Event Banner - Fixed height for consistency */}
-      <div className="relative h-48 flex-shrink-0">
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl group">
+      {/* Event Banner */}
+      <div className="relative h-48">
         {event.image ? (
           <img 
             src={event.image} 
@@ -61,9 +71,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="w-full h-full overflow-hidden">
-            <DefaultEventBanner event={event} />
-          </div>
+          <DefaultEventBanner event={event} />
         )}
         
         {/* Status and Type badges */}
@@ -78,19 +86,19 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </div>
       </div>
       
-      <CardContent className="p-6 flex-grow flex flex-col">
+      <CardContent className="p-6">
         <div className="flex items-start justify-between mb-3">
-          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 flex-grow">
+          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
             {event.title}
           </h3>
-          <Badge variant="outline" className="capitalize ml-2 flex-shrink-0">
+          <Badge variant="outline" className="capitalize ml-2">
             {event.category}
           </Badge>
         </div>
         
-        <div className="space-y-2 mb-4 flex-shrink-0">
+        <div className="space-y-2 mb-4">
           <div className="flex items-center text-sm text-muted-foreground">
-            <Calendar size={16} className="mr-2 text-primary flex-shrink-0" />
+            <Calendar size={16} className="mr-2 text-primary" />
             <span>{new Date(event.date).toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
@@ -100,38 +108,36 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </div>
           
           <div className="flex items-center text-sm text-muted-foreground">
-            <Clock size={16} className="mr-2 text-primary flex-shrink-0" />
+            <Clock size={16} className="mr-2 text-primary" />
             <span>{event.time}</span>
           </div>
           
           <div className="flex items-center text-sm text-muted-foreground">
-            <MapPin size={16} className="mr-2 text-primary flex-shrink-0" />
+            <MapPin size={16} className="mr-2 text-primary" />
             <span className="truncate">{event.venue}</span>
           </div>
 
           <div className="flex items-center text-sm text-muted-foreground">
-            <Users size={16} className="mr-2 text-primary flex-shrink-0" />
+            <Users size={16} className="mr-2 text-primary" />
             <span>
               {event.currentRegistrations || 0} people registered
             </span>
           </div>
+
+          <div className="text-sm font-medium text-muted-foreground">
+            Registration Deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
+          </div>
         </div>
         
-        {/* Description preview - with proper HTML rendering */}
-        <div className="flex-grow mb-4">
-          <div 
-            className="text-sm text-muted-foreground line-clamp-3 prose prose-sm max-w-none [&>*]:text-muted-foreground [&>*]:text-sm"
-            dangerouslySetInnerHTML={{ 
-              __html: event.description.length > 150 
-                ? event.description.substring(0, 150) + '...'
-                : event.description
-            }}
-          />
-        </div>
+        {/* Description preview */}
+        <div 
+          className="text-sm text-muted-foreground mb-4 line-clamp-2"
+          dangerouslySetInnerHTML={{ 
+            __html: event.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...'
+          }}
+        />
         
-        <div className="mt-auto">
-          {getActionButton()}
-        </div>
+        {getActionButton()}
       </CardContent>
     </Card>
   );
