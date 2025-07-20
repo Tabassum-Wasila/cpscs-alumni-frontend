@@ -12,8 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users, CreditCard } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { EventService, ReunionRegistration, FeeBreakdown, ReunionPricing } from '@/services/eventService';
-import PaymentModal from '@/components/PaymentModal';
 import { useToast } from "@/hooks/use-toast";
+import BkashPaymentButton from '../payment/BkashPayment';
+import RegistrationSuccessModal from './RegistrationSuccessModal';
 import { getSSCYears } from '@/utils/yearUtils';
 
 const formSchema = z.object({
@@ -44,6 +45,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
     totalFee: 0
   });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [pricing, setPricing] = useState<ReunionPricing>();
 
   const form = useForm<FormValues>({
@@ -102,7 +104,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
     setShowPaymentModal(true);
   };
 
-  const handlePaymentSuccess = async (transactionData: any) => {
+  const handlePaymentSuccess = async (data: { paymentID: string; trxID: string }) => {
     // Complete registration data to send to backend
     const registrationData = {
       eventId,
@@ -128,9 +130,10 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
       },
       feeBreakdown,
       paymentDetails: {
-        transactionId: transactionData.transactionId,
+        paymentID: data.paymentID,
+        transactionId: data.trxID,
         amount: feeBreakdown.totalFee,
-        paymentStatus: transactionData.success ? 'success' : 'failed',
+        paymentStatus: 'success',
         paymentMethod: 'bkash',
         paymentDate: new Date().toISOString()
       },
@@ -147,7 +150,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
     // });
     
     setShowPaymentModal(false);
-    onSuccess();
+    setShowSuccessModal(true);
   };
 
   const getPricingDisplay = () => {
@@ -426,28 +429,41 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                 </div>
               </div>
               
-              <Button 
-                type="submit" 
-                className="w-full mt-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
-                disabled={feeBreakdown.totalFee === 0}
-              >
-                <CreditCard className="mr-2 h-4 w-4" />
-                Proceed to Payment - ৳{feeBreakdown.totalFee}
-              </Button>
+              {!showPaymentModal ? (
+                <Button 
+                  type="submit" 
+                  className="w-full mt-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
+                  disabled={feeBreakdown.totalFee === 0}
+                >
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Proceed to Payment - ৳{feeBreakdown.totalFee}
+                </Button>
+              ) : (
+                <div className="mt-6 space-y-4">
+                  <p className="text-center text-muted-foreground">
+                    Complete your payment below to confirm registration
+                  </p>
+                  <BkashPaymentButton
+                    amount={feeBreakdown.totalFee}
+                    invoice={`CPSCS-R25-${Date.now()}`}
+                    onSuccess={handlePaymentSuccess}
+                    onClose={() => setShowPaymentModal(false)}
+                  />
+                </div>
+              )}
             </CardContent>
           </Card>
         </form>
       </Form>
 
-      {showPaymentModal && (
-        <PaymentModal
-          amount={feeBreakdown.totalFee}
-          description="Grand Alumni Reunion 2025 Registration"
-          onSuccess={handlePaymentSuccess}
-          onCancel={() => setShowPaymentModal(false)}
-          merchantNumber="+8801886579596"
-        />
-      )}
+      <RegistrationSuccessModal
+        open={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          onSuccess();
+        }}
+        eventTitle="Grand Alumni Reunion 2025"
+      />
     </div>
   );
 };
