@@ -30,7 +30,6 @@ const NoticeBoard = () => {
       );
     }
 
-
     // Apply sorting
     filtered.sort((a, b) => {
       const dateA = new Date(a.publishDate).getTime();
@@ -42,13 +41,17 @@ const NoticeBoard = () => {
   }, [filters]);
 
   const handleNoticeClick = (notice: Notice) => {
+    console.log('Notice clicked:', notice.noticeTitle); // Debug log
     setSelectedNotice(notice);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
+    console.log('Modal closing'); // Debug log
     setIsModalOpen(false);
-    setSelectedNotice(null);
+    setTimeout(() => {
+      setSelectedNotice(null);
+    }, 300); // Small delay to allow animation
   };
 
   return (
@@ -56,12 +59,17 @@ const NoticeBoard = () => {
       <Navbar />
       
       <div className="flex-grow pt-20 lg:pt-24">
-        {/* Header Section */}
-        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent py-12 mb-6">
-          <div className="container mx-auto px-4 text-center">
+        {/* Enhanced Header Section */}
+        <div className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent py-12 mb-6 relative overflow-hidden">
+          {/* Subtle background animation */}
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-secondary/5 to-accent/5 animate-pulse" />
+          
+          <div className="container mx-auto px-4 text-center relative z-10">
             <div className="flex justify-center items-center gap-3 mb-4">
               <Bell className="h-8 w-8 text-primary animate-pulse" />
-              <h1 className="text-4xl md:text-5xl font-bold text-foreground">Notice Board</h1>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground to-primary bg-clip-text text-transparent">
+                Notice Board
+              </h1>
               <Bell className="h-8 w-8 text-primary animate-pulse" />
             </div>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -70,9 +78,9 @@ const NoticeBoard = () => {
           </div>
         </div>
 
-        {/* Notice List */}
+        {/* Notice List with enhanced container */}
         <div className="container mx-auto px-4 pb-16">
-          <div className="bg-background/60 backdrop-blur-sm rounded-2xl border shadow-lg overflow-hidden">
+          <div className="bg-background/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl overflow-hidden">
             <NoticeHeader 
               filters={filters}
               onFiltersChange={setFilters}
@@ -109,7 +117,7 @@ const NoticeBoard = () => {
       
       <Footer />
 
-      {/* Notice Modal */}
+      {/* Enhanced Notice Modal */}
       <NoticeModal
         notice={selectedNotice}
         isOpen={isModalOpen}
