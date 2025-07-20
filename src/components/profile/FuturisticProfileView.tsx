@@ -385,40 +385,40 @@ const FuturisticProfileView: React.FC<FuturisticProfileViewProps> = ({
           className="mt-8"
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-5 bg-white/80 backdrop-blur-sm border border-blue-200/50 shadow-lg">
+            <TabsList className="grid w-full grid-cols-5 bg-white/80 backdrop-blur-sm border border-blue-200/50 shadow-lg text-xs sm:text-sm">
               <TabsTrigger 
                 value="basic" 
-                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50"
+                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50 text-xs sm:text-sm px-1 sm:px-3"
               >
-                <Star className="h-4 w-4 mr-2 hidden sm:block" />
+                <Star className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 hidden sm:block" />
                 Basic
               </TabsTrigger>
               <TabsTrigger 
                 value="work" 
-                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50"
+                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50 text-xs sm:text-sm px-1 sm:px-3"
               >
-                <Briefcase className="h-4 w-4 mr-2 hidden sm:block" />
+                <Briefcase className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 hidden sm:block" />
                 Work
               </TabsTrigger>
               <TabsTrigger 
                 value="education" 
-                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50"
+                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50 text-xs sm:text-sm px-1 sm:px-3"
               >
-                <Book className="h-4 w-4 mr-2 hidden sm:block" />
+                <Book className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 hidden sm:block" />
                 Education
               </TabsTrigger>
               <TabsTrigger 
                 value="social" 
-                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50"
+                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50 text-xs sm:text-sm px-1 sm:px-3"
               >
-                <Users className="h-4 w-4 mr-2 hidden sm:block" />
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 hidden sm:block" />
                 Social
               </TabsTrigger>
               <TabsTrigger 
                 value="more" 
-                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50"
+                className="data-[state=active]:bg-gradient-radial data-[state=active]:from-amber-900 data-[state=active]:via-blue-900 data-[state=active]:to-slate-900 data-[state=active]:text-yellow-100 transition-all duration-300 hover:bg-blue-50 text-xs sm:text-sm px-1 sm:px-3"
               >
-                <Target className="h-4 w-4 mr-2 hidden sm:block" />
+                <Target className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 hidden sm:block" />
                 More
               </TabsTrigger>
             </TabsList>
