@@ -141,7 +141,7 @@ export class EventService {
     return [
       {
         id: "grand-reunion-2025",
-        title: "Grand Alumni Reunion 2025: Back to Our Roots! 🌳",
+        title: "Grand Alumni Reunion 2025",
         description: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1f2937; background-color: #f9fafb; padding: 2rem; border-radius: 12px;">
 
     <div style="text-align: center; margin-bottom: 3rem;">
