@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,12 +30,12 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
   const [newPlatform, setNewPlatform] = useState('');
   const [newUrl, setNewUrl] = useState('');
 
-  const validateUrl = (url: string) => {
+  const validateUrl = (url: string, platform: string) => {
     if (!url) return true; // Allow empty URLs
     
     try {
-      new URL(url); // Basic URL validation - just check if it's a valid URL format
-      return true;
+      new URL(url); // Basic URL validation
+      return true; // If URL is valid, accept it regardless of platform
     } catch {
       return false;
     }
@@ -45,7 +44,7 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
   const addSocialLink = () => {
     if (!newPlatform || !newUrl) return;
     
-    if (!validateUrl(newUrl)) {
+    if (!validateUrl(newUrl, newPlatform)) {
       return; // Could show error toast here
     }
 
@@ -107,8 +106,8 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
                     placeholder={platformConfig?.placeholder}
                     className="mt-1 text-sm"
                   />
-                  {url && !validateUrl(url) && (
-                    <p className="text-xs text-red-500 mt-1">Please enter a valid URL</p>
+                  {url && !validateUrl(url, platform) && (
+                    <p className="text-xs text-red-500 mt-1">Please enter a valid {platformConfig?.label} URL</p>
                   )}
                 </div>
               </div>
@@ -159,7 +158,7 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
             
             <Button
               onClick={addSocialLink}
-              disabled={!newPlatform || !newUrl || !validateUrl(newUrl)}
+              disabled={!newPlatform || !newUrl || !validateUrl(newUrl, newPlatform)}
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-1" />
