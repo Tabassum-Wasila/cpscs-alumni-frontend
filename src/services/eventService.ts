@@ -44,6 +44,17 @@ export interface ReunionRegistration {
   numberOfKids: number;
   bringingMother: boolean;
   bringingFather: boolean;
+  isCurrentStudent?: boolean;
+}
+
+export interface ReunionPricing {
+  earlyBirdDeadline: string;
+  lateOwlDeadline: string;
+  regularEarlyBird: number;
+  regularLateOwl: number;
+  ssc2020to2025: number;
+  currentStudent: number;
+  guest: number;
 }
 
 export interface FeeBreakdown {
@@ -129,19 +140,79 @@ export class EventService {
   static getMockEvents(): Event[] {
     return [
       {
-        id: "1",
-        title: "Grand Alumni Reunion 2025",
-        description: "<p>Join us for the most anticipated event of the year! A day filled with nostalgia, networking, and celebration.</p><p>Activities include campus tour, cultural programs, alumni dinner, and much more.</p>",
+        id: "grand-reunion-2025",
+        title: "Grand Alumni Reunion 2025: Back to Our Roots! 🌳",
+        description: `<div style="text-align: center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
+    <h1>Grand Alumni Reunion 2025: Back to Our Roots! 🌳</h1>
+    <h2>এসো প্রাণে প্রাণে মিলি সবাই (Let's all unite in spirit)</h2>
+    <p>Get ready for the most anticipated event of the year! It's time to walk down memory lane, reconnect with lifelong friends, and celebrate the legacy of Cantonment Public School and College, Saidpur. This isn't just an event; it's a homecoming. A day filled with laughter, memories, and the joy of togetherness.</p>
+</div>
+
+<h3>✨ What to Expect</h3>
+<div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 30px;">
+    <div style="flex: 1; min-width: 250px; text-align: center;">
+        <h4>🤝 Reconnect & Reminisce</h4>
+        <p>Meet your batchmates, catch up with your favorite teachers, and share stories from the good old days.</p>
+    </div>
+    <div style="flex: 1; min-width: 250px; text-align: center;">
+        <h4>🎉 Fun & Festivities</h4>
+        <p>Enjoy exciting games, a grand rally, and a spectacular cultural program to light up the evening.</p>
+    </div>
+    <div style="flex: 1; min-width: 250px; text-align: center;">
+        <h4>🍽️ Delicious Cuisine</h4>
+        <p>From morning snacks to a grand dinner, treat your taste buds to a delightful culinary journey.</p>
+    </div>
+</div>
+
+<h3>⏰ Full Day Itinerary</h3>
+<ul style="list-style: none; padding: 0;">
+    <li><strong>☀️ Morning Session (8:00 AM - 12:30 PM)</strong>
+        <ul>
+            <li><strong>8:00 AM:</strong> Gate Opens! Welcome & Registration Kit Distribution.</li>
+            <li><strong>9:00 AM:</strong> Grand Inauguration & Rally Preparation.</li>
+            <li><strong>9:30 AM:</strong> Batch-wise Campus Procession & Nostalgia Walk.</li>
+            <li><strong>10:40 AM:</strong> Welcome speeches & heartfelt reminiscence session.</li>
+        </ul>
+    </li>
+    <li><strong>🌙 Afternoon Session (12:30 PM - 6:00 PM)</strong>
+        <ul>
+            <li><strong>12:30 PM:</strong> Prayer & Grand Lunch Break.</li>
+            <li><strong>2:30 PM:</strong> Batch-wise Photo Sessions, Adda & Networking.</li>
+            <li><strong>3:30 PM:</strong> Fun Sports, Games & Prize Giving Ceremony.</li>
+        </ul>
+    </li>
+    <li><strong>✨ Evening Gala (6:00 PM - 11:00 PM)</strong>
+        <ul>
+            <li><strong>6:00 PM:</strong> Honoring Our Legends: Crests for Teachers & Donors.</li>
+            <li><strong>7:00 PM:</strong> Mesmerizing Cultural Program & Raffle Draw.</li>
+            <li><strong>9:00 PM:</strong> Grand Reunion Dinner.</li>
+        </ul>
+    </li>
+</ul>
+
+<h3>🎟️ Registration & Fees</h3>
+<div style="background: #f1f5f9; padding: 20px; border-radius: 8px; text-align: center;">
+    <h4>Don't miss out! Secure your spot today.</h4>
+    <p>Registration is mandatory for all attendees, including guests.</p>
+    <ul style="list-style: none; padding: 0; margin-bottom: 20px;">
+        <li><strong>Early Birds (Until Nov 26, 2025):</strong> 2000 BDT</li>
+        <li><strong>Late Owls (After Nov 26, 2025):</strong> 3000 BDT</li>
+        <li><strong>Alumni (SSC 2020 - 2025):</strong> 1500 BDT</li>
+        <li><strong>Current Students:</strong> 1000 BDT</li>
+        <li><strong>Guests (Spouse/Parent/Child over 5):</strong> 1000 BDT each</li>
+    </ul>
+    <p><em><strong>Note:</strong> Children under 5 are free but will not receive a separate food pack.</em></p>
+</div>`,
         date: "2025-12-25",
-        time: "9:00 AM - 10:00 PM",
+        time: "8:00 AM - 11:00 PM",
         venue: "Cantonment Public School and College, Saidpur",
         type: "in-person",
         category: "reunion",
         status: "upcoming",
-        registrationDeadline: "2025-11-30",
+        registrationDeadline: "2025-12-20",
         capacity: 500,
         currentRegistrations: 234,
-        image: "https://i.imgur.com/j75BIZN.jpg",
+        image: "https://i.postimg.cc/fR9gCNtY/IMG-7464.jpg",
         useInternalForm: true,
         isSpecialEvent: true,
         organizer: "CPSCS Alumni Association",
@@ -201,21 +272,43 @@ export class EventService {
     ];
   }
 
-  static calculateReunionFees(registration: ReunionRegistration): FeeBreakdown {
-    // Calculate base fee based on SSC year
+  static calculateReunionFees(registration: ReunionRegistration, pricing?: ReunionPricing): FeeBreakdown {
+    const currentDate = new Date();
+    const defaultPricing: ReunionPricing = {
+      earlyBirdDeadline: "2025-11-26",
+      lateOwlDeadline: "2025-12-20",
+      regularEarlyBird: 2000,
+      regularLateOwl: 3000,
+      ssc2020to2025: 1500,
+      currentStudent: 1000,
+      guest: 1000
+    };
+    
+    const finalPricing = pricing || defaultPricing;
+    const earlyBirdDeadline = new Date(finalPricing.earlyBirdDeadline);
+    
+    // Calculate base fee
     let baseFee = 0;
-    if (registration.sscYear) {
+    
+    if (registration.isCurrentStudent) {
+      baseFee = finalPricing.currentStudent;
+    } else if (registration.sscYear) {
       const year = parseInt(registration.sscYear);
-      if (year <= 2000) baseFee = 5000;
-      else if (year <= 2015) baseFee = 3500;
-      else if (year <= 2022) baseFee = 3000;
-      else baseFee = 1000;
+      if (year >= 2020 && year <= 2025) {
+        baseFee = finalPricing.ssc2020to2025;
+      } else {
+        // Check early bird vs late owl pricing
+        baseFee = currentDate <= earlyBirdDeadline 
+          ? finalPricing.regularEarlyBird 
+          : finalPricing.regularLateOwl;
+      }
     }
 
-    // Calculate additional fees
-    const spouseFee = registration.bringingSpouse ? 2000 : 0;
-    const kidsFee = registration.numberOfKids * 1000;
-    const parentsFee = (registration.bringingMother ? 1000 : 0) + (registration.bringingFather ? 1000 : 0);
+    // Calculate guest fees
+    const spouseFee = registration.bringingSpouse ? finalPricing.guest : 0;
+    const kidsFee = registration.numberOfKids * finalPricing.guest;
+    const parentsFee = (registration.bringingMother ? finalPricing.guest : 0) + 
+                       (registration.bringingFather ? finalPricing.guest : 0);
     const totalFee = baseFee + spouseFee + kidsFee + parentsFee;
 
     return {
@@ -224,6 +317,19 @@ export class EventService {
       kidsFee,
       parentsFee,
       totalFee
+    };
+  }
+
+  static getReunionPricing(): ReunionPricing {
+    // This would normally come from backend/admin panel
+    return {
+      earlyBirdDeadline: "2025-11-26",
+      lateOwlDeadline: "2025-12-20",
+      regularEarlyBird: 2000,
+      regularLateOwl: 3000,
+      ssc2020to2025: 1500,
+      currentStudent: 1000,
+      guest: 1000
     };
   }
 

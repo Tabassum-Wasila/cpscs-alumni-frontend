@@ -16,7 +16,7 @@ import Sponsors from "./pages/Sponsors";
 import MentorshipCareer from "./pages/MentorshipCareer";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
-import Register from "./pages/Register";
+
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import CompleteProfile from "./pages/CompleteProfile";
@@ -47,7 +47,7 @@ const AppContent = () => {
         <Route path="/blog" element={<Blog />} />
         <Route path="/notice-board" element={<NoticeBoard />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/register" element={<Register />} />
+        
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/complete-profile" element={<CompleteProfile />} />

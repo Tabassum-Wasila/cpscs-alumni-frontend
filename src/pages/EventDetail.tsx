@@ -12,6 +12,7 @@ import EventRegistrationForm from '@/components/events/EventRegistrationForm';
 import LoginPromptModal from '@/components/events/LoginPromptModal';
 import RegistrationSuccessModal from '@/components/events/RegistrationSuccessModal';
 import DefaultEventBanner from '@/components/events/DefaultEventBanner';
+import ReunionRegistrationForm from '@/components/events/ReunionRegistrationForm';
 
 const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -99,7 +100,13 @@ const EventDetail: React.FC = () => {
 
           {/* Event Banner */}
           <div className="relative h-64 md:h-80 rounded-lg overflow-hidden mb-8">
-            {event.image ? (
+            {event.isSpecialEvent && event.id === 'grand-reunion-2025' ? (
+              <img 
+                src="https://i.postimg.cc/26Fswft0/Grand-Alumni-Reunion-Banner-2025.jpg" 
+                alt={event.title} 
+                className="w-full h-full object-cover"
+              />
+            ) : event.image ? (
               <img 
                 src={event.image} 
                 alt={event.title} 
@@ -173,7 +180,24 @@ const EventDetail: React.FC = () => {
                       </p>
                     </div>
                     
-                    {event.registrationUrl ? (
+                    {/* Special Reunion Registration Form */}
+                    {event.isSpecialEvent && event.id === 'grand-reunion-2025' ? (
+                      user ? (
+                        <ReunionRegistrationForm 
+                          eventId={event.id} 
+                          onSuccess={() => setShowSuccessModal(true)} 
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <Button 
+                            onClick={handleRegistration}
+                            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
+                          >
+                            Login to Register for Reunion
+                          </Button>
+                        </div>
+                      )
+                    ) : event.registrationUrl ? (
                       <div className="space-y-4">
                         <Button 
                           onClick={handleRegistration}
