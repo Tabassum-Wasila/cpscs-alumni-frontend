@@ -61,9 +61,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl group">
+    <Card className="overflow-hidden transition-all duration-300 hover:shadow-xl group h-full flex flex-col">
       {/* Event Banner */}
-      <div className="relative h-48">
+      <div className="relative h-48 flex-shrink-0">
         {event.image ? (
           <img 
             src={event.image} 
@@ -71,7 +71,9 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <DefaultEventBanner event={event} />
+          <div className="w-full h-full">
+            <DefaultEventBanner event={event} />
+          </div>
         )}
         
         {/* Status and Type badges */}
@@ -86,7 +88,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
         </div>
       </div>
       
-      <CardContent className="p-6">
+      <CardContent className="p-6 flex-grow flex flex-col">
         <div className="flex items-start justify-between mb-3">
           <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
             {event.title}
@@ -96,7 +98,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </Badge>
         </div>
         
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-4 flex-grow">
           <div className="flex items-center text-sm text-muted-foreground">
             <Calendar size={16} className="mr-2 text-primary" />
             <span>{new Date(event.date).toLocaleDateString('en-US', { 
@@ -127,17 +129,19 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           <div className="text-sm font-medium text-muted-foreground">
             Registration Deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
           </div>
+          
+          {/* Description preview with rich text support */}
+          <div 
+            className="text-sm text-muted-foreground line-clamp-2 prose prose-sm max-w-none"
+            dangerouslySetInnerHTML={{ 
+              __html: event.description.substring(0, 120) + '...'
+            }}
+          />
         </div>
         
-        {/* Description preview */}
-        <div 
-          className="text-sm text-muted-foreground mb-4 line-clamp-2"
-          dangerouslySetInnerHTML={{ 
-            __html: event.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...'
-          }}
-        />
-        
-        {getActionButton()}
+        <div className="mt-auto">
+          {getActionButton()}
+        </div>
       </CardContent>
     </Card>
   );

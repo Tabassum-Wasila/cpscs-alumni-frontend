@@ -115,91 +115,89 @@ const EventDetail: React.FC = () => {
             </div>
           </div>
 
-          {/* Event Info */}
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="lg:col-span-2">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{event.title}</h1>
-              
-              <div className="grid gap-4 sm:grid-cols-2 mb-6">
-                <div className="flex items-center text-muted-foreground">
-                  <Calendar className="mr-3 h-5 w-5 text-primary" />
-                  <span>{new Date(event.date).toLocaleDateString('en-US', { 
-                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-                  })}</span>
-                </div>
-                
-                <div className="flex items-center text-muted-foreground">
-                  <Clock className="mr-3 h-5 w-5 text-primary" />
-                  <span>{event.time}</span>
-                </div>
-                
-                <div className="flex items-center text-muted-foreground">
-                  <MapPin className="mr-3 h-5 w-5 text-primary" />
-                  <span>{event.venue}</span>
-                </div>
-                
-                <div className="flex items-center text-muted-foreground">
-                  <Users className="mr-3 h-5 w-5 text-primary" />
-                  <span>{event.currentRegistrations || 0} registered</span>
-                </div>
+          {/* Event Info - Single Column Layout */}
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold mb-6">{event.title}</h1>
+            
+            <div className="grid gap-4 sm:grid-cols-2 mb-8">
+              <div className="flex items-center text-muted-foreground">
+                <Calendar className="mr-3 h-5 w-5 text-primary" />
+                <span>{new Date(event.date).toLocaleDateString('en-US', { 
+                  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                })}</span>
               </div>
-
-              <div 
-                className="prose prose-lg max-w-none text-foreground"
-                dangerouslySetInnerHTML={{ __html: event.description }}
-              />
+              
+              <div className="flex items-center text-muted-foreground">
+                <Clock className="mr-3 h-5 w-5 text-primary" />
+                <span>{event.time}</span>
+              </div>
+              
+              <div className="flex items-center text-muted-foreground">
+                <MapPin className="mr-3 h-5 w-5 text-primary" />
+                <span>{event.venue}</span>
+              </div>
+              
+              <div className="flex items-center text-muted-foreground">
+                <Users className="mr-3 h-5 w-5 text-primary" />
+                <span>{event.currentRegistrations || 0} registered</span>
+              </div>
             </div>
 
-            {/* Registration Card */}
-            <div>
-              <Card className="sticky top-24">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-4">Registration</h3>
-                  
-                  {event.status === 'past' ? (
-                    <div className="text-center py-4">
-                      <Badge variant="secondary" className="mb-4">Event Concluded</Badge>
-                      <p className="text-muted-foreground">This event has already taken place.</p>
-                    </div>
-                  ) : !isRegistrationOpen ? (
-                    <div className="text-center py-4">
-                      <Badge variant="outline" className="mb-4">Registration Closed</Badge>
-                      <p className="text-muted-foreground">
-                        Registration deadline was {new Date(event.registrationDeadline).toLocaleDateString()}
+            <div 
+              className="prose prose-lg max-w-none text-foreground mb-8"
+              dangerouslySetInnerHTML={{ __html: event.description }}
+            />
+
+            {/* Registration Section */}
+            <Card className="w-full">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-semibold mb-4">Registration</h3>
+                
+                {event.status === 'past' ? (
+                  <div className="text-center py-4">
+                    <Badge variant="secondary" className="mb-4">Event Concluded</Badge>
+                    <p className="text-muted-foreground">This event has already taken place.</p>
+                  </div>
+                ) : !isRegistrationOpen ? (
+                  <div className="text-center py-4">
+                    <Badge variant="outline" className="mb-4">Registration Closed</Badge>
+                    <p className="text-muted-foreground">
+                      Registration deadline was {new Date(event.registrationDeadline).toLocaleDateString()}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Registration deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
                       </p>
                     </div>
-                  ) : (
-                    <div className="space-y-4">
-                      <div className="text-center">
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Registration deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
+                    
+                    {event.registrationUrl ? (
+                      <div className="space-y-4">
+                        <Button 
+                          onClick={handleRegistration}
+                          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
+                        >
+                          Register for Event
+                          <ExternalLink className="ml-2 h-4 w-4" />
+                        </Button>
+                        <p className="text-xs text-muted-foreground text-center">
+                          You must be logged in to register
                         </p>
                       </div>
-                      
-                      {event.registrationUrl ? (
-                        <div className="space-y-4">
-                          <Button 
-                            onClick={handleRegistration}
-                            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
-                          >
-                            Click here to complete registration
-                            <ExternalLink className="ml-2 h-4 w-4" />
-                          </Button>
-                          <p className="text-xs text-muted-foreground text-center">
-                            Opens in new tab
-                          </p>
-                        </div>
-                      ) : (
-                        <EventRegistrationForm 
-                          event={event} 
-                          onSuccess={() => setShowSuccessModal(true)}
-                        />
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                    ) : (
+                      <Button 
+                        onClick={handleRegistration}
+                        className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary transition-all duration-300"
+                      >
+                        Register for Event
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

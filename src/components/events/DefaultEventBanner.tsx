@@ -11,8 +11,7 @@ const DefaultEventBanner: React.FC<DefaultEventBannerProps> = ({ event, classNam
 
   return (
     <div 
-      className={`relative w-full aspect-video overflow-hidden rounded-lg ${className}`}
-      style={{ aspectRatio: '16/9' }}
+      className={`relative w-full h-full overflow-hidden ${className}`}
     >
       {/* Animated gradient background */}
       <div 
