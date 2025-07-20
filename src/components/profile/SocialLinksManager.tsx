@@ -107,7 +107,7 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
                     className="mt-1 text-sm"
                   />
                   {url && !validateUrl(url, platform) && (
-                    <p className="text-xs text-red-500 mt-1">Please enter a valid {platformConfig?.label} URL</p>
+                    <p className="text-xs text-red-500 mt-1">Please enter a valid URL</p>
                   )}
                 </div>
               </div>

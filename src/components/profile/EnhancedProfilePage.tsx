@@ -273,10 +273,21 @@ Contact: ${user.email}`);
     }
   }, [hasUnsavedChanges]);
 
+  const handlePopState = useCallback(() => {
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+      window.history.pushState(null, '', window.location.pathname);
+    }
+  }, [hasUnsavedChanges]);
+
   useEffect(() => {
     window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [handleBeforeUnload]);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [handleBeforeUnload, handlePopState]);
 
   const handleCancelEdit = () => {
     if (hasUnsavedChanges) {

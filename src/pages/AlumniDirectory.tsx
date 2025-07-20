@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Filter, Users, MapPin, Heart, GraduationCap, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserType } from '@/contexts/AuthContext';
+import Navbar from '@/components/Navbar';
 const AlumniDirectory = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<UserType[]>([]);
@@ -62,7 +63,9 @@ const AlumniDirectory = () => {
     });
     return filtered;
   }, [users, searchTerm, filters]);
-  return <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
+      <Navbar />
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -238,6 +241,7 @@ const AlumniDirectory = () => {
             </p>
           </div>}
       </div>
-    </div>;
+    </div>
+  );
 };
 export default AlumniDirectory;
