@@ -39,39 +39,24 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
   }, []);
 
   const initiatePayment = async () => {
+    if (!isScriptLoaded || typeof bKash === 'undefined') {
+      alert('bKash payment system is not ready. Please try again.');
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // For testing: Use mock service until backend is ready
-      // TODO: Replace with real backend calls when ready
+      // Use mock service to get payment data, but show real bKash modal
       console.log('Creating payment with mock service for testing...');
       const paymentData = await MockBkashService.createPayment(amount, invoice);
       
       console.log('Mock payment created:', paymentData);
       
-      // For testing: Simulate bKash modal interaction
-      // In production, this would use the real bKash library
-      setTimeout(async () => {
-        try {
-          console.log('Executing payment with mock service...');
-          const executeResult = await MockBkashService.executePayment(paymentData.paymentID);
-          
-          console.log('Mock payment executed:', executeResult);
-          
-          if (executeResult && executeResult.statusCode === '0000') {
-            onSuccess({
-              paymentID: executeResult.paymentID,
-              trxID: executeResult.trxID
-            });
-          } else {
-            alert(executeResult.statusMessage || 'Payment execution failed.');
-          }
-        } catch (error) {
-          console.error('Mock payment execution error:', error);
-          alert('Payment execution failed. Please try again.');
-        }
-        setIsLoading(false);
-      }, 2000); // Simulate user interaction time
-      
+      if (paymentData && paymentData.paymentID) {
+        initializeBkash(paymentData);
+      } else {
+        throw new Error(paymentData.statusMessage || 'Failed to initialize payment.');
+      }
     } catch (error) {
       console.error('Mock payment creation error:', error);
       alert('Payment initialization failed. Please try again.');
@@ -87,18 +72,11 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
       // This function is called by bKash after the user authorizes the payment
       executeRequestOnAuthorization: async () => {
         try {
-          // 2. Call your own backend to execute the payment
-          const executeResponse = await fetch('/api/bkash/execute-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ paymentID: paymentData.paymentID }),
-          });
+          // Use mock service for testing until backend is ready
+          console.log('Executing payment with mock service...');
+          const executeResult = await MockBkashService.executePayment(paymentData.paymentID);
           
-          if (!executeResponse.ok) {
-            throw new Error('Failed to execute payment');
-          }
-          
-          const executeResult = await executeResponse.json();
+          console.log('Mock payment executed:', executeResult);
 
           if (executeResult && executeResult.statusCode === '0000') {
             // Payment is successful
@@ -112,7 +90,7 @@ const BkashPaymentButton: React.FC<BkashPaymentProps> = ({
             bKash.execute().onError();
           }
         } catch (error) {
-          console.error('bKash execute payment error:', error);
+          console.error('Mock payment execution error:', error);
           alert('Payment execution failed. Please try again.');
           bKash.execute().onError();
         }
