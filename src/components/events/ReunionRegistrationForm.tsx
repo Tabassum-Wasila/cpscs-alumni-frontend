@@ -102,23 +102,49 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
     setShowPaymentModal(true);
   };
 
-  const handlePaymentSuccess = async () => {
-    // Here you would submit the registration data to backend
+  const handlePaymentSuccess = async (transactionData: any) => {
+    // Complete registration data to send to backend
     const registrationData = {
       eventId,
       userId: user?.id,
-      sscYear: watchValues.sscYear,
-      isCurrentStudent: watchValues.isCurrentStudent,
-      bringingSpouse: watchValues.bringingSpouse,
-      numberOfKids: parseInt(watchValues.numberOfKids) || 0,
-      bringingMother: watchValues.bringingMother,
-      bringingFather: watchValues.bringingFather,
-      specialRequests: watchValues.specialRequests,
+      userProfile: {
+        name: user?.fullName,
+        email: user?.email,
+        phone: user?.phoneNumber,
+        sscYear: user?.sscYear,
+        hscYear: user?.hscYear,
+        countryCode: user?.countryCode,
+        isAdmin: user?.isAdmin,
+        hasMembership: user?.hasMembership
+      },
+      registrationDetails: {
+        sscYear: watchValues.sscYear,
+        isCurrentStudent: watchValues.isCurrentStudent,
+        bringingSpouse: watchValues.bringingSpouse,
+        numberOfKids: parseInt(watchValues.numberOfKids) || 0,
+        bringingMother: watchValues.bringingMother,
+        bringingFather: watchValues.bringingFather,
+        specialRequests: watchValues.specialRequests
+      },
       feeBreakdown,
+      paymentDetails: {
+        transactionId: transactionData.transactionId,
+        amount: feeBreakdown.totalFee,
+        paymentStatus: transactionData.success ? 'success' : 'failed',
+        paymentMethod: 'bkash',
+        paymentDate: new Date().toISOString()
+      },
       registrationDate: new Date().toISOString(),
     };
 
-    console.log('Registration data to be sent to backend:', registrationData);
+    console.log('Complete registration data to be sent to backend:', registrationData);
+    
+    // TODO: Send to backend API
+    // await fetch('/api/reunion-registration', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(registrationData)
+    // });
     
     setShowPaymentModal(false);
     onSuccess();
@@ -144,18 +170,15 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <span>Regular Alumni:</span>
-                <div className="flex items-center gap-2">
-                  {isEarlyBird ? (
-                    <>
-                      <Badge variant="secondary">Early Bird</Badge>
-                      <span className="font-semibold">৳{pricing.regularEarlyBird}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Badge variant="outline">Late Owl</Badge>
-                      <span className="font-semibold">৳{pricing.regularLateOwl}</span>
-                    </>
-                  )}
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">Early Bird</Badge>
+                    <span className="font-semibold">৳{pricing.regularEarlyBird}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline">Late Owl</Badge>
+                    <span className="font-semibold">৳{pricing.regularLateOwl}</span>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-between items-center">
@@ -173,7 +196,8 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                 <span className="font-semibold">৳{pricing.guest}</span>
               </div>
               <div className="text-sm text-muted-foreground">
-                Early Bird Deadline: {new Date(pricing.earlyBirdDeadline).toLocaleDateString()}
+                <div>Early Bird Deadline: {new Date(pricing.earlyBirdDeadline).toLocaleDateString()}</div>
+                <div>Late Owl Deadline: {new Date(pricing.lateOwlDeadline).toLocaleDateString()}</div>
               </div>
               <div className="text-xs text-muted-foreground">
                 *Children under 5 are free (no separate meal)
@@ -203,9 +227,13 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>SSC Batch Year</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        defaultValue={field.value}
+                        disabled={watchValues.isCurrentStudent}
+                      >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className={watchValues.isCurrentStudent ? "opacity-50" : ""}>
                             <SelectValue placeholder="Select year" />
                           </SelectTrigger>
                         </FormControl>
@@ -215,6 +243,11 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                           ))}
                         </SelectContent>
                       </Select>
+                      {watchValues.isCurrentStudent && (
+                        <FormDescription className="text-muted-foreground">
+                          SSC batch not required for current students
+                        </FormDescription>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -412,6 +445,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
           description="Grand Alumni Reunion 2025 Registration"
           onSuccess={handlePaymentSuccess}
           onCancel={() => setShowPaymentModal(false)}
+          merchantNumber="+8801886579596"
         />
       )}
     </div>

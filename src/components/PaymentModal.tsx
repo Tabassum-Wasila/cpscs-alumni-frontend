@@ -9,11 +9,12 @@ import { PaymentService } from '@/services/paymentService';
 interface PaymentModalProps {
   amount: number;
   description: string;
-  onSuccess: () => void;
+  onSuccess: (transactionData: any) => void;
   onCancel: () => void;
+  merchantNumber?: string;
 }
 
-const PaymentModal: React.FC<PaymentModalProps> = ({ amount, description, onSuccess, onCancel }) => {
+const PaymentModal: React.FC<PaymentModalProps> = ({ amount, description, onSuccess, onCancel, merchantNumber = "+8801886579596" }) => {
   const { toast } = useToast();
 
   const handleBkashPayment = async () => {
@@ -26,7 +27,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ amount, description, onSucc
       amount,
       currency: 'BDT',
       description,
-      reference: 'CPSCS Alumni'
+      merchantNumber,
+      reference: 'CPSCS Alumni Reunion'
     };
 
     const result = await PaymentService.processBkashPayment(paymentConfig);
@@ -37,7 +39,7 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ amount, description, onSucc
         description: `Transaction ID: ${result.transactionId}`,
         variant: "default",
       });
-      onSuccess();
+      onSuccess(result);
     } else {
       toast({
         title: "Payment Failed",
@@ -51,7 +53,8 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ amount, description, onSucc
     amount,
     currency: 'BDT',
     description,
-    reference: 'CPSCS Alumni'
+    merchantNumber,
+    reference: 'CPSCS Alumni Reunion'
   });
 
   return (

@@ -203,13 +203,13 @@ export class EventService {
     </ul>
     <p><em><strong>Note:</strong> Children under 5 are free but will not receive a separate food pack.</em></p>
 </div>`,
-        date: "2025-12-25",
+        date: "2025-12-26",
         time: "8:00 AM - 11:00 PM",
         venue: "Cantonment Public School and College, Saidpur",
         type: "in-person",
         category: "reunion",
         status: "upcoming",
-        registrationDeadline: "2025-12-20",
+        registrationDeadline: "2025-12-16",
         capacity: 500,
         currentRegistrations: 234,
         image: "https://i.postimg.cc/fR9gCNtY/IMG-7464.jpg",
@@ -276,7 +276,7 @@ export class EventService {
     const currentDate = new Date();
     const defaultPricing: ReunionPricing = {
       earlyBirdDeadline: "2025-11-26",
-      lateOwlDeadline: "2025-12-20",
+      lateOwlDeadline: "2025-12-16",
       regularEarlyBird: 2000,
       regularLateOwl: 3000,
       ssc2020to2025: 1500,
@@ -324,7 +324,7 @@ export class EventService {
     // This would normally come from backend/admin panel
     return {
       earlyBirdDeadline: "2025-11-26",
-      lateOwlDeadline: "2025-12-20",
+      lateOwlDeadline: "2025-12-16",
       regularEarlyBird: 2000,
       regularLateOwl: 3000,
       ssc2020to2025: 1500,
