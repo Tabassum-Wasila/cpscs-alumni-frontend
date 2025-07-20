@@ -15,7 +15,6 @@ const NoticeBoard = () => {
   const [filters, setFilters] = useState<NoticeFilters>({
     searchQuery: '',
     sortBy: 'date-desc',
-    category: undefined,
   });
 
   // Filter and sort notices
@@ -31,10 +30,6 @@ const NoticeBoard = () => {
       );
     }
 
-    // Apply category filter
-    if (filters.category) {
-      filtered = filtered.filter(notice => notice.category === filters.category);
-    }
 
     // Apply sorting
     filtered.sort((a, b) => {

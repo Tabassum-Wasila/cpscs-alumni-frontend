@@ -22,55 +22,42 @@ const NoticeCard: React.FC<NoticeCardProps> = ({ notice, onClick }) => {
     return text.substring(0, maxLength) + '...';
   };
 
-  const getCategoryColor = (category?: string) => {
-    switch (category) {
-      case 'announcement':
-        return 'from-red-400/20 via-red-300/10 to-red-200/20 border-red-200';
-      case 'event':
-        return 'from-blue-400/20 via-blue-300/10 to-blue-200/20 border-blue-200';
-      case 'spotlight':
-        return 'from-yellow-400/20 via-yellow-300/10 to-yellow-200/20 border-yellow-200';
-      case 'general':
-        return 'from-green-400/20 via-green-300/10 to-green-200/20 border-green-200';
-      default:
-        return 'from-gray-400/20 via-gray-300/10 to-gray-200/20 border-gray-200';
-    }
-  };
+  const gradientVariations = [
+    'from-purple-200/40 via-pink-100/20 to-blue-100/30 border-purple-200/40',
+    'from-blue-200/40 via-cyan-100/20 to-teal-100/30 border-blue-200/40',
+    'from-green-200/40 via-emerald-100/20 to-lime-100/30 border-green-200/40',
+    'from-rose-200/40 via-pink-100/20 to-red-100/30 border-rose-200/40',
+    'from-orange-200/40 via-amber-100/20 to-yellow-100/30 border-orange-200/40',
+    'from-indigo-200/40 via-purple-100/20 to-blue-100/30 border-indigo-200/40',
+    'from-teal-200/40 via-cyan-100/20 to-emerald-100/30 border-teal-200/40',
+    'from-pink-200/40 via-rose-100/20 to-purple-100/30 border-pink-200/40',
+    'from-violet-200/40 via-indigo-100/20 to-blue-100/30 border-violet-200/40',
+    'from-cyan-200/40 via-blue-100/20 to-teal-100/30 border-cyan-200/40'
+  ];
 
-  const getPriorityIcon = (priority?: string) => {
-    switch (priority) {
-      case 'high':
-        return '🔴';
-      case 'medium':
-        return '🟡';
-      case 'low':
-        return '🟢';
-      default:
-        return '';
-    }
+  const getRandomGradient = () => {
+    const hash = notice.id.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    const index = Math.abs(hash) % gradientVariations.length;
+    return gradientVariations[index];
   };
 
   const hasMedia = notice.imageUrl || notice.videoUrl || notice.pdfUrl;
 
   return (
     <Card 
-      className={`p-6 cursor-pointer group relative overflow-hidden border-2 bg-gradient-to-br ${getCategoryColor(notice.category)} hover:shadow-xl hover:scale-[1.02] transition-all duration-300 animate-fade-in`}
+      className={`p-6 cursor-pointer group relative overflow-hidden border-2 bg-gradient-to-br ${getRandomGradient()} hover:shadow-xl hover:scale-[1.02] transition-all duration-300 animate-fade-in`}
       onClick={onClick}
     >
-      {/* Animated gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+      {/* Animated gradient flow overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+      <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/10 to-transparent translate-x-full group-hover:-translate-x-full transition-transform duration-1500 ease-out delay-200" />
       
       <div className="relative z-10">
-        {/* Header with priority and date */}
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex items-center gap-2">
-            {notice.priority && (
-              <span className="text-sm">{getPriorityIcon(notice.priority)}</span>
-            )}
-            <span className="text-xs text-muted-foreground bg-background/50 px-2 py-1 rounded-full">
-              {notice.category?.toUpperCase() || 'NOTICE'}
-            </span>
-          </div>
+        {/* Header with date */}
+        <div className="flex justify-end items-start mb-3">
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <Calendar className="h-3 w-3" />
             {formatDate(notice.publishDate)}
