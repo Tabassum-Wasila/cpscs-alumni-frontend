@@ -1,297 +1,152 @@
+import { SignupFormData } from '@/components/auth/SignupForm';
 
-import { User } from '@/contexts/AuthContext';
-
-export interface LoginCredentials {
+export interface User {
+  id: string;
+  fullName: string;
   email: string;
-  password: string;
+  password?: string;
+  sscYear: string;
+  hscYear: string;
+  dateJoined: string;
+  hasMembership: boolean;
+  profile: UserProfile;
 }
 
-export interface SignupData extends Partial<User> {
-  password: string;
-  socialProfileLink?: string;
-  proofDocument?: File;
-  countryCode?: string;
+export type UserProfile = {
+  profilePicture?: string;
+  bio?: string;
+  profession?: string;
+  organization?: string;
+  organizationWebsite?: string;
+  jobTitle?: string;
+  city?: string;
+  country?: string;
+  permanentAddress?: string;
+  sameAsCurrentAddress?: boolean;
   phoneNumber?: string;
-  approvalStatus?: 'pending' | 'approved' | 'rejected';
-}
+  showPhone?: boolean;
+  dateOfBirth?: string;
+  expertise?: string[];
+  socialLinks?: {
+    facebook?: string;
+    linkedin?: string;
+    youtube?: string;
+    twitter?: string;
+    instagram?: string;
+    website?: string;
+  };
+  willingToMentor?: boolean;
+  mentorshipAreas?: string[];
+  aboutMe?: string;
+  hallOfFameOptIn?: boolean;
+  hallOfFameBio?: string;
+  education?: EducationEntry[];
+  workExperience?: WorkExperience[];
+  profileCompletionScore?: number;
+};
+
+export type EducationEntry = {
+  id: string;
+  degree: string;
+  institution: string;
+  graduationYear: string;
+  department?: string;
+  isDefault?: boolean;
+};
+
+export type WorkExperience = {
+  id: string;
+  title: string;
+  company: string;
+  startDate: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description?: string;
+};
 
 export class AuthService {
-  private static USERS_KEY = 'cpscs_users';
-  private static CURRENT_USER_KEY = 'cpscs_user';
-  private static ADMIN_SETTINGS_KEY = 'cpscs_admin_settings';
-
-  static async login(credentials: LoginCredentials): Promise<User | null> {
-    try {
-      const users = this.getStoredUsers();
-      const user = users.find((u: any) => u.email === credentials.email);
-      
-      if (user && user.password === credentials.password) {
-        // Check if user is approved
-        if (user.approvalStatus === 'pending') {
-          return null; // User not approved yet
-        }
-        
-        const { password: _, ...userWithoutPassword } = user;
-        const authUser: User = {
-          ...userWithoutPassword,
-          isAuthenticated: true,
-          approvalStatus: user.approvalStatus as 'pending' | 'approved' | 'rejected'
-        };
-        
-        localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(authUser));
-        return authUser;
-      }
-      return null;
-    } catch (error) {
-      console.error("Login error:", error);
-      return null;
-    }
-  }
-
-  static async signup(userData: SignupData): Promise<User | null> {
-    try {
-      const userId = `user_${Date.now()}`;
-      const adminSettings = this.getAdminSettings();
-      
-      const newUser = {
-        id: userId,
-        fullName: userData.fullName || "",
-        email: userData.email || "",
-        sscYear: userData.sscYear || "",
-        hscYear: userData.hscYear || "",
-        password: userData.password,
-        hasMembership: true,
-        dateJoined: new Date().toISOString(),
-        approvalStatus: (adminSettings.manualApproval ? 'pending' : 'approved') as 'pending' | 'approved' | 'rejected',
-        socialProfileLink: userData.socialProfileLink || "",
-        countryCode: userData.countryCode || "",
-        phoneNumber: userData.phoneNumber || "",
-        profile: {
-          profilePicture: "",
-          bio: "",
-          profession: "",
-          organization: "",
-          city: "",
-          country: "",
-          phoneNumber: userData.phoneNumber || "",
-          showPhone: false,
-          expertise: [],
-          socialLinks: {},
-          willingToMentor: false,
-          mentorshipAreas: []
-        }
-      };
-
-      const users = this.getStoredUsers();
-      users.push(newUser);
-      localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-      
-      // Only set current user if automatically approved
-      if (newUser.approvalStatus === 'approved') {
-        const { password: _, ...userWithoutPassword } = newUser;
-        const authUser: User = {
-          ...userWithoutPassword,
-          isAuthenticated: true,
-          approvalStatus: newUser.approvalStatus as 'pending' | 'approved' | 'rejected'
-        };
-        
-        localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(authUser));
-        return authUser;
-      }
-      
-      return null; // User needs approval
-    } catch (error) {
-      console.error("Signup error:", error);
-      return null;
-    }
-  }
-
   static getCurrentUser(): User | null {
-    try {
-      const storedUser = localStorage.getItem(this.CURRENT_USER_KEY);
-      return storedUser ? JSON.parse(storedUser) : null;
-    } catch (error) {
-      console.error("Get current user error:", error);
-      return null;
-    }
-  }
-
-  static logout(): void {
-    localStorage.removeItem(this.CURRENT_USER_KEY);
-  }
-
-  static async checkEmailExists(email: string): Promise<boolean> {
-    const users = this.getStoredUsers();
-    return users.some((user: any) => user.email === email);
-  }
-
-  static getAdminSettings(): { manualApproval: boolean } {
-    try {
-      const settings = localStorage.getItem(this.ADMIN_SETTINGS_KEY);
-      return settings ? JSON.parse(settings) : { manualApproval: false };
-    } catch (error) {
-      console.error("Get admin settings error:", error);
-      return { manualApproval: false };
-    }
-  }
-
-  static setAdminSettings(settings: { manualApproval: boolean }): void {
-    localStorage.setItem(this.ADMIN_SETTINGS_KEY, JSON.stringify(settings));
-  }
-
-  static getPendingApprovals(): any[] {
-    const users = this.getStoredUsers();
-    return users.filter((user: any) => user.approvalStatus === 'pending');
-  }
-
-  static approveUser(userId: string): boolean {
-    try {
-      const users = this.getStoredUsers();
-      const userIndex = users.findIndex((u: any) => u.id === userId);
-      
-      if (userIndex !== -1) {
-        users[userIndex].approvalStatus = 'approved';
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-        return true;
+    const userJson = localStorage.getItem('cpscs_user');
+    if (userJson) {
+      try {
+        return JSON.parse(userJson);
+      } catch (error) {
+        console.error("Error parsing user data from localStorage:", error);
+        return null;
       }
-      return false;
-    } catch (error) {
-      console.error("Approve user error:", error);
-      return false;
     }
+    return null;
   }
 
-  static rejectUser(userId: string): boolean {
-    try {
-      const users = this.getStoredUsers();
-      const userIndex = users.findIndex((u: any) => u.id === userId);
-      
-      if (userIndex !== -1) {
-        users[userIndex].approvalStatus = 'rejected';
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Reject user error:", error);
-      return false;
-    }
+  static isLoggedIn(): boolean {
+    return !!AuthService.getCurrentUser();
   }
 
-  private static getStoredUsers(): any[] {
-    try {
-      return JSON.parse(localStorage.getItem(this.USERS_KEY) || "[]");
-    } catch (error) {
-      console.error("Error getting stored users:", error);
-      return [];
-    }
+  static updateUser(user: User): void {
+    localStorage.setItem('cpscs_user', JSON.stringify(user));
   }
 
   static updateStoredUser(updatedUser: User): boolean {
     try {
-      const users = this.getStoredUsers();
-      const userIndex = users.findIndex((u: any) => u.id === updatedUser.id);
-      
+      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+      const userIndex = storedUsers.findIndex((user: User) => user.id === updatedUser.id);
+
       if (userIndex !== -1) {
-        const { password } = users[userIndex];
-        users[userIndex] = { ...updatedUser, password };
-        localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-        localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(updatedUser));
+        storedUsers[userIndex] = updatedUser;
+        localStorage.setItem('cpscs_users', JSON.stringify(storedUsers));
+        AuthService.updateUser(updatedUser);
         return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Update stored user error:", error);
-      return false;
-    }
-  }
-
-  // Password Reset Methods
-  static async sendPasswordResetOTP(email: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const users = this.getStoredUsers();
-      const user = users.find((u: any) => u.email === email);
-      
-      if (!user) {
-        return {
-          success: false,
-          message: 'No account found with this email address'
-        };
-      }
-
-      // Import OTPService dynamically to avoid circular dependency
-      const { OTPService } = await import('./otpService');
-      return await OTPService.sendPasswordResetOTP(email);
-    } catch (error) {
-      console.error("Send password reset OTP error:", error);
-      return {
-        success: false,
-        message: 'Failed to send password reset OTP. Please try again.'
-      };
-    }
-  }
-
-  static async verifyPasswordResetOTP(email: string, otp: string): Promise<{ success: boolean; message: string }> {
-    try {
-      const { OTPService } = await import('./otpService');
-      const isValid = OTPService.verifyOTP(email, otp, 'password-reset');
-      
-      if (isValid) {
-        return {
-          success: true,
-          message: 'OTP verified successfully'
-        };
       } else {
-        return {
-          success: false,
-          message: 'Invalid or expired OTP. Please try again.'
-        };
+        console.warn('User not found in stored users.');
+        return false;
       }
     } catch (error) {
-      console.error("Verify password reset OTP error:", error);
-      return {
-        success: false,
-        message: 'Failed to verify OTP. Please try again.'
-      };
+      console.error('Error updating stored user:', error);
+      return false;
     }
   }
 
-  static async resetPassword(email: string, otp: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    try {
-      // Verify OTP first
-      const otpVerification = await this.verifyPasswordResetOTP(email, otp);
-      if (!otpVerification.success) {
-        return otpVerification;
+  static createUser(userData: SignupFormData): User {
+    const newUser: User = {
+      id: crypto.randomUUID(),
+      fullName: userData.fullName,
+      email: userData.email,
+      password: userData.password,
+      sscYear: userData.sscYear,
+      hscYear: userData.hscYear,
+      dateJoined: new Date().toISOString(),
+      hasMembership: false,
+      profile: {
+        profilePicture: '',
+        bio: '',
+        profession: '',
+        organization: '',
+        city: '',
+        country: '',
+        phoneNumber: '',
+        showPhone: true, // Changed from false to true - default to showing phone
+        expertise: [],
+        socialLinks: {},
+        willingToMentor: false,
+        mentorshipAreas: [],
+        education: [],
+        workExperience: []
       }
+    };
 
-      // Update password
-      const users = this.getStoredUsers();
-      const userIndex = users.findIndex((u: any) => u.email === email);
-      
-      if (userIndex === -1) {
-        return {
-          success: false,
-          message: 'User not found'
-        };
-      }
-
-      users[userIndex].password = newPassword;
-      localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
-
-      // Remove OTP after successful password reset
-      const { OTPService } = await import('./otpService');
-      OTPService.removeOTP(email, 'password-reset');
-
-      return {
-        success: true,
-        message: 'Password reset successfully'
-      };
-    } catch (error) {
-      console.error("Reset password error:", error);
-      return {
-        success: false,
-        message: 'Failed to reset password. Please try again.'
-      };
+    let users = [];
+    const storedUsers = localStorage.getItem('cpscs_users');
+    if (storedUsers) {
+      users = JSON.parse(storedUsers);
     }
+
+    users.push(newUser);
+    localStorage.setItem('cpscs_users', JSON.stringify(users));
+    AuthService.updateUser(newUser);
+    return newUser;
+  }
+
+  static logout(): void {
+    localStorage.removeItem('cpscs_user');
   }
 }

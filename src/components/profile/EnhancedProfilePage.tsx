@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Edit, Save, Camera, User, Briefcase, GraduationCap, 
   Globe, Plus, X, MapPin, Phone, Mail, Calendar as CalendarIcon,
@@ -39,11 +40,14 @@ const EnhancedProfilePage = () => {
   const { user, updateUserProfile } = useAuth();
   const { toast } = useToast();
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [viewUser, setViewUser] = useState<UserType | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
   const [countryCode, setCountryCode] = useState('+880');
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Determine if this is the user's own profile
   const isOwnProfile = !userId || (user && userId === user.id);
@@ -139,6 +143,7 @@ const EnhancedProfilePage = () => {
         workExperience: currentUser.profile.workExperience || [],
         profileCompletionScore: currentUser.profile.profileCompletionScore || 0
       });
+      setHasUnsavedChanges(false);
     }
   }, [currentUser]);
 
@@ -151,6 +156,7 @@ const EnhancedProfilePage = () => {
 
   const updateField = (field: string, value: any) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
+    setHasUnsavedChanges(true);
   };
 
   const addExpertise = () => {
@@ -218,6 +224,7 @@ const EnhancedProfilePage = () => {
           description: "Your profile has been successfully updated.",
         });
         setIsEditing(false);
+        setHasUnsavedChanges(false);
       } else {
         toast({
           title: "Update Failed",
@@ -257,6 +264,61 @@ Batch ${user.sscYear}
 Contact: ${user.email}`);
 
     window.open(`mailto:${mentorUser.email}?subject=${subject}&body=${body}`, '_blank');
+  };
+
+  const handleBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [handleBeforeUnload]);
+
+  const handleCancelEdit = () => {
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+    } else {
+      setIsEditing(false);
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowUnsavedDialog(false);
+    setIsEditing(false);
+    setHasUnsavedChanges(false);
+    // Reset profile data to current user data
+    if (currentUser?.profile) {
+      setProfileData({
+        profilePicture: currentUser.profile.profilePicture || '',
+        bio: currentUser.profile.bio || '',
+        profession: currentUser.profile.profession || '',
+        organization: currentUser.profile.organization || '',
+        organizationWebsite: currentUser.profile.organizationWebsite || '',
+        jobTitle: currentUser.profile.jobTitle || '',
+        city: currentUser.profile.city || '',
+        country: currentUser.profile.country || '',
+        permanentAddress: currentUser.profile.permanentAddress || '',
+        sameAsCurrentAddress: currentUser.profile.sameAsCurrentAddress || false,
+        phoneNumber: currentUser.profile.phoneNumber || '',
+        showPhone: currentUser.profile.showPhone ?? true,
+        dateOfBirth: currentUser.profile.dateOfBirth || '',
+        expertise: currentUser.profile.expertise || [],
+        socialLinks: currentUser.profile.socialLinks || {},
+        willingToMentor: currentUser.profile.willingToMentor || false,
+        mentorshipAreas: currentUser.profile.mentorshipAreas || [],
+        aboutMe: currentUser.profile.aboutMe || '',
+        hallOfFameOptIn: currentUser.profile.hallOfFameOptIn || false,
+        hallOfFameBio: currentUser.profile.hallOfFameBio || '',
+        education: currentUser.profile.education || [],
+        workExperience: currentUser.profile.workExperience || [],
+        profileCompletionScore: currentUser.profile.profileCompletionScore || 0
+      });
+      setHasUnsavedChanges(false);
+    }
   };
 
   if (!currentUser) {
@@ -326,7 +388,7 @@ Contact: ${user.email}`);
                         <Save className="h-4 w-4 mr-2" />
                         {isSaving ? 'Saving...' : 'Save Changes'}
                       </Button>
-                      <Button variant="outline" onClick={() => setIsEditing(false)}>
+                      <Button variant="outline" onClick={handleCancelEdit}>
                         <X className="h-4 w-4 mr-2" />
                         Cancel
                       </Button>
@@ -347,10 +409,10 @@ Contact: ${user.email}`);
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
             <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="basic">Basic</TabsTrigger>
-              <TabsTrigger value="professional">Work</TabsTrigger>
+              <TabsTrigger value="work">Work</TabsTrigger>
               <TabsTrigger value="education">Education</TabsTrigger>
               <TabsTrigger value="social">Social</TabsTrigger>
-              <TabsTrigger value="additional">More</TabsTrigger>
+              <TabsTrigger value="more">More</TabsTrigger>
             </TabsList>
 
             {/* Basic Information Tab */}
@@ -417,6 +479,17 @@ Contact: ${user.email}`);
                       />
                     </div>
                     
+                    {/* Phone Privacy Toggle */}
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="showPhone"
+                        checked={profileData.showPhone}
+                        onCheckedChange={(checked) => updateField('showPhone', checked)}
+                      />
+                      <Label htmlFor="showPhone" className="text-sm">
+                        {profileData.showPhone ? "Show My Number" : "Don't Show My Number"}
+                      </Label>
+                    </div>
                   </div>
 
                   {/* Date of Birth */}
@@ -480,8 +553,8 @@ Contact: ${user.email}`);
               </Card>
             </TabsContent>
 
-            {/* Professional Information Tab */}
-            <TabsContent value="professional" className="space-y-4">
+            {/* Work Tab */}
+            <TabsContent value="work" className="space-y-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -617,8 +690,8 @@ Contact: ${user.email}`);
               </Card>
             </TabsContent>
 
-            {/* Additional Information Tab */}
-            <TabsContent value="additional" className="space-y-4">
+            {/* More Tab */}
+            <TabsContent value="more" className="space-y-4">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -675,6 +748,29 @@ Contact: ${user.email}`);
           </Tabs>
         </div>
       </div>
+
+      {/* Unsaved Changes Dialog */}
+      <Dialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Unsaved Changes</DialogTitle>
+            <DialogDescription>
+              You have unsaved changes. What would you like to do?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUnsavedDialog(false)}>
+              Continue Editing
+            </Button>
+            <Button variant="destructive" onClick={handleDiscardChanges}>
+              Discard Changes
+            </Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

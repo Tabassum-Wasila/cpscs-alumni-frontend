@@ -1,10 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const DEFAULT_PROFESSIONS = [
+  'Software Engineer', 'Data Scientist', 'Product Manager', 'Designer',
+  'Marketing Manager', 'Sales Manager', 'Business Analyst', 'Consultant',
+  'Teacher', 'Doctor', 'Engineer', 'Architect', 'Lawyer', 'Accountant',
+  'Project Manager', 'Research Scientist', 'Entrepreneur', 'Writer',
+  'Journalist', 'Photographer', 'Artist', 'Musician'
+];
 
 interface ProfessionAutocompleteProps {
   value: string;
@@ -13,213 +21,178 @@ interface ProfessionAutocompleteProps {
   className?: string;
 }
 
-// Comprehensive list of professions common in Bangladesh
-const DEFAULT_PROFESSIONS = [
-  // Medical & Healthcare
-  'Doctor', 'Physician', 'Surgeon', 'Dentist', 'Pharmacist', 'Nurse', 'Medical Technologist',
-  'Physiotherapist', 'Veterinarian', 'Medical Researcher', 'Healthcare Administrator',
-  
-  // Engineering & Technology
-  'Software Engineer', 'Web Developer', 'Mobile App Developer', 'Data Scientist', 'Data Analyst',
-  'Civil Engineer', 'Mechanical Engineer', 'Electrical Engineer', 'Electronics Engineer',
-  'Computer Engineer', 'Chemical Engineer', 'Textile Engineer', 'Marine Engineer',
-  'Architect', 'Network Engineer', 'Cybersecurity Specialist', 'DevOps Engineer',
-  'UI/UX Designer', 'Graphic Designer', 'Product Manager', 'Project Manager',
-  
-  // Business & Finance
-  'Entrepreneur', 'Business Owner', 'CEO', 'Managing Director', 'Business Analyst',
-  'Financial Analyst', 'Accountant', 'Chartered Accountant', 'Banker', 'Investment Banker',
-  'Insurance Agent', 'Stock Broker', 'Financial Advisor', 'Auditor', 'Tax Consultant',
-  'Marketing Manager', 'Sales Manager', 'Business Development Manager',
-  
-  // Government & Public Service
-  'Government Officer', 'Civil Servant', 'BCS Officer', 'Deputy Commissioner',
-  'Upazila Nirbahi Officer', 'Police Officer', 'Magistrate', 'Judge', 'Lawyer',
-  'Public Prosecutor', 'Customs Officer', 'Tax Officer', 'Bank Officer',
-  
-  // Education & Research
-  'Teacher', 'Professor', 'Lecturer', 'Principal', 'Educational Administrator',
-  'Research Scientist', 'Academic Researcher', 'School Teacher', 'College Teacher',
-  'University Professor', 'Librarian', 'Education Consultant',
-  
-  // Media & Communication
-  'Journalist', 'News Reporter', 'Editor', 'Content Writer', 'Copywriter',
-  'Television Producer', 'Radio Presenter', 'Social Media Manager', 'PR Specialist',
-  'Photographer', 'Videographer', 'Documentary Filmmaker',
-  
-  // Agriculture & Environment
-  'Agricultural Officer', 'Farmer', 'Agricultural Scientist', 'Livestock Specialist',
-  'Environmental Scientist', 'Forest Officer', 'Fisheries Officer',
-  
-  // Manufacturing & Industry
-  'Factory Manager', 'Production Manager', 'Quality Control Engineer',
-  'Industrial Engineer', 'Textile Worker', 'Garment Worker', 'RMG Professional',
-  
-  // Transportation & Logistics
-  'Pilot', 'Ship Captain', 'Maritime Officer', 'Logistics Manager',
-  'Supply Chain Manager', 'Transportation Coordinator',
-  
-  // Arts & Culture
-  'Artist', 'Musician', 'Actor', 'Writer', 'Poet', 'Cultural Activist',
-  'Art Director', 'Creative Director', 'Interior Designer',
-  
-  // Sports & Fitness
-  'Professional Athlete', 'Sports Coach', 'Fitness Trainer', 'Sports Journalist',
-  
-  // Social Services
-  'Social Worker', 'NGO Worker', 'Development Worker', 'Community Organizer',
-  'Human Rights Activist', 'Volunteer Coordinator',
-  
-  // Other Professions
-  'Consultant', 'Freelancer', 'Self-Employed', 'Retired', 'Homemaker',
-  'Real Estate Agent', 'Travel Agent', 'Tour Guide', 'Chef', 'Restaurant Owner',
-  'Shop Owner', 'Trader', 'Import/Export Business'
-];
-
 const ProfessionAutocomplete: React.FC<ProfessionAutocompleteProps> = ({
   value,
   onChange,
-  placeholder = "Select or type your profession...",
+  placeholder = "e.g., Software Engineer",
   className
 }) => {
-  const [open, setOpen] = useState(false);
-  const [customProfessions, setCustomProfessions] = useState<string[]>([]);
-  
+  const [inputValue, setInputValue] = useState(value);
+  const [isOpen, setIsOpen] = useState(false);
+  const [professions, setProfessions] = useState(DEFAULT_PROFESSIONS);
+  const [filteredProfessions, setFilteredProfessions] = useState<string[]>([]);
+  const [showAddButton, setShowAddButton] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   // Load custom professions from localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('custom_professions');
-    if (stored) {
+    const savedProfessions = localStorage.getItem('custom_professions');
+    if (savedProfessions) {
       try {
-        setCustomProfessions(JSON.parse(stored));
+        const customProfessions = JSON.parse(savedProfessions);
+        const allProfessions = Array.from(new Set([...DEFAULT_PROFESSIONS, ...customProfessions]));
+        setProfessions(allProfessions);
       } catch (error) {
         console.error('Error loading custom professions:', error);
       }
     }
   }, []);
 
-  // Save custom profession to localStorage
-  const saveCustomProfession = (profession: string) => {
-    if (!DEFAULT_PROFESSIONS.includes(profession) && !customProfessions.includes(profession)) {
-      const updated = [...customProfessions, profession];
-      setCustomProfessions(updated);
-      localStorage.setItem('custom_professions', JSON.stringify(updated));
+  // Update input value when prop value changes
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+
+  // Filter professions and check if we should show add button
+  useEffect(() => {
+    if (inputValue.trim()) {
+      const filtered = professions.filter(profession =>
+        profession.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      setFilteredProfessions(filtered);
+      
+      // Show add button if input doesn't match any existing profession exactly
+      const exactMatch = professions.some(profession => 
+        profession.toLowerCase() === inputValue.toLowerCase()
+      );
+      setShowAddButton(!exactMatch && inputValue.trim().length > 2);
+    } else {
+      setFilteredProfessions([]);
+      setShowAddButton(false);
+    }
+  }, [inputValue, professions]);
+
+  // Handle clicks outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    setIsOpen(true);
+    onChange(newValue); // Update parent immediately for real-time feedback
+  };
+
+  const handleInputFocus = () => {
+    setIsOpen(true);
+  };
+
+  const handleSelectProfession = (profession: string) => {
+    setInputValue(profession);
+    onChange(profession);
+    setIsOpen(false);
+    inputRef.current?.blur();
+  };
+
+  const handleAddProfession = () => {
+    const newProfession = inputValue.trim();
+    if (newProfession && !professions.includes(newProfession)) {
+      const updatedProfessions = [...professions, newProfession];
+      setProfessions(updatedProfessions);
+      
+      // Save custom professions to localStorage
+      const customProfessions = updatedProfessions.filter(p => !DEFAULT_PROFESSIONS.includes(p));
+      localStorage.setItem('custom_professions', JSON.stringify(customProfessions));
+      
+      // Select the new profession
+      onChange(newProfession);
+      setIsOpen(false);
+      inputRef.current?.blur();
     }
   };
 
-  const allProfessions = [...DEFAULT_PROFESSIONS, ...customProfessions].sort();
-  
-  // Check if current input is a new profession not in the list
-  const isNewProfession = value && !allProfessions.includes(value);
-  
-  const handleSelect = (selectedValue: string) => {
-    onChange(selectedValue);
-    saveCustomProfession(selectedValue);
-    setOpen(false);
-  };
-
-  const handleCustomInput = (customValue: string) => {
-    if (customValue && customValue !== value) {
-      onChange(customValue);
-      saveCustomProfession(customValue);
-    }
-  };
-
-  const handleAddNew = () => {
-    if (value && !allProfessions.includes(value)) {
-      saveCustomProfession(value);
-      setOpen(false);
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (showAddButton) {
+        handleAddProfession();
+      } else if (filteredProfessions.length > 0) {
+        handleSelectProfession(filteredProfessions[0]);
+      }
+    } else if (e.key === 'Escape') {
+      setIsOpen(false);
+      inputRef.current?.blur();
     }
   };
 
   return (
-    <div className={className}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between"
-          >
-            {value || placeholder}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-full p-0" align="start">
-          <Command>
-            <CommandInput 
-              placeholder="Search professions..." 
-              onValueChange={(searchValue) => {
-                // Allow typing custom professions
-                if (searchValue && !allProfessions.some(p => 
-                  p.toLowerCase().includes(searchValue.toLowerCase())
-                )) {
-                  // This is a potential custom profession
-                }
-              }}
-            />
-            <CommandList>
-              <CommandEmpty>
-                <div className="p-2 text-sm">
-                  <p className="text-muted-foreground mb-2">No profession found.</p>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      const input = document.querySelector('[cmdk-input]') as HTMLInputElement;
-                      if (input?.value) {
-                        handleCustomInput(input.value);
-                      }
-                    }}
-                    className="w-full"
-                  >
-                    Add "{(document.querySelector('[cmdk-input]') as HTMLInputElement)?.value}"
-                  </Button>
+    <div ref={containerRef} className={cn("relative", className)}>
+      <Input
+        ref={inputRef}
+        value={inputValue}
+        onChange={handleInputChange}
+        onFocus={handleInputFocus}
+        onKeyDown={handleKeyDown}
+        placeholder={placeholder}
+        className="pr-4"
+      />
+      
+      {isOpen && (inputValue.length > 0) && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+          {/* Show add button first if applicable */}
+          {showAddButton && (
+            <Button
+              variant="ghost"
+              onClick={handleAddProfession}
+              className="w-full justify-start p-3 text-left hover:bg-blue-50 border-b border-gray-100"
+            >
+              <Plus className="h-4 w-4 mr-2 text-blue-600" />
+              <span className="font-medium text-blue-600">
+                ADD "{inputValue.toUpperCase()}"
+              </span>
+            </Button>
+          )}
+          
+          {/* Show filtered professions */}
+          {filteredProfessions.length > 0 && (
+            <>
+              {filteredProfessions.slice(0, 8).map((profession, index) => (
+                <button
+                  key={profession}
+                  onClick={() => handleSelectProfession(profession)}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none flex items-center justify-between"
+                >
+                  <span>{profession}</span>
+                  {profession.toLowerCase() === inputValue.toLowerCase() && (
+                    <Check className="h-4 w-4 text-green-600" />
+                  )}
+                </button>
+              ))}
+              {filteredProfessions.length > 8 && (
+                <div className="px-4 py-2 text-sm text-gray-500 border-t">
+                  +{filteredProfessions.length - 8} more options...
                 </div>
-              </CommandEmpty>
-              
-              {DEFAULT_PROFESSIONS.length > 0 && (
-                <CommandGroup heading="Common Professions">
-                  {DEFAULT_PROFESSIONS.map((profession) => (
-                    <CommandItem
-                      key={profession}
-                      value={profession}
-                      onSelect={() => handleSelect(profession)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === profession ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {profession}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
               )}
-              
-              {customProfessions.length > 0 && (
-                <CommandGroup heading="Recently Added">
-                  {customProfessions.map((profession) => (
-                    <CommandItem
-                      key={profession}
-                      value={profession}
-                      onSelect={() => handleSelect(profession)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          value === profession ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {profession}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
+            </>
+          )}
+          
+          {/* Show message if no matches and can't add */}
+          {filteredProfessions.length === 0 && !showAddButton && inputValue.trim().length > 0 && (
+            <div className="px-4 py-3 text-sm text-gray-500">
+              No matching professions found. Type more to add a custom profession.
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

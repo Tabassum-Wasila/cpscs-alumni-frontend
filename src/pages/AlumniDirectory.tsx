@@ -1,373 +1,284 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect, useCallback } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Search, Users, MapPin, Briefcase, GraduationCap, Heart, User as UserIcon, Mail, Phone } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Search, Filter, Users, MapPin, Heart, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import { User } from '@/contexts/AuthContext';
+import { User as UserType } from '@/contexts/AuthContext';
 
 const AlumniDirectory = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserType[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedBatch, setSelectedBatch] = useState('all');
-  const [selectedProfession, setSelectedProfession] = useState('all');
-  const [selectedLocation, setSelectedLocation] = useState('all');
-  const [showOnlyMentors, setShowOnlyMentors] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    batch: 'all',
+    country: 'all',
+    profession: 'all',
+    willingToMentor: false
+  });
 
+  // Load user data from localStorage
   useEffect(() => {
-    loadUsers();
+    const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
+    setUsers(storedUsers);
   }, []);
 
-  const loadUsers = () => {
-    try {
-      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      // Filter out demo users and current user
-      const realUsers = storedUsers.filter((user: User) => 
-        !user.isDemoUser && user.id !== currentUser?.id
-      );
-      setUsers(realUsers);
-    } catch (error) {
-      console.error('Error loading users:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load alumni directory",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Memoize derived data to prevent unnecessary re-renders
+  const uniqueBatches = useCallback(() => {
+    return [...new Set(users.map(user => user.sscYear))];
+  }, [users]);
 
-  useEffect(() => {
-    let filtered = users;
+  const uniqueCountries = useCallback(() => {
+    return [...new Set(users.map(user => user.profile?.country).filter(Boolean))];
+  }, [users]);
 
-    // Search filter
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.fullName.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        (user.profile?.profession && user.profile.profession.toLowerCase().includes(searchLower)) ||
-        (user.profile?.organization && user.profile.organization.toLowerCase().includes(searchLower)) ||
-        (user.profile?.city && user.profile.city.toLowerCase().includes(searchLower)) ||
-        (user.profile?.country && user.profile.country.toLowerCase().includes(searchLower)) ||
-        (user.profile?.expertise && user.profile.expertise.some(skill => 
-          skill.toLowerCase().includes(searchLower)
-        ))
-      );
-    }
+  const uniqueProfessions = useCallback(() => {
+    return [...new Set(users.map(user => user.profile?.profession).filter(Boolean))];
+  }, [users]);
 
-    // Batch filter
-    if (selectedBatch !== 'all') {
-      filtered = filtered.filter(user => user.sscYear === selectedBatch);
-    }
+  const mentorCount = useCallback(() => {
+    return users.filter(user => user.profile?.willingToMentor).length;
+  }, [users]);
 
-    // Profession filter
-    if (selectedProfession !== 'all') {
-      filtered = filtered.filter(user => user.profile?.profession === selectedProfession);
-    }
+  const filteredUsers = useCallback(() => {
+    let filtered = users.filter(user => {
+      const searchRegex = new RegExp(searchTerm, 'i');
+      const matchesSearch = searchRegex.test(user.fullName) ||
+        searchRegex.test(user.profile?.profession || '') ||
+        searchRegex.test(user.profile?.organization || '');
 
-    // Location filter
-    if (selectedLocation !== 'all') {
-      filtered = filtered.filter(user => user.profile?.country === selectedLocation);
-    }
+      let matchesFilters = true;
+      if (filters.batch !== 'all') {
+        matchesFilters = matchesFilters && user.sscYear === filters.batch;
+      }
+      if (filters.country !== 'all') {
+        matchesFilters = matchesFilters && user.profile?.country === filters.country;
+      }
+      if (filters.profession !== 'all') {
+        matchesFilters = matchesFilters && user.profile?.profession === filters.profession;
+      }
+      if (filters.willingToMentor) {
+        matchesFilters = matchesFilters && user.profile?.willingToMentor === true;
+      }
 
-    // Mentors filter
-    if (showOnlyMentors) {
-      filtered = filtered.filter(user => user.profile?.willingToMentor);
-    }
-
-    setFilteredUsers(filtered);
-  }, [users, searchTerm, selectedBatch, selectedProfession, selectedLocation, showOnlyMentors]);
-
-  // Get unique values for filters
-  const uniqueBatches = [...new Set(users.map(user => user.sscYear))].sort();
-  const uniqueProfessions = [...new Set(users.map(user => user.profile?.profession).filter(Boolean))].sort();
-  const uniqueLocations = [...new Set(users.map(user => user.profile?.country).filter(Boolean))].sort();
-
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  };
-
-  const handleContactAlumni = (contactUser: User, contactType: 'email' | 'phone') => {
-    if (contactType === 'email') {
-      window.location.href = `mailto:${contactUser.email}`;
-    } else if (contactType === 'phone' && contactUser.profile?.phoneNumber) {
-      window.location.href = `tel:${contactUser.profile.phoneNumber}`;
-    }
-    
-    toast({
-      title: "Contact Initiated",
-      description: `Opening ${contactType} client for ${contactUser.fullName}`,
+      return matchesSearch && matchesFilters;
     });
-  };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <div className="flex-grow pt-24 pb-16 bg-cpscs-light flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cpscs-blue mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading Alumni Directory...</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+    return filtered;
+  }, [users, searchTerm, filters]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <div className="flex-grow pt-24 pb-16 bg-cpscs-light">
-        <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-cpscs-blue mb-4">Alumni Directory</h1>
-            <p className="text-gray-600 text-lg">
-              Connect with fellow CPSCS alumni from around the world
-            </p>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold mb-4">Alumni Directory</h1>
+          <p className="text-lg text-muted-foreground">
+            Connect with fellow alumni from Chittagong Public School and College
+          </p>
+        </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <Users className="h-8 w-8 text-cpscs-blue" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Alumni</p>
-                    <p className="text-2xl font-bold text-cpscs-blue">{users.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <GraduationCap className="h-8 w-8 text-green-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Batches</p>
-                    <p className="text-2xl font-bold text-green-600">{uniqueBatches.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <MapPin className="h-8 w-8 text-blue-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Countries</p>
-                    <p className="text-2xl font-bold text-blue-600">{uniqueLocations.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <Heart className="h-8 w-8 text-red-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Mentors</p>
-                    <p className="text-2xl font-bold text-red-600">
-                      {users.filter(user => user.profile?.willingToMentor).length}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Search and Filter */}
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Search className="mr-2" />
-                Search & Filter
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <Input
-                    placeholder="Search by name, email, profession, organization, location, or skills..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                
-                <Select value={selectedBatch} onValueChange={setSelectedBatch}>
-                  <SelectTrigger className="w-full md:w-48">
-                    <SelectValue placeholder="All Batches" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Batches</SelectItem>
-                    {uniqueBatches.map(batch => (
-                      <SelectItem key={batch} value={batch}>Batch {batch}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={selectedProfession} onValueChange={setSelectedProfession}>
-                  <SelectTrigger className="w-full md:w-48">
-                    <SelectValue placeholder="All Professions" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Professions</SelectItem>
-                    {uniqueProfessions.map(profession => (
-                      <SelectItem key={profession} value={profession!}>{profession}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger className="w-full md:w-48">
-                    <SelectValue placeholder="All Countries" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Countries</SelectItem>
-                    {uniqueLocations.map(location => (
-                      <SelectItem key={location} value={location!}>{location}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="mentors-only"
-                  checked={showOnlyMentors}
-                  onCheckedChange={(checked) => setShowOnlyMentors(checked === true)}
-                />
-                <label htmlFor="mentors-only" className="text-sm font-medium cursor-pointer">
-                  Show only mentors
-                </label>
-              </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="text-center">
+            <CardContent className="pt-6">
+              <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+              <div className="text-2xl font-bold">{users.length}</div>
+              <p className="text-sm text-muted-foreground">Total Alumni</p>
             </CardContent>
           </Card>
 
-          {/* Alumni Grid */}
-          {filteredUsers.length === 0 ? (
-            <Card>
-              <CardContent className="p-12 text-center">
-                <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-600 mb-2">No Alumni Found</h3>
-                <p className="text-gray-500">
-                  {users.length === 0 
-                    ? "No alumni profiles available. More alumni will appear as they join the platform." 
-                    : "Try adjusting your search criteria to find more alumni."}
-                </p>
+          <Card className="text-center">
+            <CardContent className="pt-6">
+              <GraduationCap className="h-8 w-8 mx-auto mb-2 text-blue-600" />
+              <div className="text-2xl font-bold">{uniqueBatches().length}</div>
+              <p className="text-sm text-muted-foreground">Batches</p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardContent className="pt-6">
+              <MapPin className="h-8 w-8 mx-auto mb-2 text-green-600" />
+              <div className="text-2xl font-bold">{uniqueCountries().length}</div>
+              <p className="text-sm text-muted-foreground">Countries</p>
+            </CardContent>
+          </Card>
+
+          <Card className="text-center">
+            <CardContent className="pt-6">
+              <Heart className="h-8 w-8 mx-auto mb-2 text-red-600" />
+              <div className="text-2xl font-bold">{mentorCount()}</div>
+              <p className="text-sm text-muted-foreground">Mentors</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Search and Filters */}
+        <Card className="mb-8">
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, profession, or organization..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowFilters(!showFilters)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {Object.values(filters).some(v => v !== 'all' && v !== '') && (
+                  <Badge variant="secondary" className="ml-1">
+                    {Object.values(filters).filter(v => v !== 'all' && v !== '').length}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+
+            {showFilters && (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-muted/50 rounded-lg">
+                <div>
+                  <Label htmlFor="batch-filter">Batch</Label>
+                  <Select value={filters.batch} onValueChange={(value) => setFilters(prev => ({...prev, batch: value}))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All batches" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All batches</SelectItem>
+                      {uniqueBatches().map(batch => (
+                        <SelectItem key={batch} value={batch}>{batch}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="country-filter">Country</Label>
+                  <Select value={filters.country} onValueChange={(value) => setFilters(prev => ({...prev, country: value}))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All countries" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All countries</SelectItem>
+                      {uniqueCountries().map(country => (
+                        <SelectItem key={country} value={country}>{country}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="profession-filter">Profession</Label>
+                  <Select value={filters.profession} onValueChange={(value) => setFilters(prev => ({...prev, profession: value}))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="All professions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All professions</SelectItem>
+                      {uniqueProfessions().map(profession => (
+                        <SelectItem key={profession} value={profession}>{profession}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="mentor-filter"
+                    checked={filters.willingToMentor}
+                    onCheckedChange={(checked) => setFilters(prev => ({...prev, willingToMentor: checked}))}
+                  />
+                  <Label htmlFor="mentor-filter">Available for mentoring</Label>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Alumni Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredUsers().map((user) => (
+            <Card key={user.id} className="hover:shadow-lg transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-start space-x-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={user.profile?.profilePicture} alt={user.fullName} />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
+                      {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-lg truncate">{user.fullName}</h3>
+                    <p className="text-sm text-muted-foreground">SSC {user.sscYear}</p>
+                    
+                    {user.profile?.profession && (
+                      <p className="text-sm font-medium text-primary mt-1 truncate">
+                        {user.profile.profession}
+                      </p>
+                    )}
+                    
+                    {user.profile?.organization && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.profile.organization}
+                      </p>
+                    )}
+                    
+                    {user.profile?.city && user.profile?.country && (
+                      <p className="text-xs text-muted-foreground mt-1 flex items-center">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {user.profile.city}, {user.profile.country}
+                      </p>
+                    )}
+
+                    {user.profile?.willingToMentor && (
+                      <Badge variant="secondary" className="mt-2 text-xs">
+                        <Heart className="h-3 w-3 mr-1" />
+                        Available for Mentoring
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-2 mt-4">
+                  <Button
+                    size="sm"
+                    onClick={() => navigate(`/profile/${user.id}`)}
+                    className="flex-1"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    View Profile
+                  </Button>
+                </div>
               </CardContent>
             </Card>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredUsers.map((user) => (
-                <Card key={user.id} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col items-center text-center">
-                      <Avatar className="h-20 w-20 mb-4">
-                        <AvatarImage src={user.profile?.profilePicture} alt={user.fullName} />
-                        <AvatarFallback className="bg-cpscs-blue text-white text-lg">
-                          {getInitials(user.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <h3 className="font-bold text-lg mb-1">{user.fullName}</h3>
-                      
-                      {user.profile?.profession && (
-                        <div className="flex items-center text-gray-600 mb-2">
-                          <Briefcase size={14} className="mr-1" />
-                          <span className="text-sm">{user.profile.profession}</span>
-                        </div>
-                      )}
-                      
-                      {user.profile?.organization && (
-                        <p className="text-sm text-gray-600 mb-2">{user.profile.organization}</p>
-                      )}
-                      
-                      <div className="flex items-center text-gray-600 mb-2">
-                        <GraduationCap size={14} className="mr-1" />
-                        <span className="text-sm">SSC {user.sscYear}</span>
-                      </div>
-                      
-                      {user.profile?.city && user.profile?.country && (
-                        <div className="flex items-center text-gray-600 mb-4">
-                          <MapPin size={14} className="mr-1" />
-                          <span className="text-sm">{user.profile.city}, {user.profile.country}</span>
-                        </div>
-                      )}
-                      
-                      <div className="flex flex-wrap gap-1 mb-4 justify-center">
-                        {user.profile?.expertise?.slice(0, 2).map((skill, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {user.profile?.expertise && user.profile.expertise.length > 2 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{user.profile.expertise.length - 2}
-                          </Badge>
-                        )}
-                      </div>
-                      
-                      {user.profile?.willingToMentor && (
-                        <Badge className="mb-4 bg-green-100 text-green-800">
-                          <Heart size={12} className="mr-1" />
-                          Available for Mentoring
-                        </Badge>
-                      )}
-                      
-                      <div className="flex gap-2 w-full">
-                        <Button 
-                          onClick={() => navigate(`/profile/${user.id}`)}
-                          className="flex-1"
-                          size="sm"
-                        >
-                          <UserIcon size={14} className="mr-2" />
-                          View Profile
-                        </Button>
-                        
-                        
-                        {user.profile?.phoneNumber && user.profile?.showPhone !== false && (
-                          <Button 
-                            onClick={() => handleContactAlumni(user, 'phone')}
-                            variant="outline"
-                            size="sm"
-                            className="px-3"
-                          >
-                            <Phone size={14} />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
+
+        {filteredUsers().length === 0 && (
+          <div className="text-center py-12">
+            <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No alumni found</h3>
+            <p className="text-muted-foreground">
+              Try adjusting your search criteria or filters
+            </p>
+          </div>
+        )}
       </div>
-      
-      <Footer />
     </div>
   );
 };
