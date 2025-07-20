@@ -1,58 +1,43 @@
+
 import React from 'react';
+import { Calendar, MapPin } from 'lucide-react';
 import { Event, EventService } from '@/services/eventService';
 
 interface DefaultEventBannerProps {
   event: Event;
-  className?: string;
 }
 
-const DefaultEventBanner: React.FC<DefaultEventBannerProps> = ({ event, className = "" }) => {
+const DefaultEventBanner: React.FC<DefaultEventBannerProps> = ({ event }) => {
   const colorScheme = EventService.getCategoryColorScheme(event.category);
 
   return (
-    <div 
-      className={`relative w-full aspect-video overflow-hidden rounded-lg ${className}`}
-      style={{ aspectRatio: '16/9' }}
-    >
-      {/* Animated gradient background */}
-      <div 
-        className={`absolute inset-0 bg-gradient-to-br ${colorScheme.gradient} animate-gradient-flow`}
-      />
+    <div className={`relative w-full h-full bg-gradient-to-br ${colorScheme.gradient} flex flex-col items-center justify-center text-white p-6 overflow-hidden`}>
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]" />
+      </div>
       
-      {/* Animated overlay patterns */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full opacity-20">
-          <div className="absolute top-10 left-10 w-32 h-32 rounded-full bg-white/20 animate-pulse" />
-          <div className="absolute top-1/3 right-20 w-24 h-24 rounded-full bg-white/15 animate-pulse delay-300" />
-          <div className="absolute bottom-20 left-1/4 w-40 h-40 rounded-full bg-white/10 animate-pulse delay-700" />
-        </div>
-      </div>
-
-      {/* Flowing particles effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 left-0 w-2 h-2 bg-white/30 rounded-full animate-float-horizontal" />
-        <div className="absolute top-3/4 left-1/3 w-1 h-1 bg-white/40 rounded-full animate-float-horizontal delay-500" />
-        <div className="absolute top-1/2 left-2/3 w-1.5 h-1.5 bg-white/25 rounded-full animate-float-horizontal delay-1000" />
-      </div>
-
-      {/* Content overlay */}
-      <div className="absolute inset-0 flex items-center justify-center p-6">
-        <div className="text-center max-w-4xl">
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg leading-tight animate-title-glow">
-            {event.title}
-          </h1>
+      {/* Content */}
+      <div className="relative z-10 text-center">
+        <h3 className="text-lg font-bold mb-2 line-clamp-2">
+          {event.title}
+        </h3>
+        
+        <div className="space-y-1 text-sm opacity-90">
+          <div className="flex items-center justify-center">
+            <Calendar size={14} className="mr-1" />
+            <span>{new Date(event.date).toLocaleDateString()}</span>
+          </div>
           
-          {/* Subtle category badge */}
-          <div className="mt-4 inline-flex items-center px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-            <span className="text-white text-sm font-medium capitalize">
-              {event.category}
-            </span>
+          <div className="flex items-center justify-center">
+            <MapPin size={14} className="mr-1" />
+            <span className="truncate max-w-[150px]">{event.venue}</span>
           </div>
         </div>
+        
+        <div className="absolute -top-8 -right-8 w-24 h-24 rounded-full bg-white/10 blur-xl" />
+        <div className="absolute -bottom-6 -left-6 w-20 h-20 rounded-full bg-white/5 blur-lg" />
       </div>
-
-      {/* Bottom gradient overlay for better text readability */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black/30 to-transparent" />
     </div>
   );
 };
