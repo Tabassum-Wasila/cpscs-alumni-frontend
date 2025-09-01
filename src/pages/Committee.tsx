@@ -96,7 +96,7 @@ const Committee = () => {
                   <span className="sm:hidden">Advisors</span>
                 </TabsTrigger>
                 <TabsTrigger value="ambassadors" className="text-xs sm:text-sm font-semibold px-3 sm:px-4">
-                  Ambassadors
+                  Lifetime Members
                 </TabsTrigger>
               </TabsList>
             </div>
