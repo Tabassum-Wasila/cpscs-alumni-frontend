@@ -20,3 +20,16 @@ export interface CommitteeData {
   advisorCouncil: CommitteeMember[];
   ambassadors: CommitteeMember[];
 }
+
+export interface CommitteeTerm {
+  id: string;
+  term: string;
+  startYear: number;
+  endYear: number;
+  isActive: boolean;
+}
+
+export interface CommitteeByTerm {
+  term: CommitteeTerm;
+  data: CommitteeData;
+}
