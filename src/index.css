@@ -98,6 +98,24 @@
     @apply rounded-lg shadow-[3px_3px_6px_rgba(0,0,0,0.1),-3px_-3px_6px_rgba(255,255,255,0.7)] dark:shadow-[3px_3px_6px_rgba(0,0,0,0.3),-3px_-3px_6px_rgba(255,255,255,0.05)] transition-all duration-300 hover:shadow-[1px_1px_2px_rgba(0,0,0,0.1),-1px_-1px_2px_rgba(255,255,255,0.7)] active:shadow-[inset_3px_3px_6px_rgba(0,0,0,0.1),inset_-3px_-3px_6px_rgba(255,255,255,0.7)];
   }
 
+  /* Premium Alumni Card Styles */
+  .alumni-card-premium {
+    @apply backdrop-blur-sm bg-card/80 border border-border/50 rounded-2xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:scale-[1.03] hover:border-primary/30 hover:bg-card/90 overflow-hidden;
+  }
+
+  .alumni-card-glow {
+    @apply absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10;
+  }
+
+  .alumni-profile-ring {
+    @apply absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/30 to-secondary/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-md -z-10;
+  }
+
+  /* Smooth Animation Pause on Hover */
+  .hover-pause:hover {
+    animation-play-state: paused;
+  }
+
   /* Custom background */
   .bg-gradient-animated {
     @apply bg-gradient-to-r from-cpscs-blue via-blue-600 to-purple-600 bg-[length:200%_auto] animate-gradient-x;

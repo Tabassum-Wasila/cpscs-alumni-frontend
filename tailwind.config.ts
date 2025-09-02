@@ -140,6 +140,44 @@ export default {
 						transform: 'translateX(-33.333%)'
 					}
 				},
+				
+				// Enhanced smooth flowing animations for alumni cards
+				'flow-left-smooth': {
+					'0%': {
+						transform: 'translateX(0)'
+					},
+					'100%': {
+						transform: 'translateX(-33.333%)'
+					}
+				},
+				
+				'flow-right-smooth': {
+					'0%': {
+						transform: 'translateX(-33.333%)'
+					},
+					'100%': {
+						transform: 'translateX(0)'
+					}
+				},
+
+				// Premium card animations
+				'card-glow': {
+					'0%': {
+						boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
+					},
+					'100%': {
+						boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15), 0 0 40px hsl(var(--primary) / 0.1)'
+					}
+				},
+
+				'gradient-shift': {
+					'0%, 100%': {
+						backgroundPosition: '0% 50%'
+					},
+					'50%': {
+						backgroundPosition: '100% 50%'
+					}
+				},
 
         // Event-specific animations
         "gradient-flow": {
@@ -195,6 +233,14 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'gradient-x': 'gradient-x 3s ease infinite',
 				'scroll-left': 'scroll-left 60s linear infinite',
+				
+				// Enhanced flowing animations for seamless circular motion
+				'flow-left-smooth': 'flow-left-smooth 45s linear infinite',
+				'flow-right-smooth': 'flow-right-smooth 50s linear infinite',
+				
+				// Premium card animations  
+				'card-glow': 'card-glow 3s ease-in-out infinite alternate',
+				'gradient-shift': 'gradient-shift 4s ease-in-out infinite',
         
         // Event animations
         "gradient-flow": "gradient-flow 6s ease-in-out infinite",

@@ -9,26 +9,27 @@ interface FlowingRowProps {
 }
 
 const FlowingRow = ({ alumni, direction, className = '' }: FlowingRowProps) => {
-  // Duplicate the alumni array to create seamless loop
-  const duplicatedAlumni = [...alumni, ...alumni];
+  // Triple the alumni array for truly seamless circular flow
+  const extendedAlumni = [...alumni, ...alumni, ...alumni];
   
-  // Animation classes based on direction
+  // Animation classes based on direction with smooth circular flow
   const animationClass = direction === 'left' 
-    ? 'animate-flow-left' 
-    : 'animate-flow-right';
+    ? 'animate-flow-left-smooth' 
+    : 'animate-flow-right-smooth';
 
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {/* Gradient overlays for smooth edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+      {/* Enhanced gradient overlays for smooth edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-background via-background/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-background via-background/80 to-transparent z-10 pointer-events-none" />
       
-      {/* Flowing content */}
-      <div className={`flex gap-6 ${animationClass} group-hover:pause`}>
-        {duplicatedAlumni.map((alumni, index) => (
+      {/* Flowing content with seamless circular animation */}
+      <div className={`flex gap-8 ${animationClass} hover:animation-play-state-paused`}>
+        {extendedAlumni.map((alumni, index) => (
           <AlumniCard 
-            key={`${alumni.id}-${index}`}
+            key={`${alumni.id}-${index}-${direction}`}
             alumni={alumni}
+            className="flex-shrink-0"
           />
         ))}
       </div>
