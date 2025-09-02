@@ -146,13 +146,16 @@ const Hero = () => {
             {isLoading ? (
               <Skeleton className="h-12 w-48 rounded-lg" />
             ) : showReunionContent ? (
-              <Button className="relative bg-gradient-to-r from-cpscs-gold via-yellow-400 to-cpscs-gold hover:from-yellow-300 hover:via-cpscs-gold hover:to-yellow-300 text-cpscs-blue hover:text-cpscs-blue font-bold px-8 py-6 rounded-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl animate-pulse hover:animate-none border-2 border-cpscs-gold/50 hover:border-white/30">
-                <Link to={`/events/${reunionData?.event_id}`} className="flex items-center gap-2">
-                  <span className="relative z-10">Register for Reunion</span>
-                  <ArrowRight size={16} className="relative z-10" />
-                </Link>
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000"></div>
-              </Button>
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-cpscs-gold via-yellow-300 to-cpscs-gold rounded-xl blur-lg opacity-70 group-hover:opacity-100 group-hover:blur-xl transition-all duration-300 animate-pulse group-hover:animate-none"></div>
+                <Button className="relative bg-gradient-to-r from-cpscs-gold via-yellow-400 to-cpscs-gold hover:from-yellow-300 hover:via-cpscs-gold hover:to-yellow-300 text-cpscs-blue hover:text-white font-bold px-8 py-6 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-xl border-2 border-cpscs-gold/50 hover:border-white/50 overflow-hidden">
+                  <Link to={reunionData?.registration_url || '/events'} className="flex items-center gap-2 relative z-10">
+                    <span>Register for Reunion</span>
+                    <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transform translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700"></div>
+                </Button>
+              </div>
             ) : null}
           </div>
         </div>
