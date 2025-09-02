@@ -136,6 +136,63 @@ export class EventService {
     return schemes[category] || schemes.other;
   }
 
+  // Get events for homepage display (max 3 events)
+  static async getHomePageEvents(): Promise<Event[]> {
+    // For now, use mock data. Later, this will be replaced with API call:
+    // const response = await fetch('/api/events/homepage');
+    // return response.json();
+    
+    const allEvents = this.getMockEvents();
+    
+    // Update event statuses based on current date
+    const eventsWithStatus = allEvents.map(event => ({
+      ...event,
+      status: this.getEventStatus(event.date, event.registrationDeadline)
+    }));
+    
+    // Smart event selection for homepage
+    const upcomingEvents = eventsWithStatus.filter(e => e.status === 'upcoming');
+    const ongoingEvents = eventsWithStatus.filter(e => e.status === 'ongoing');
+    const recentPastEvents = eventsWithStatus
+      .filter(e => e.status === 'past')
+      .filter(e => {
+        const eventDate = new Date(e.date);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return eventDate >= thirtyDaysAgo;
+      })
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    // Priority: upcoming → ongoing → recent past
+    let selectedEvents: Event[] = [];
+    
+    // Add upcoming events first (sorted by date)
+    const sortedUpcoming = upcomingEvents.sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    );
+    selectedEvents.push(...sortedUpcoming.slice(0, 3));
+    
+    // If we need more events, add ongoing events
+    if (selectedEvents.length < 3) {
+      const remaining = 3 - selectedEvents.length;
+      selectedEvents.push(...ongoingEvents.slice(0, remaining));
+    }
+    
+    // If still need more, add recent past events
+    if (selectedEvents.length < 3) {
+      const remaining = 3 - selectedEvents.length;
+      selectedEvents.push(...recentPastEvents.slice(0, remaining));
+    }
+    
+    return selectedEvents;
+  }
+
+  // Check if homepage should show events section
+  static async shouldShowEventsSection(): Promise<boolean> {
+    const events = await this.getHomePageEvents();
+    return events.length > 0;
+  }
+
   // Mock data for development (will be replaced with backend API)
   static getMockEvents(): Event[] {
     return [

@@ -1,110 +1,146 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, MapPin } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
+import { EventService } from "@/services/eventService";
+import HomeEventCard from "./HomeEventCard";
+import { Calendar, Sparkles } from "lucide-react";
 
-interface EventProps {
-  title: string;
-  date: string;
-  time: string;
-  location: string;
-  image: string;
-  category: string;
-  delay: number;
-}
-
-const EventCard = ({ title, date, time, location, image, category, delay }: EventProps) => {
-  return (
-    <div 
-      className="neumorphic-card overflow-hidden transition-all duration-300 hover:translate-y-[-5px] opacity-0 animate-fade-in"
-      style={{ animationDelay: `${delay}s` }}
-    >
-      <div className="relative">
-        <img 
-          src={image} 
-          alt={title} 
-          className="w-full h-48 object-cover"
-        />
-        <div className="absolute top-4 right-4 bg-cpscs-gold text-cpscs-blue text-xs font-semibold px-3 py-1 rounded-full">
-          {category}
-        </div>
-      </div>
-      
+// Loading skeleton for event cards
+const EventCardSkeleton = ({ delay }: { delay: number }) => (
+  <div 
+    className="opacity-0 animate-fade-in"
+    style={{ animationDelay: `${delay}s` }}
+  >
+    <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
+      <Skeleton className="h-48 w-full" />
       <div className="p-6">
-        <h3 className="text-xl font-bold text-cpscs-blue mb-3">{title}</h3>
-        
+        <Skeleton className="h-6 w-3/4 mb-3" />
         <div className="space-y-2 mb-4">
-          <div className="flex items-center text-sm text-gray-600">
-            <Calendar size={16} className="mr-2 text-cpscs-gold" />
-            <span>{date}</span>
-          </div>
-          
-          <div className="flex items-center text-sm text-gray-600">
-            <Clock size={16} className="mr-2 text-cpscs-gold" />
-            <span>{time}</span>
-          </div>
-          
-          <div className="flex items-center text-sm text-gray-600">
-            <MapPin size={16} className="mr-2 text-cpscs-gold" />
-            <span>{location}</span>
-          </div>
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
         </div>
-        
-        <Button variant="outline" className="w-full border-cpscs-blue text-cpscs-blue hover:bg-cpscs-blue hover:text-white transition-all duration-300">
-          RSVP Now
-        </Button>
+        <Skeleton className="h-10 w-full" />
       </div>
     </div>
-  );
-};
+  </div>
+);
+
+// Empty state component
+const EmptyEventsState = () => (
+  <div className="text-center py-16">
+    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-muted flex items-center justify-center">
+      <Calendar size={32} className="text-muted-foreground" />
+    </div>
+    <h3 className="text-xl font-semibold text-foreground mb-2">No Events Yet</h3>
+    <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+      We're working on exciting events for our alumni community. Check back soon for updates!
+    </p>
+    <Button variant="outline" asChild>
+      <Link to="/contact">Suggest an Event</Link>
+    </Button>
+  </div>
+);
 
 const EventsSection = () => {
-  const upcomingEvents = [
-    {
-      title: "Annual Alumni Reunion 2025",
-      date: "June 15, 2025",
-      time: "6:00 PM - 10:00 PM",
-      location: "CPSCS Campus, Saidpur",
-      image: "https://i.imgur.com/j75BIZN.jpg",
-      category: "Reunion",
-      delay: 0.3
-    },
-    {
-      title: "Career Development Workshop",
-      date: "July 8, 2025",
-      time: "10:00 AM - 3:00 PM",
-      location: "Virtual Event",
-      image: "https://i.imgur.com/BcF7rBZ.jpg",
-      category: "Workshop",
-      delay: 0.5
-    },
-    {
-      title: "Homecoming Festival",
-      date: "August 20, 2025",
-      time: "11:00 AM - 8:00 PM",
-      location: "CPSCS Campus Grounds",
-      image: "https://i.imgur.com/WtfTf9U.jpg",
-      category: "Festival",
-      delay: 0.7
-    }
-  ];
+  // Fetch homepage events
+  const { data: events, isLoading, error } = useQuery({
+    queryKey: ['homepage-events'],
+    queryFn: EventService.getHomePageEvents,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false
+  });
+
+  // Check if section should be shown
+  const { data: shouldShow } = useQuery({
+    queryKey: ['show-events-section'],
+    queryFn: EventService.shouldShowEventsSection,
+    staleTime: 5 * 60 * 1000
+  });
+
+  // Don't render section if no events and not loading
+  if (!isLoading && !error && (!events || events.length === 0) && shouldShow === false) {
+    return null;
+  }
+
+  // Determine grid layout based on number of events
+  const getGridLayout = (eventCount: number) => {
+    if (eventCount === 1) return "grid-cols-1 lg:grid-cols-1 max-w-md mx-auto";
+    if (eventCount === 2) return "grid-cols-1 md:grid-cols-2 lg:grid-cols-2 max-w-4xl mx-auto";
+    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+  };
 
   return (
-    <section className="py-16 bg-cpscs-light">
+    <section className="py-16 bg-background/50">
       <div className="container mx-auto px-4">
+        {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-cpscs-blue">Upcoming Events</h2>
-          <Button className="mt-4 md:mt-0 bg-cpscs-gold text-cpscs-blue hover:bg-cpscs-gold/80">
-            <Link to="/events">View All Events</Link>
+          <div className="flex items-center gap-3 mb-4 md:mb-0">
+            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Sparkles size={20} className="text-primary" />
+            </div>
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground">
+                {isLoading ? 'Loading Events...' : 
+                 events && events.length > 0 ? 'Upcoming Events' : 'Alumni Events'}
+              </h2>
+              {!isLoading && events && (
+                <p className="text-muted-foreground text-sm mt-1">
+                  {events.length === 1 ? 'Featured event' : 
+                   events.length > 1 ? `${events.length} featured events` : 
+                   'Stay tuned for exciting events'}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <Button 
+            className="bg-primary hover:bg-primary/90 text-primary-foreground hover-scale" 
+            asChild
+          >
+            <Link to="/events" className="flex items-center gap-2">
+              View All Events
+              <Calendar size={16} />
+            </Link>
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {upcomingEvents.map((event, index) => (
-            <EventCard key={index} {...event} />
-          ))}
-        </div>
+        {/* Events Grid */}
+        {isLoading ? (
+          <div className={`grid gap-8 ${getGridLayout(3)}`}>
+            {[...Array(3)].map((_, index) => (
+              <EventCardSkeleton key={index} delay={index * 0.2} />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-destructive/10 flex items-center justify-center">
+              <Calendar size={32} className="text-destructive" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">Unable to Load Events</h3>
+            <p className="text-muted-foreground mb-6">
+              We're having trouble loading the latest events. Please try again later.
+            </p>
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </div>
+        ) : !events || events.length === 0 ? (
+          <EmptyEventsState />
+        ) : (
+          <div className={`grid gap-8 ${getGridLayout(events.length)}`}>
+            {events.map((event, index) => (
+              <HomeEventCard 
+                key={event.id} 
+                event={event} 
+                delay={index * 0.2} 
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
