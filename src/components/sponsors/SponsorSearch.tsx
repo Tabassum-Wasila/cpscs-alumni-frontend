@@ -15,7 +15,7 @@ interface SponsorSearchProps {
 const SponsorSearch: React.FC<SponsorSearchProps> = ({ onFiltersChange, totalCount, activeTab }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSort, setSelectedSort] = useState<'newest' | 'oldest'>('newest');
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
 
   const handleSearchChange = (value: string) => {
@@ -30,7 +30,7 @@ const SponsorSearch: React.FC<SponsorSearchProps> = ({ onFiltersChange, totalCou
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);
-    updateFilters({ category: value || undefined });
+    updateFilters({ category: value === 'all' ? undefined : value });
   };
 
   const updateFilters = (partialFilters: Partial<SponsorFilters>) => {
@@ -46,7 +46,7 @@ const SponsorSearch: React.FC<SponsorSearchProps> = ({ onFiltersChange, totalCou
   const clearFilters = () => {
     setSearchQuery('');
     setSelectedSort('newest');
-    setSelectedCategory('');
+    setSelectedCategory('all');
     onFiltersChange({ sortBy: 'newest' });
   };
 
@@ -121,7 +121,7 @@ const SponsorSearch: React.FC<SponsorSearchProps> = ({ onFiltersChange, totalCou
                 <SelectValue placeholder="All categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All categories</SelectItem>
+                <SelectItem value="all">All categories</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category} value={category}>
                     {category}
