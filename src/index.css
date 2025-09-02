@@ -372,6 +372,39 @@
   animation: scroll-left 60s linear infinite;
 }
 
+/* Alumni Flow Animations */
+@keyframes flow-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes flow-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-flow-left {
+  animation: flow-left 40s linear infinite;
+}
+
+.animate-flow-right {
+  animation: flow-right 40s linear infinite;
+}
+
+/* Pause animation on hover */
+.group:hover .animate-flow-left,
+.group:hover .animate-flow-right {
+  animation-play-state: paused;
+}
+
 /* VIP Sponsor Banner Styles */
 .vip-banner-container {
   display: block;
