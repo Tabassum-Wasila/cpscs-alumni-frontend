@@ -144,66 +144,81 @@ export class EventService {
         title: "Grand Alumni Reunion 2025",
         description: `<div style="font-family: 'Noto Sans Bengali', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 2rem;">
     <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden;">
-        <div style="padding: 2.5rem; text-align: center; background: linear-gradient(135deg, #4f46e5, #522081); color: #ffffff;">
-            <h1 style="font-size: 2.75rem; font-weight: 700; margin: 0; letter-spacing: 1px;">গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
-            <p style="font-size: 1.25rem; opacity: 0.9; margin-top: 0.5rem;">এসো প্রাণে প্রাণে মিলি সবাই</p>
+        <div style="padding: 2.5rem; text-align: center; background: transparent;">
+            <h1 style="font-size: 2.75rem; font-weight: 800; margin: 0; letter-spacing: 1px; background: linear-gradient(90deg, #4f46e5, #522081); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
+            <p style="font-size: 1.25rem; color: #475569; margin-top: 0.5rem;">এসো প্রাণে প্রাণে মিলি সবাই</p>
         </div>
-        <div style="padding: 2.5rem;">
+        <div style="padding: 2.5rem; padding-top: 0;">
             <p style="font-size: 1.1rem; text-align: center; line-height: 1.8; color: #475569; margin-bottom: 3rem;">
-                বহুল প্রতীক্ষিত সেই মাহেন্দ্রক্ষণের আর দেরি নেই! স্মৃতির করিডোর ধরে হেঁটে পুরনো বন্ধুদের সাথে reconnect করার এবং আমাদের প্রিয় প্রতিষ্ঠান <strong>ক্যান্টনমেন্ট পাবলিক স্কুল অ্যান্ড কলেজ, সৈয়দপুর</strong>-এর গৌরব উদযাপন করার সময় এসেছে। এটি শুধু একটি অনুষ্ঠান নয়, এটি আমাদের শেকড়ে ফেরার উৎসব।
+                বহুল প্রতীক্ষিত সেই মাহেন্দ্রক্ষণের আর দেরি নেই! স্মৃতির করিডোর ধরে হেঁটে পুরনো বন্ধুদের সাথে reconnect করার এবং আমাদের প্রিয় প্রতিষ্ঠানের গৌরব উদযাপন করার সময় এসেছে। এটি শুধু একটি অনুষ্ঠান নয়, এটি আমাদের শেকড়ে ফেরার উৎসব।
             </p>
 
-            <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 2.5rem; color: #1e293b;">অনুষ্ঠান সূচি</h2>
+            <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 2.5rem; color: #1e293b;">পূর্ণাঙ্গ অনুষ্ঠান সূচি</h2>
             <div style="position: relative; padding-left: 40px; border-left: 3px solid #cbd5e1;">
+                
                 <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☀️</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:০০ - ৮:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">অতিথিদের আগমন, গিফট ব্যাগ ও টোকেন বিতরণ</p>
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">➡️</div>
+                    <p style="color: #475569; margin: 0; font-weight: 700; font-size: 1.25rem; color: #1e293b;">প্রথম পর্ব</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎁</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৮:০০ - ৮:৩০ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">গিফট ব্যাগ ও টোকেন প্রদান</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
                     <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:৩০ - ৯:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক ও অতিথিদের আসন গ্রহণ</p>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৮:৪০ - ৯:১৫ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক ও অতিথিবৃন্দের আসন গ্রহণ</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
                     <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚩</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:০০ - ৯:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">জাতীয় পতাকা উত্তোলন, র‍্যালি ও উদ্বোধন</p>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৯:২০ - ১০:০০ টা পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">বড় মাঠে সমাবেশ</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💬</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:৩০ - ১১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">স্বাগত বক্তব্য, স্মৃতিচারণ ও ব্যাচ পরিচিতি</p>
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📣</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১০:১৫ - ১১:০০ টা পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">উদ্বোধনী ঘোষণা, প্রধান অতিথি, বিশেষ অতিথিবৃন্দ ও সভাপতির স্বাগত বক্তব্য ও মাঠ পরিদর্শন। (জুলাই শহীদদের, এবং হারানো শিক্ষক ও শিক্ষার্থীদের স্মরণে ১ মিনিট নীরবতা পালন।)</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
                     <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☕</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:০০ - ১১:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সকালের নাস্তা</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📸</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:৩০ - দুপুর ১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">ব্যাচ ভিত্তিক ফটোসেশন</p>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১১:১০ - ১২:৫৫ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">নাস্তার বিরতি: প্রাক্তন শিক্ষক ও ব্যাচ ভিত্তিক শিক্ষার্থীদের স্মৃতিচারণ, ফটোসেশন।</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
                     <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍽️</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ১:০০ - দুপুর ২:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">নামাজ ও মধ্যাহ্নভোজের বিরতি</p>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১:০০ - ২:৩০ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">নামাজ ও দুপুরের খাবার বিরতি</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏆</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ২:৩০ - বিকাল ৫:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">বিভিন্ন ধরনের খেলাধুলা ও পুরস্কার বিতরণ</p>
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">⚽</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">২:৩৫ - ৫:৩৫ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">বিভিন্ন ধরনের খেলাধুলা</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍵</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৫:৪০ - ৬:১৫ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">নামাজ ও চা বিরতি</p>
+                </div>
+
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">➡️</div>
+                    <p style="color: #475569; margin: 0; font-weight: 700; font-size: 1.25rem; color: #1e293b;">দ্বিতীয় পর্ব</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
                     <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎤</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">বিকাল ৫:৩০ - সন্ধ্যা ৭:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সম্মাননা প্রদান ও অতিথিদের বক্তব্য</p>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৬: ২০ - ০৭ টা পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">প্রধান ও বিশেষ অতিথিবৃন্দের আসন গ্রহণ ও বক্তব্য প্রদান</p>
                 </div>
                 <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🌙</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সন্ধ্যা ৭:০০ - রাত ১১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সাংস্কৃতিক অনুষ্ঠান, র‍্যাফেল ড্র ও রাতের খাবার</p>
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏆</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">০৭: ০৫ - ৭:৩০ মিনিট পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক, ডোনার ও কমিটি সদস্যদের ক্রেস্ট প্রদান</p>
+                </div>
+                <div style="position: relative; margin-bottom: 0;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎶</div>
+                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৭:৩৫ - ১১: ০০ টা পর্যন্ত।</p>
+                    <p style="color: #475569; margin: 0;">রাতের খাবার, লটারি র‍্যাফেল ড্র ও সাংস্কৃতিক অনুষ্ঠান</p>
                 </div>
             </div>
 
