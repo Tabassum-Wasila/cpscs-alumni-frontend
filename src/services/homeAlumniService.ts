@@ -1,5 +1,4 @@
 import { committeeData } from '@/data/committeeData';
-import { UserService } from './userService';
 
 export interface FeaturedAlumni {
   id: string;
@@ -17,9 +16,13 @@ export interface FeaturedAlumni {
 export class HomeAlumniService {
   // Transform committee data to alumni data for dummy implementation
   private static transformCommitteeToAlumni(committee: any): FeaturedAlumni {
-    const bio = committee.position && committee.organization 
-      ? `${committee.position} with extensive experience in ${committee.profession}`
-      : `Experienced professional in ${committee.profession}`;
+    // Generate bio from position and profession, make it optional
+    let bio = '';
+    if (committee.position && committee.profession) {
+      bio = `${committee.position} with extensive experience in ${committee.profession}`;
+    } else if (committee.profession) {
+      bio = `Experienced professional in ${committee.profession}`;
+    }
 
     const slug = this.generateSlug(committee.name, committee.ssc_batch);
     
@@ -70,13 +73,18 @@ export class HomeAlumniService {
         ...committeeData.ambassadors
       ];
 
-      const transformedAlumni = allCommitteeMembers.map(this.transformCommitteeToAlumni);
+      console.log('Total committee members:', allCommitteeMembers.length);
+      
+      const transformedAlumni = allCommitteeMembers.map((member) => this.transformCommitteeToAlumni(member));
+      console.log('Transformed alumni:', transformedAlumni.length);
       
       // Filter qualified alumni (80%+ completion)
       const qualifiedAlumni = this.filterQualifiedAlumni(transformedAlumni);
+      console.log('Qualified alumni:', qualifiedAlumni.length);
       
       // Shuffle and limit the results
       const shuffledAlumni = this.shuffleArray(qualifiedAlumni);
+      console.log('Final alumni for display:', shuffledAlumni.length);
       
       return shuffledAlumni.slice(0, limit);
     } catch (error) {
