@@ -31,13 +31,13 @@ const AlumniDirectory = () => {
 
   // Memoize derived data to prevent unnecessary re-renders
   const uniqueBatches = useCallback(() => {
-    return [...new Set(users.map(user => user.sscYear))];
+    return [...new Set(users.map(user => user.sscYear).filter(year => year && year.toString().trim() !== ''))].sort();
   }, [users]);
   const uniqueCountries = useCallback(() => {
-    return [...new Set(users.map(user => user.profile?.country).filter(Boolean))];
+    return [...new Set(users.map(user => user.profile?.country).filter(country => country && country.trim() !== ''))].sort();
   }, [users]);
   const uniqueProfessions = useCallback(() => {
-    return [...new Set(users.map(user => user.profile?.profession).filter(Boolean))];
+    return [...new Set(users.map(user => user.profile?.profession).filter(profession => profession && profession.trim() !== ''))].sort();
   }, [users]);
   const mentorCount = useCallback(() => {
     return users.filter(user => user.profile?.willingToMentor).length;
@@ -120,9 +120,9 @@ const AlumniDirectory = () => {
               </div>
               <Button variant="outline" onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
-                Filters
-                {Object.values(filters).some(v => v !== 'all' && v !== '') && <Badge variant="secondary" className="ml-1">
-                    {Object.values(filters).filter(v => v !== 'all' && v !== '').length}
+                 Filters
+                {(filters.batch !== 'all' || filters.country !== 'all' || filters.profession !== 'all' || filters.willingToMentor) && <Badge variant="secondary" className="ml-1">
+                    {[filters.batch !== 'all', filters.country !== 'all', filters.profession !== 'all', filters.willingToMentor].filter(Boolean).length}
                   </Badge>}
               </Button>
             </div>
@@ -139,7 +139,7 @@ const AlumniDirectory = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All batches</SelectItem>
-                      {uniqueBatches().map(batch => <SelectItem key={batch} value={batch}>{batch}</SelectItem>)}
+                      {uniqueBatches().map(batch => <SelectItem key={batch} value={String(batch)}>{batch}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -155,7 +155,7 @@ const AlumniDirectory = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All countries</SelectItem>
-                      {uniqueCountries().map(country => <SelectItem key={country} value={country}>{country}</SelectItem>)}
+                      {uniqueCountries().map(country => <SelectItem key={country} value={String(country)}>{country}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -171,7 +171,7 @@ const AlumniDirectory = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All professions</SelectItem>
-                      {uniqueProfessions().map(profession => <SelectItem key={profession} value={profession}>{profession}</SelectItem>)}
+                      {uniqueProfessions().map(profession => <SelectItem key={profession} value={String(profession)}>{profession}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
