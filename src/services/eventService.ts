@@ -142,98 +142,253 @@ export class EventService {
       {
         id: "grand-reunion-2025",
         title: "Grand Alumni Reunion 2025",
-        description: `<div style="font-family: 'Noto Sans Bengali', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 2rem;">
-    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden;">
-        <div style="padding: 2.5rem; text-align: center; background: linear-gradient(135deg, #4f46e5, #522081); color: #ffffff;">
-            <h1 style="font-size: 2.75rem; font-weight: 700; margin: 0; letter-spacing: 1px;">গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
-            <p style="font-size: 1.25rem; opacity: 0.9; margin-top: 0.5rem;">এসো প্রাণে প্রাণে মিলি সবাই</p>
+        description: `<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Bengali', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        .header {
+            padding: 2.5rem;
+            text-align: center;
+            background: transparent;
+        }
+        .header h1 {
+            font-size: 2.75rem;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #4f46e5, #522081);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            font-size: 1.25rem;
+            color: #475569;
+            margin-top: 0.5rem;
+        }
+        .content {
+            padding: 2.5rem;
+            padding-top: 0;
+        }
+        .intro {
+            font-size: 1.1rem;
+            text-align: center;
+            line-height: 1.8;
+            color: #475569;
+            margin-bottom: 3rem;
+        }
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            color: #1e293b;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            border-left: 3px solid #cbd5e1;
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .timeline-item:last-child {
+             margin-bottom: 0;
+        }
+        .timeline-icon {
+            position: absolute;
+            left: -54px; /* Adjusted from -54px to align better */
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background-color: #ffffff;
+            border: 3px solid #cbd5e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .timeline-time {
+            font-weight: 600;
+            color: #522081; 
+            margin-bottom: 0.25rem;
+        }
+        .timeline-activity {
+            color: #475569;
+            margin: 0;
+        }
+        .section-break {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: #1e293b;
+        }
+        .fees-section {
+            background-color: #f1f5f9;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        .fees-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .fees-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1.1rem;
+        }
+        .fees-item:last-child {
+            border-bottom: none;
+        }
+        .fees-item span {
+            color: #475569;
+        }
+        .fees-item strong {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .fees-note {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
+            <p>এসো প্রাণে প্রাণে মিলি সবাই</p>
         </div>
-        <div style="padding: 2.5rem;">
-            <p style="font-size: 1.1rem; text-align: center; line-height: 1.8; color: #475569; margin-bottom: 3rem;">
+        <div class="content">
+            <p class="intro">
                 বহুল প্রতীক্ষিত সেই মাহেন্দ্রক্ষণের আর দেরি নেই! স্মৃতির করিডোর ধরে হেঁটে পুরনো বন্ধুদের সাথে reconnect করার এবং আমাদের প্রিয় প্রতিষ্ঠান <strong>ক্যান্টনমেন্ট পাবলিক স্কুল অ্যান্ড কলেজ, সৈয়দপুর</strong>-এর গৌরব উদযাপন করার সময় এসেছে। এটি শুধু একটি অনুষ্ঠান নয়, এটি আমাদের শেকড়ে ফেরার উৎসব।
             </p>
 
-            <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 2.5rem; color: #1e293b;">অনুষ্ঠান সূচি</h2>
-            <div style="position: relative; padding-left: 40px; border-left: 3px solid #cbd5e1;">
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☀️</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:০০ - ৮:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">অতিথিদের আগমন, গিফট ব্যাগ ও টোকেন বিতরণ</p>
+            <h2 class="section-title">পূর্ণাঙ্গ অনুষ্ঠান সূচি</h2>
+            <div class="timeline">
+                
+                <div class="timeline-item">
+                    <div class="timeline-icon">➡️</div>
+                    <p class="timeline-activity section-break">প্রথম পর্ব</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:৩০ - ৯:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক ও অতিথিদের আসন গ্রহণ</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🎁</div>
+                    <p class="timeline-time">সকাল ৮:০০ - ৮:৩০ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">গিফট ব্যাগ ও টোকেন প্রদান</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚩</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:০০ - ৯:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">জাতীয় পতাকা উত্তোলন, র‍্যালি ও উদ্বোধন</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">👥</div>
+                    <p class="timeline-time">সকাল ৮:৪০ - ৯:১৫ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">প্রাক্তন শিক্ষক ও অতিথিবৃন্দের আসন গ্রহণ</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💬</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:৩০ - ১১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">স্বাগত বক্তব্য, স্মৃতিচারণ ও ব্যাচ পরিচিতি</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🚩</div>
+                    <p class="timeline-time">সকাল ৯:২০ - ১০:০০ টা পর্যন্ত।</p>
+                    <p class="timeline-activity">বড় মাঠে সমাবেশ</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☕</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:০০ - ১১:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সকালের নাস্তা</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">📣</div>
+                    <p class="timeline-time">১০:১৫ - ১১:০০ টা পর্যন্ত।</p>
+                    <p class="timeline-activity">উদ্বোধনী ঘোষণা, প্রধান অতিথি, বিশেষ অতিথিবৃন্দ ও সভাপতির স্বাগত বক্তব্য ও মাঠ পরিদর্শন। (জুলাই শহীদদের, এবং হারানো শিক্ষক ও শিক্ষার্থীদের স্মরণে ১ মিনিট নীরবতা পালন।)</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📸</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:৩০ - দুপুর ১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">ব্যাচ ভিত্তিক ফটোসেশন</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">☕</div>
+                    <p class="timeline-time">১১:১০ - ১২:৫৫ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">নাস্তার বিরতি: প্রাক্তন শিক্ষক ও ব্যাচ ভিত্তিক শিক্ষার্থীদের স্মৃতিচারণ, ফটোসেশন।</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍽️</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ১:০০ - দুপুর ২:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">নামাজ ও মধ্যাহ্নভোজের বিরতি</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🍽️</div>
+                    <p class="timeline-time">১:০০ - ২:৩০ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">নামাজ ও দুপুরের খাবার বিরতি</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏆</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ২:৩০ - বিকাল ৫:৩০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">বিভিন্ন ধরনের খেলাধুলা ও পুরস্কার বিতরণ</p>
+                <div class="timeline-item">
+                    <div class="timeline-icon">⚽</div>
+                    <p class="timeline-time">২:৩৫ - ৫:৩৫ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">বিভিন্ন ধরনের খেলাধুলা</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎤</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">বিকাল ৫:৩০ - সন্ধ্যা ৭:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সম্মাননা প্রদান ও অতিথিদের বক্তব্য</p>
+                 <div class="timeline-item">
+                    <div class="timeline-icon">🍵</div>
+                    <p class="timeline-time">৫:৪০ - ৬:১৫ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">নামাজ ও চা বিরতি</p>
                 </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🌙</div>
-                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সন্ধ্যা ৭:০০ - রাত ১১:০০ মিনিট</p>
-                    <p style="color: #475569; margin: 0;">সাংস্কৃতিক অনুষ্ঠান, র‍্যাফেল ড্র ও রাতের খাবার</p>
+
+                <div class="timeline-item">
+                    <div class="timeline-icon">➡️</div>
+                    <p class="timeline-activity section-break">দ্বিতীয় পর্ব</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🎤</div>
+                    <p class="timeline-time">৬: ২০ - ০৭ টা পর্যন্ত।</p>
+                    <p class="timeline-activity">প্রধান ও বিশেষ অতিথিবৃন্দের আসন গ্রহণ ও বক্তব্য প্রদান</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🏆</div>
+                    <p class="timeline-time">০৭: ০৫ - ৭:৩০ মিনিট পর্যন্ত।</p>
+                    <p class="timeline-activity">প্রাক্তন শিক্ষক, ডোনার ও কমিটি সদস্যদের ক্রেস্ট প্রদান</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-icon">🎶</div>
+                    <p class="timeline-time">৭:৩৫ - ১১: ০০ টা পর্যন্ত।</p>
+                    <p class="timeline-activity">রাতের খাবার, লটারি র‍্যাফেল ড্র ও সাংস্কৃতিক অনুষ্ঠান</p>
                 </div>
             </div>
 
-            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 2rem; margin-top: 3rem;">
-                <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem; color: #1e293b;">🎟️ রেজিস্ট্রেশন ফি</h2>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">আর্লি বার্ড (Early Birds)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">২০০০ টাকা</strong>
+            <div class="fees-section">
+                <h2 class="section-title" style="margin-bottom: 1.5rem;">🎟️ রেজিস্ট্রেশন ফি</h2>
+                <ul class="fees-list">
+                    <li class="fees-item">
+                        <span>আর্লি বার্ড (Early Birds)</span>
+                        <strong>২০০০ টাকা</strong>
                     </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">লেট আউল (Late Owls)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">২৫০০ টাকা</strong>
+                    <li class="fees-item">
+                        <span>লেট আউল (Late Owls)</span>
+                        <strong>২৫০০ টাকা</strong>
                     </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">ইয়াং অ্যালামনাই (এসএসসি ২০২০-২০২৫)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">১৫০০ টাকা</strong>
+                    <li class="fees-item">
+                        <span>ইয়াং অ্যালামনাই (এসএসসি ২০২০-২০২৫)</span>
+                        <strong>১৫০০ টাকা</strong>
                     </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; font-size: 1.1rem;">
-                        <span style="color: #475569;">পরিবার ও শিশু (৫ বছরের উর্ধ্বে)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">১০০০ টাকা</strong>
+                    <li class="fees-item">
+                        <span>পরিবার ও শিশু (৫ বছরের উর্ধ্বে)</span>
+                        <strong>১০০০ টাকা</strong>
                     </li>
                 </ul>
-                <p style="text-align: center; font-size: 0.9rem; color: #64748b; margin-top: 1.5rem;">
+                <p class="fees-note">
                     <em><strong>দ্রষ্টব্য:</strong> ৫ বছরের কম বয়সী শিশুদের জন্য কোনো ফি লাগবে না, তবে তাদের জন্য আলাদা খাবারের প্যাকেট থাকবে না। গেস্টদের মধ্যে স্বামী/স্ত্রী, বাবা-মা অথবা ৫ বছরের বেশি বয়সী শিশুরা অন্তর্ভুক্ত।</em>
                 </p>
             </div>
         </div>
     </div>
-</div>`,
+</body>
+</html>`,
         date: "2025-12-26",
         time: "8:00 AM - 11:00 PM",
         venue: "Cantonment Public School and College, Saidpur",
