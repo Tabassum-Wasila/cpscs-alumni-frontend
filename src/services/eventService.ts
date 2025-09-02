@@ -142,100 +142,97 @@ export class EventService {
       {
         id: "grand-reunion-2025",
         title: "Grand Alumni Reunion 2025",
-        description: `<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1f2937; background-color: #f9fafb; padding: 2rem; border-radius: 12px;">
+        description: `<div style="font-family: 'Noto Sans Bengali', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 2rem;">
+    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden;">
+        <div style="padding: 2.5rem; text-align: center; background: linear-gradient(135deg, #4f46e5, #522081); color: #ffffff;">
+            <h1 style="font-size: 2.75rem; font-weight: 700; margin: 0; letter-spacing: 1px;">গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
+            <p style="font-size: 1.25rem; opacity: 0.9; margin-top: 0.5rem;">এসো প্রাণে প্রাণে মিলি সবাই</p>
+        </div>
+        <div style="padding: 2.5rem;">
+            <p style="font-size: 1.1rem; text-align: center; line-height: 1.8; color: #475569; margin-bottom: 3rem;">
+                বহুল প্রতীক্ষিত সেই মাহেন্দ্রক্ষণের আর দেরি নেই! স্মৃতির করিডোর ধরে হেঁটে পুরনো বন্ধুদের সাথে reconnect করার এবং আমাদের প্রিয় প্রতিষ্ঠান <strong>ক্যান্টনমেন্ট পাবলিক স্কুল অ্যান্ড কলেজ, সৈয়দপুর</strong>-এর গৌরব উদযাপন করার সময় এসেছে। এটি শুধু একটি অনুষ্ঠান নয়, এটি আমাদের শেকড়ে ফেরার উৎসব।
+            </p>
 
-    <div style="text-align: center; margin-bottom: 3rem;">
-        <h1 style="font-size: 2.75rem; font-weight: 800; letter-spacing: -1px; background: linear-gradient(90deg, #4f46e5, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0;">এসো প্রাণে প্রাণে মিলি সবাই</h1>
-        <p style="font-size: 1.25rem; color: #6b7280; margin-top: 0.5rem;">Let's all unite in spirit</p>
-    </div>
-
-    <p style="font-size: 1.1rem; text-align: center; max-width: 750px; margin: 0 auto 3rem; line-height: 1.7;">
-        The moment we've all been waiting for is finally here! It's time to walk down memory lane, reconnect with lifelong friends, and celebrate the legacy of <strong>Cantonment Public School and College, Saidpur</strong>. This isn't just an event; it's a homecoming. A day filled with laughter, memories, and the joy of togetherness.
-    </p>
-
-    <div>
-        <h2 style="font-size: 2rem; font-weight: 700; text-align: center; margin-bottom: 2.5rem; color: #111827;">A Day to Remember: The Official Schedule</h2>
-        
-        <div style="border-left: 3px solid #d1d5db; margin-left: 1.5rem; padding-left: 2rem;">
-
-            <div style="position: relative; margin-bottom: 2rem;">
-                <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">☀️</div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">8:00 AM - 8:30 AM</p>
-                <p style="margin: 0; color: #6b7280;">Arrival, Gift Bag & Token Distribution.</p>
+            <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 2.5rem; color: #1e293b;">অনুষ্ঠান সূচি</h2>
+            <div style="position: relative; padding-left: 40px; border-left: 3px solid #cbd5e1;">
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☀️</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:০০ - ৮:৩০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">অতিথিদের আগমন, গিফট ব্যাগ ও টোকেন বিতরণ</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৮:৩০ - ৯:০০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক ও অতিথিদের আসন গ্রহণ</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚩</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:০০ - ৯:৩০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">জাতীয় পতাকা উত্তোলন, র‍্যালি ও উদ্বোধন</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💬</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ৯:৩০ - ১১:০০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">স্বাগত বক্তব্য, স্মৃতিচারণ ও ব্যাচ পরিচিতি</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☕</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:০০ - ১১:৩০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">সকালের নাস্তা</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📸</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সকাল ১১:৩০ - দুপুর ১:০০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">ব্যাচ ভিত্তিক ফটোসেশন</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍽️</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ১:০০ - দুপুর ২:৩০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">নামাজ ও মধ্যাহ্নভোজের বিরতি</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏆</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">দুপুর ২:৩০ - বিকাল ৫:৩০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">বিভিন্ন ধরনের খেলাধুলা ও পুরস্কার বিতরণ</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎤</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">বিকাল ৫:৩০ - সন্ধ্যা ৭:০০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">সম্মাননা প্রদান ও অতিথিদের বক্তব্য</p>
+                </div>
+                <div style="position: relative; margin-bottom: 2rem;">
+                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🌙</div>
+                    <p style="font-weight: 600; color: #4f46e5; margin-bottom: 0.25rem;">সন্ধ্যা ৭:০০ - রাত ১১:০০ মিনিট</p>
+                    <p style="color: #475569; margin: 0;">সাংস্কৃতিক অনুষ্ঠান, র‍্যাফেল ড্র ও রাতের খাবার</p>
+                </div>
             </div>
 
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">8:30 AM - 9:00 AM</p>
-                <p style="margin: 0; color: #6b7280;">Former Teachers & Guests Arrive and are Seated.</p>
+            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 2rem; margin-top: 3rem;">
+                <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem; color: #1e293b;">🎟️ রেজিস্ট্রেশন ফি</h2>
+                <ul style="list-style: none; padding: 0; margin: 0;">
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
+                        <span style="color: #475569;">আর্লি বার্ড (Early Birds)</span>
+                        <strong style="font-weight: 600; color: #1e293b;">২০০০ টাকা</strong>
+                    </li>
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
+                        <span style="color: #475569;">লেট আউল (Late Owls)</span>
+                        <strong style="font-weight: 600; color: #1e293b;">২৫০০ টাকা</strong>
+                    </li>
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
+                        <span style="color: #475569;">ইয়াং অ্যালামনাই (এসএসসি ২০২০-২০২৫)</span>
+                        <strong style="font-weight: 600; color: #1e293b;">১৫০০ টাকা</strong>
+                    </li>
+                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; font-size: 1.1rem;">
+                        <span style="color: #475569;">পরিবার ও শিশু (৫ বছরের উর্ধ্বে)</span>
+                        <strong style="font-weight: 600; color: #1e293b;">১০০০ টাকা</strong>
+                    </li>
+                </ul>
+                <p style="text-align: center; font-size: 0.9rem; color: #64748b; margin-top: 1.5rem;">
+                    <em><strong>দ্রষ্টব্য:</strong> ৫ বছরের কম বয়সী শিশুদের জন্য কোনো ফি লাগবে না, তবে তাদের জন্য আলাদা খাবারের প্যাকেট থাকবে না। গেস্টদের মধ্যে স্বামী/স্ত্রী, বাবা-মা অথবা ৫ বছরের বেশি বয়সী শিশুরা অন্তর্ভুক্ত।</em>
+                </p>
             </div>
-            
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">9:00 AM - 9:30 AM</p>
-                <p style="margin: 0; color: #6b7280;">Assembly, Rally Preparation, Inauguration & 1 Minute of Silence.</p>
-            </div>
-
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px;"></div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">9:30 AM - 10:15 AM</p>
-                <p style="margin: 0; color: #6b7280;">Grand Rally & Batch-wise Campus Procession.</p>
-            </div>
-            
-             <div style="position: relative; margin-bottom: 2rem;">
-                <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">☕</div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">10:15 AM - 12:30 PM</p>
-                <p style="margin: 0; color: #6b7280;">Snacks Break, followed by Welcome Speeches & a Heartfelt Reminiscence Session.</p>
-            </div>
-            
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🍽️</div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">12:30 PM - 3:30 PM</p>
-                <p style="margin: 0; color: #6b7280;">Prayer & Lunch Break, followed by Batch-wise Discussions & Photo Sessions.</p>
-            </div>
-            
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🏆</div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">3:30 PM - 6:30 PM</p>
-                <p style="margin: 0; color: #6b7280;">Fun & Games, Prize Distribution, and Speeches by Honored Guests.</p>
-            </div>
-            
-            <div style="position: relative; margin-bottom: 2rem;">
-                 <div style="position: absolute; left: -2.7rem; top: 0; background-color: #f9fafb; border: 3px solid #d1d5db; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">🌙</div>
-                <p style="margin: 0; font-weight: 600; color: #374151;">6:30 PM - 11:00 PM</p>
-                <p style="margin: 0; color: #6b7280;">Crest Presentation, spectacular Cultural Program, Raffle Draw, and Grand Dinner.</p>
-            </div>
-
         </div>
     </div>
-    
-    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 2rem; margin-top: 3rem;">
-        <h2 style="font-size: 2rem; font-weight: 700; color: #111827; text-align:center; margin-bottom: 1.5rem;">🎟️ Registration Fees & Deadlines</h2>
-        <ul style="list-style: none; padding: 0; max-width: 550px; margin: 0 auto;">
-            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
-                <span style="color: #4b5563;">Early Birds <em style="font-style: normal; color: #6b7280;">(Until Nov 26, 2025)</em></span>
-                <strong style="color: #16a34a;">2000 BDT</strong>
-            </li>
-            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
-                <span style="color: #4b5563;">Late Owls <em style="font-style: normal; color: #6b7280;">(Until Dec 16, 2025)</em></span>
-                <strong style="color: #f97316;">3000 BDT</strong>
-            </li>
-            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
-                <span style="color: #4b5563;">Young Alumni <em style="font-style: normal; color: #6b7280;">(SSC 2020-2025)</em></span>
-                <strong style="color: #4f46e5;">1500 BDT</strong>
-            </li>
-            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
-                <span style="color: #4b5563;">Current Students</span>
-                <strong>1000 BDT</strong>
-            </li>
-            <li style="display: flex; justify-content: space-between; padding: 0.75rem 0;">
-                <span style="color: #4b5563;">Guests & Children (5+)</span>
-                <strong>1000 BDT</strong>
-            </li>
-        </ul>
-        <p style="text-align: center; font-size: 0.9rem; color: #6b7280; margin-top: 1.5rem;"><em><strong>Note:</strong> Children under 5 are welcome free of charge but will not receive a separate food pack. Guests include spouse, parents, or children over 5.</em></p>
-    </div>
-
 </div>`,
         date: "2025-12-26",
         time: "8:00 AM - 11:00 PM",
