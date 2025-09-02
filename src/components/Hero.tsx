@@ -2,8 +2,21 @@ import React, { useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
+import { reunionService, ReunionData } from '@/services/reunionService';
+import { Skeleton } from "@/components/ui/skeleton";
 const Hero = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+  
+  // Fetch active reunion data
+  const { data: reunionData, isLoading } = useQuery({
+    queryKey: ['active-reunion'],
+    queryFn: reunionService.getActiveReunion,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false
+  });
+
+  const showReunionContent = reunionData?.is_reunion && reunionData?.is_active;
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!heroRef.current) return;
@@ -29,7 +42,9 @@ const Hero = () => {
 
   // Function to calculate time until the reunion
   const calculateTimeLeft = () => {
-    const reunionDate = new Date('December 25, 2025 09:00:00').getTime();
+    if (!reunionData?.event_date) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    
+    const reunionDate = new Date(reunionData.event_date).getTime();
     const now = new Date().getTime();
     const difference = reunionDate - now;
     if (difference > 0) {
@@ -52,12 +67,15 @@ const Hero = () => {
     };
   };
   const [timeLeft, setTimeLeft] = React.useState(calculateTimeLeft());
+  
   useEffect(() => {
+    if (!showReunionContent) return;
+    
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [reunionData, showReunionContent]);
   return <div ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden animated-bg">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -82,59 +100,60 @@ const Hero = () => {
             Connecting generations of excellence, fostering lifelong bonds, and creating a legacy that continues beyond the classroom.
           </p>
           
-          {/* Countdown Timer for Grand Reunion */}
-          <div className="mb-8 opacity-0 animate-fade-in" style={{
-          animationDelay: '0.7s'
-        }}>
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 inline-block">
-              <div className="flex items-center justify-center mb-2">
-                <Calendar className="text-cpscs-gold mr-2" size={20} />
-                <h3 className="text-cpscs-gold text-lg font-semibold">Grand Alumni Reunion 2025</h3>
-              </div>
-              <div className="flex justify-center space-x-4">
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.days}</div>
-                  <div className="text-xs text-gray-300">DAYS</div>
+          {/* Countdown Timer for Active Reunion */}
+          {isLoading ? (
+            <div className="mb-8 opacity-0 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+              <Skeleton className="h-24 w-80 mx-auto rounded-lg" />
+            </div>
+          ) : showReunionContent ? (
+            <div className="mb-8 opacity-0 animate-fade-in" style={{ animationDelay: '0.7s' }}>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 inline-block border border-white/20">
+                <div className="flex items-center justify-center mb-2">
+                  <Calendar className="text-cpscs-gold mr-2" size={20} />
+                  <h3 className="text-cpscs-gold text-lg font-semibold">
+                    {reunionData?.title || 'Grand Alumni Reunion'}
+                  </h3>
                 </div>
-                <div className="text-white text-xl md:text-2xl font-bold">:</div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.hours}</div>
-                  <div className="text-xs text-gray-300">HOURS</div>
-                </div>
-                <div className="text-white text-xl md:text-2xl font-bold">:</div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.minutes}</div>
-                  <div className="text-xs text-gray-300">MINS</div>
-                </div>
-                <div className="text-white text-xl md:text-2xl font-bold">:</div>
-                <div className="text-center">
-                  <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.seconds}</div>
-                  <div className="text-xs text-gray-300">SECS</div>
+                <div className="flex justify-center space-x-4">
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.days}</div>
+                    <div className="text-xs text-gray-300">DAYS</div>
+                  </div>
+                  <div className="text-white text-xl md:text-2xl font-bold">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.hours}</div>
+                    <div className="text-xs text-gray-300">HOURS</div>
+                  </div>
+                  <div className="text-white text-xl md:text-2xl font-bold">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.minutes}</div>
+                    <div className="text-xs text-gray-300">MINS</div>
+                  </div>
+                  <div className="text-white text-xl md:text-2xl font-bold">:</div>
+                  <div className="text-center">
+                    <div className="text-2xl md:text-3xl font-bold text-white">{timeLeft.seconds}</div>
+                    <div className="text-xs text-gray-300">SECS</div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          ) : null}
           
+          {/* Register for Reunion Button - Only show when active reunion exists */}
           <div className="flex flex-wrap justify-center gap-4 opacity-0 animate-fade-in" style={{
-          animationDelay: '0.9s'
-        }}>
-            <Button className="bg-gradient-to-r from-cpscs-blue to-blue-700 hover:from-blue-700 hover:to-cpscs-blue text-white font-medium px-6 py-6 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl">
-              <Link to="/about" className="flex items-center gap-2">
-                Learn About Us
-                <ArrowRight size={16} />
-              </Link>
-            </Button>
-            
-            <Button variant="outline" className="bg-transparent border-2 border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-cpscs-blue font-medium px-6 py-6 rounded-lg transition-all duration-300 hover:scale-105">
-              <Link to="/events">Upcoming Events</Link>
-            </Button>
-            
-            <Button className="bg-cpscs-gold text-cpscs-blue font-medium px-6 py-6 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl animate-pulse">
-              <Link to="/register" className="flex items-center gap-2">
-                Register for Reunion
-                <ArrowRight size={16} />
-              </Link>
-            </Button>
+            animationDelay: '0.9s'
+          }}>
+            {isLoading ? (
+              <Skeleton className="h-12 w-48 rounded-lg" />
+            ) : showReunionContent ? (
+              <Button className="relative bg-gradient-to-r from-cpscs-gold via-yellow-400 to-cpscs-gold hover:from-yellow-300 hover:via-cpscs-gold hover:to-yellow-300 text-cpscs-blue hover:text-cpscs-blue font-bold px-8 py-6 rounded-lg transition-all duration-300 hover:scale-105 shadow-xl hover:shadow-2xl animate-pulse hover:animate-none border-2 border-cpscs-gold/50 hover:border-white/30">
+                <Link to={`/events/${reunionData?.event_id}`} className="flex items-center gap-2">
+                  <span className="relative z-10">Register for Reunion</span>
+                  <ArrowRight size={16} className="relative z-10" />
+                </Link>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-full group-hover:translate-x-[-200%] transition-transform duration-1000"></div>
+              </Button>
+            ) : null}
           </div>
         </div>
       </div>
