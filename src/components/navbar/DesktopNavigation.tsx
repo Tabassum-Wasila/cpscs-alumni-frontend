@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { useLocation } from "react-router-dom";
-import { navLinks, getLinkColorClass } from '@/utils/navbarUtils';
+import { getLinkColorClass } from '@/utils/navbarUtils';
+import { useDynamicNavigation } from '@/hooks/useDynamicNavigation';
 import SmartNavLink from './SmartNavLink';
 
 interface DesktopNavigationProps {
@@ -11,6 +12,7 @@ interface DesktopNavigationProps {
 
 const DesktopNavigation: React.FC<DesktopNavigationProps> = ({ isScrolled, isHomePage }) => {
   const location = useLocation();
+  const { navLinks } = useDynamicNavigation();
 
   return (
     <div className="hidden lg:flex items-center space-x-6">

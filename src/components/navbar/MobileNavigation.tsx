@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation } from "react-router-dom";
-import { navLinks } from '@/utils/navbarUtils';
+import { useDynamicNavigation } from '@/hooks/useDynamicNavigation';
 import SmartNavLink from './SmartNavLink';
 
 interface MobileNavigationProps {
@@ -11,6 +11,7 @@ interface MobileNavigationProps {
 
 const MobileNavigation: React.FC<MobileNavigationProps> = ({ isScrolled, isHomePage }) => {
   const location = useLocation();
+  const { navLinks } = useDynamicNavigation();
 
   const getLinkClass = (path: string) => {
     const isActive = location.pathname === path || (path === '/alumni-directory' && location.pathname === '/alumni-directory-preview');

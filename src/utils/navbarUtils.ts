@@ -1,15 +1,6 @@
 
-export const navLinks = [
-  { name: 'Home', path: '/' },
-  { name: 'Gallery', path: '/gallery' },
-  { name: 'Events', path: '/events' },
-  { name: 'Alumni Directory', path: '/alumni-directory' },
-  { name: 'Committee', path: '/committee' },
-  { name: 'Sponsors', path: '/sponsors' },
-  { name: 'Hall of Fame', path: '/hall-of-fame' },
-  { name: 'Magazine', path: '/magazine' },
-  { name: 'Notice Board', path: '/notice-board' },
-];
+// Navigation links are now dynamic based on reunion status
+// Use useDynamicNavigation hook to get current nav links
 
 export const getTextColorClass = (isScrolled: boolean, isHomePage: boolean) => {
   if (isScrolled) {

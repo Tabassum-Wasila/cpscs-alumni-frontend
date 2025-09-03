@@ -13,7 +13,6 @@ import AlumniDirectory from "./pages/AlumniDirectory";
 import AlumniDirectoryLanding from "./pages/AlumniDirectoryLanding";
 import Committee from "./pages/Committee";
 import Sponsors from "./pages/Sponsors";
-import MentorshipCareer from "./pages/MentorshipCareer";
 import Blog from "./pages/Blog";
 import Contact from "./pages/Contact";
 
@@ -22,6 +21,7 @@ import Signup from "./pages/Signup";
 import CompleteProfile from "./pages/CompleteProfile";
 import EnhancedProfilePage from "./components/profile/EnhancedProfilePage";
 import NotFound from "./pages/NotFound";
+import ReunionCommittee from "./pages/ReunionCommittee";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HallOfFame from "./pages/HallOfFame";
 import NoticeBoard from "./pages/NoticeBoard";
@@ -41,6 +41,7 @@ const AppContent = () => {
         } />
         <Route path="/alumni-directory-preview" element={<AlumniDirectoryLanding />} />
         <Route path="/committee" element={<Committee />} />
+        <Route path="/reunion-committee" element={<ReunionCommittee />} />
         <Route path="/sponsors" element={<Sponsors />} />
         <Route path="/hall-of-fame" element={<HallOfFame />} />
         <Route path="/magazine" element={<Blog />} />
