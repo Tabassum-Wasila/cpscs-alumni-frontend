@@ -449,6 +449,16 @@ export class EventService {
     };
   }
 
+  // Format date for display (e.g., "26 November 2025")
+  static formatDateForDisplay(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  }
+
   static getEventDetails() {
     return {
       title: "Grand Alumni Reunion 2025",
