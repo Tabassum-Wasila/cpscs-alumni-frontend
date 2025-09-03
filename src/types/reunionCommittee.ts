@@ -16,10 +16,15 @@ export interface ReunionCommitteeCategory {
   members: ReunionCommitteeMember[];
 }
 
+export interface ReunionCommitteeTerm {
+  id: string;
+  term: string;
+  isActive: boolean;
+}
+
 export interface ReunionCommitteeData {
   title: string;
   subtitle: string;
-  event_date: string;
   event_id: string;
   committees: {
     conveningCommittee: ReunionCommitteeMember[];

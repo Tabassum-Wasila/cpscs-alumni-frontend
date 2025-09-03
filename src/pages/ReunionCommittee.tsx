@@ -10,13 +10,15 @@ import { ReunionCommitteeMember } from '@/types/reunionCommittee';
 import CommitteeMember from '../components/committee/CommitteeMember';
 import CommitteeModal from '../components/committee/CommitteeModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Users, Calendar, MapPin } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Users, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const ReunionCommittee = () => {
   const location = useLocation();
   const [selectedMember, setSelectedMember] = useState<ReunionCommitteeMember | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTermId, setSelectedTermId] = useState<string>('');
 
   // Fetch banner data
   const {
@@ -27,14 +29,32 @@ const ReunionCommittee = () => {
     queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
+  // Fetch available terms
+  const {
+    data: terms = [],
+    isLoading: termsLoading
+  } = useQuery({
+    queryKey: ['reunion-committee-terms'],
+    queryFn: () => reunionCommitteeService.getReunionTerms()
+  });
+
   // Fetch reunion committee data
   const {
     data: reunionCommitteeData,
     isLoading: committeesLoading
   } = useQuery({
-    queryKey: ['reunion-committee-data'],
-    queryFn: () => reunionCommitteeService.getActiveReunionCommittee()
+    queryKey: ['reunion-committee-data', selectedTermId],
+    queryFn: () => selectedTermId ? reunionCommitteeService.getReunionCommitteeByTerm(selectedTermId) : reunionCommitteeService.getActiveReunionCommittee(),
+    enabled: !!selectedTermId || terms.length > 0
   });
+
+  // Set default term to latest when terms are loaded
+  React.useEffect(() => {
+    if (terms.length > 0 && !selectedTermId) {
+      const latestTerm = terms.find(term => term.isActive) || terms[0];
+      setSelectedTermId(latestTerm.id);
+    }
+  }, [terms, selectedTermId]);
 
   const handleMemberClick = (member: ReunionCommitteeMember) => {
     setSelectedMember(member);
@@ -50,56 +70,47 @@ const ReunionCommittee = () => {
     {
       key: 'conveningCommittee',
       title: 'Convening Committee',
-      icon: '🏛️',
-      description: 'Overall leadership and coordination of the reunion event'
+      icon: '🏛️'
     },
     {
       key: 'registrationCommittee',
       title: 'Registration, Volunteer and Distribution Committee',
-      icon: '📝',
-      description: 'Managing registrations, volunteers, and material distribution'
+      icon: '📝'
     },
     {
       key: 'publicityCommittee',
       title: 'Printing, Publication and Publicity Committee',
-      icon: '📢',
-      description: 'Marketing, publicity, and all printed materials'
+      icon: '📢'
     },
     {
       key: 'foodCommittee',
       title: 'Food Committee',
-      icon: '🍽️',
-      description: 'Catering arrangements and food logistics'
+      icon: '🍽️'
     },
     {
       key: 'sponsorCommittee',
       title: 'Sponsor and Fundraising Committee',
-      icon: '💰',
-      description: 'Securing sponsors and managing fundraising activities'
+      icon: '💰'
     },
     {
       key: 'sportsCommittee',
       title: 'Sports Committee',
-      icon: '⚽',
-      description: 'Organizing sports events and competitions'
+      icon: '⚽'
     },
     {
       key: 'culturalCommittee',
       title: 'Cultural Committee',
-      icon: '🎭',
-      description: 'Cultural programs and entertainment events'
+      icon: '🎭'
     },
     {
       key: 'receptionCommittee',
       title: 'Reception, Rally and Decoration Committee',
-      icon: '🎊',
-      description: 'Decorations, reception setup, and rally coordination'
+      icon: '🎊'
     },
     {
       key: 'batchCoordinators',
       title: 'Batch Coordinators',
-      icon: '👥',
-      description: 'Coordinating with different batches and alumni groups'
+      icon: '👥'
     }
   ];
 
@@ -131,7 +142,7 @@ const ReunionCommittee = () => {
     }
     
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 pt-4">
         {members.map(member => (
           <CommitteeMember key={member.sequence} member={member} onClick={handleMemberClick} />
         ))}
@@ -183,16 +194,34 @@ const ReunionCommittee = () => {
           <div className="text-center mb-12">
             <h1 className="font-bold text-primary mb-4 text-3xl">{reunionCommitteeData.title}</h1>
             <p className="text-muted-foreground mb-6 text-lg">{reunionCommitteeData.subtitle}</p>
-            
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <Badge variant="outline" className="px-4 py-2 text-sm bg-white/70 backdrop-blur-sm">
-                <Calendar className="w-4 h-4 mr-2" />
-                {reunionCommitteeData.event_date}
-              </Badge>
-              <Badge variant="outline" className="px-4 py-2 text-sm bg-white/70 backdrop-blur-sm">
-                <MapPin className="w-4 h-4 mr-2" />
-                CPSCS Campus, Saidpur
-              </Badge>
+          </div>
+
+          {/* Term Dropdown */}
+          <div className="mb-8 flex justify-center">
+            <div className="w-full max-w-xs">
+              <div className="flex items-center gap-3 mb-4 justify-center">
+                <Calendar className="w-5 h-5 text-primary" />
+                <span className="text-sm font-semibold text-muted-foreground">Select Term:</span>
+              </div>
+              <Select value={selectedTermId} onValueChange={setSelectedTermId} disabled={committeesLoading || termsLoading}>
+                <SelectTrigger className="w-full bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
+                  <SelectValue placeholder="Select committee term" />
+                </SelectTrigger>
+                <SelectContent className="bg-card/95 backdrop-blur-sm border-border/50">
+                  {terms.map((term) => (
+                    <SelectItem key={term.id} value={term.id} className="hover:bg-muted/50">
+                      <div className="flex items-center gap-2">
+                        <span>{term.term}</span>
+                        {term.isActive && (
+                          <span className="px-2 py-1 text-xs bg-primary/20 text-primary rounded-full">
+                            Current
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           
@@ -212,7 +241,6 @@ const ReunionCommittee = () => {
                       <div className="text-2xl">{committee.icon}</div>
                       <div>
                         <h3 className="font-semibold text-lg text-primary">{committee.title}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{committee.description}</p>
                         <Badge variant="secondary" className="mt-2">
                           {members.length} {members.length === 1 ? 'Member' : 'Members'}
                         </Badge>
