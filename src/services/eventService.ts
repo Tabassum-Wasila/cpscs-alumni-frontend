@@ -40,11 +40,28 @@ export interface EventRegistration {
 
 export interface ReunionRegistration {
   sscYear: string;
-  bringingSpouse: boolean;
-  numberOfKids: number;
-  bringingMother: boolean;
-  bringingFather: boolean;
-  isCurrentStudent?: boolean;
+  isCurrentStudent: boolean;
+  tshirtSize: 'S' | 'M' | 'L' | 'XL' | 'XXL';
+  collectionMethod: 'event-booth' | 'batch-coordinator';
+  spouse?: {
+    name: string;
+  };
+  father?: {
+    name: string;
+  };
+  mother?: {
+    name: string;
+  };
+  children?: {
+    numberOfChildren: number;
+    names: string[];
+  };
+  other?: {
+    relation: string;
+    name: string;
+  };
+  wantsToVolunteer: boolean;
+  specialRequests?: string;
 }
 
 export interface ReunionPricing {
@@ -52,17 +69,31 @@ export interface ReunionPricing {
   lateOwlDeadline: string;
   regularEarlyBird: number;
   regularLateOwl: number;
-  ssc2020to2025: number;
+  youngAlumni: number;
+  familyAndChildren: number;
   currentStudent: number;
-  guest: number;
+  // Backend control flags
+  youngAlumniDiscountEnabled?: boolean;
+  currentStudentAttendanceEnabled?: boolean;
+  youngAlumniEligibleYears?: { start: number; end: number };
 }
 
 export interface FeeBreakdown {
   baseFee: number;
   spouseFee: number;
-  kidsFee: number;
-  parentsFee: number;
+  fatherFee: number;
+  motherFee: number;
+  childrenFee: number;
+  otherGuestFee: number;
   totalFee: number;
+  itemizedBreakdown?: {
+    baseDescription: string;
+    items: Array<{
+      description: string;
+      amount: number;
+      quantity?: number;
+    }>;
+  };
 }
 
 export class EventService {
@@ -324,10 +355,13 @@ export class EventService {
       earlyBirdDeadline: "2025-11-26",
       lateOwlDeadline: "2025-12-16",
       regularEarlyBird: 2000,
-      regularLateOwl: 3000,
-      ssc2020to2025: 1500,
-      currentStudent: 1000,
-      guest: 1000
+      regularLateOwl: 2500,
+      youngAlumni: 1500,
+      familyAndChildren: 1000,
+      currentStudent: 0, // Free for current students
+      youngAlumniDiscountEnabled: true,
+      currentStudentAttendanceEnabled: true,
+      youngAlumniEligibleYears: { start: 2020, end: 2025 }
     };
     
     const finalPricing = pricing || defaultPricing;
@@ -335,47 +369,83 @@ export class EventService {
     
     // Calculate base fee
     let baseFee = 0;
+    let baseDescription = "";
     
-    if (registration.isCurrentStudent) {
+    if (registration.isCurrentStudent && finalPricing.currentStudentAttendanceEnabled) {
       baseFee = finalPricing.currentStudent;
+      baseDescription = "Current Student";
     } else if (registration.sscYear) {
       const year = parseInt(registration.sscYear);
-      if (year >= 2020 && year <= 2025) {
-        baseFee = finalPricing.ssc2020to2025;
+      const { start, end } = finalPricing.youngAlumniEligibleYears || { start: 2020, end: 2025 };
+      
+      if (year >= start && year <= end && finalPricing.youngAlumniDiscountEnabled) {
+        baseFee = finalPricing.youngAlumni;
+        baseDescription = `Young Alumni (SSC ${start}-${end})`;
       } else {
         // Check early bird vs late owl pricing
-        baseFee = currentDate <= earlyBirdDeadline 
-          ? finalPricing.regularEarlyBird 
-          : finalPricing.regularLateOwl;
+        if (currentDate <= earlyBirdDeadline) {
+          baseFee = finalPricing.regularEarlyBird;
+          baseDescription = "Regular Alumni (Early Bird)";
+        } else {
+          baseFee = finalPricing.regularLateOwl;
+          baseDescription = "Regular Alumni (Late Owl)";
+        }
       }
     }
 
     // Calculate guest fees
-    const spouseFee = registration.bringingSpouse ? finalPricing.guest : 0;
-    const kidsFee = registration.numberOfKids * finalPricing.guest;
-    const parentsFee = (registration.bringingMother ? finalPricing.guest : 0) + 
-                       (registration.bringingFather ? finalPricing.guest : 0);
-    const totalFee = baseFee + spouseFee + kidsFee + parentsFee;
+    const spouseFee = registration.spouse ? finalPricing.familyAndChildren : 0;
+    const fatherFee = registration.father ? finalPricing.familyAndChildren : 0;
+    const motherFee = registration.mother ? finalPricing.familyAndChildren : 0;
+    const childrenFee = registration.children ? (registration.children.numberOfChildren * finalPricing.familyAndChildren) : 0;
+    const otherGuestFee = registration.other ? finalPricing.familyAndChildren : 0;
+    
+    const totalFee = baseFee + spouseFee + fatherFee + motherFee + childrenFee + otherGuestFee;
+
+    // Create itemized breakdown
+    const items: Array<{ description: string; amount: number; quantity?: number }> = [];
+    
+    if (spouseFee > 0) items.push({ description: "Spouse", amount: finalPricing.familyAndChildren });
+    if (fatherFee > 0) items.push({ description: "Father", amount: finalPricing.familyAndChildren });
+    if (motherFee > 0) items.push({ description: "Mother", amount: finalPricing.familyAndChildren });
+    if (childrenFee > 0) items.push({ 
+      description: "Children (5+ years)", 
+      amount: finalPricing.familyAndChildren, 
+      quantity: registration.children?.numberOfChildren || 0 
+    });
+    if (otherGuestFee > 0) items.push({ 
+      description: `Other Guest (${registration.other?.relation})`, 
+      amount: finalPricing.familyAndChildren 
+    });
 
     return {
       baseFee,
       spouseFee,
-      kidsFee,
-      parentsFee,
-      totalFee
+      fatherFee,
+      motherFee,
+      childrenFee,
+      otherGuestFee,
+      totalFee,
+      itemizedBreakdown: {
+        baseDescription,
+        items
+      }
     };
   }
 
   static getReunionPricing(): ReunionPricing {
-    // This would normally come from backend/admin panel
+    // This would normally come from backend/admin panel with admin-controlled flags
     return {
       earlyBirdDeadline: "2025-11-26",
       lateOwlDeadline: "2025-12-16",
       regularEarlyBird: 2000,
-      regularLateOwl: 3000,
-      ssc2020to2025: 1500,
-      currentStudent: 1000,
-      guest: 1000
+      regularLateOwl: 2500,
+      youngAlumni: 1500,
+      familyAndChildren: 1000,
+      currentStudent: 0, // N/A - Free for current students when enabled
+      youngAlumniDiscountEnabled: true, // Can be controlled from backend admin panel
+      currentStudentAttendanceEnabled: true, // Can be controlled from backend admin panel
+      youngAlumniEligibleYears: { start: 2020, end: 2025 }
     };
   }
 
