@@ -155,23 +155,23 @@ export class AuthService {
         phoneNumber: userData.phoneNumber || '',
         showPhone: true,
         expertise: [],
-        socialLinks: {},
+        socialLinks: {
+          facebook: userData.socialProfileLink?.includes('facebook') ? userData.socialProfileLink : '',
+          linkedin: userData.socialProfileLink?.includes('linkedin') ? userData.socialProfileLink : '',
+        },
         willingToMentor: false,
         mentorshipAreas: [],
-        education: [],
+        education: [{
+          id: crypto.randomUUID(),
+          institution: 'Chittagong Physical Training College',
+          degree: 'SSC',
+          graduationYear: userData.sscYear,
+          isDefault: true
+        }],
         workExperience: []
       }
     };
 
-    let users = [];
-    const storedUsers = localStorage.getItem('cpscs_users');
-    if (storedUsers) {
-      users = JSON.parse(storedUsers);
-    }
-
-    users.push(newUser);
-    localStorage.setItem('cpscs_users', JSON.stringify(users));
-    AuthService.updateUser(newUser);
     return newUser;
   }
 
@@ -198,19 +198,41 @@ export class AuthService {
     }
   }
 
+
   static async signup(userData: SignupData): Promise<User | null> {
     try {
-      const users = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      const existingUser = users.find((u: User) => u.email === userData.email);
+      console.log('Starting signup process with data:', { 
+        fullName: userData.fullName, 
+        email: userData.email,
+        sscYear: userData.sscYear,
+        hscYear: userData.hscYear,
+        attendanceFromYear: userData.attendanceFromYear,
+        attendanceToYear: userData.attendanceToYear
+      });
       
+      // Load existing users and check for duplicates
+      const storedUsers = localStorage.getItem('cpscs_users');
+      const users = storedUsers ? JSON.parse(storedUsers) : [];
+      
+      const existingUser = users.find((user: User) => user.email.toLowerCase() === userData.email.toLowerCase());
       if (existingUser) {
-        return null; // User already exists
+        console.log('User already exists with email:', userData.email);
+        return null;
       }
-
-      const newUser = AuthService.createUser(userData);
-      return { ...newUser, isAuthenticated: true };
+      
+      // Create new user
+      const newUser = this.createUser(userData);
+      users.push(newUser);
+      localStorage.setItem('cpscs_users', JSON.stringify(users));
+      
+      // Set as authenticated and update current user
+      const authenticatedUser = { ...newUser, isAuthenticated: true };
+      AuthService.updateUser(authenticatedUser);
+      
+      console.log('New user created successfully:', { id: newUser.id, email: newUser.email });
+      return authenticatedUser;
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error('Signup error:', error);
       return null;
     }
   }

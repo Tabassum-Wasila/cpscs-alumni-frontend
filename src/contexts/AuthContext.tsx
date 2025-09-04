@@ -1,8 +1,22 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { AuthService, LoginCredentials, SignupData } from '@/services/authService';
+import { AuthService, LoginCredentials } from '@/services/authService';
 import { AlumniService, SearchFilters } from '@/services/alumniService';
 import { UserService, UserProfile } from '@/services/userService';
+
+export interface SignupData {
+  fullName: string;
+  email: string;
+  password: string;
+  sscYear: string;
+  hscYear: string;
+  attendanceFromYear: string;
+  attendanceToYear: string;
+  countryCode: string;
+  phoneNumber: string;
+  profilePhoto: string;
+  socialProfileLink: string;
+}
 
 export type User = {
   id: string;
