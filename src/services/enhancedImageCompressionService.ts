@@ -23,10 +23,10 @@ export class EnhancedImageCompressionService {
   };
 
   private static readonly PROOF_DOCUMENT_OPTIONS: EnhancedCompressionOptions = {
-    maxSizeMB: 0.3, // 300KB
+    maxSizeMB: 0.1, // 100KB
     maxWidthOrHeight: 1024,
     useWebWorker: true,
-    quality: 0.85,
+    quality: 0.82,
     fileType: 'image/jpeg'
   };
 

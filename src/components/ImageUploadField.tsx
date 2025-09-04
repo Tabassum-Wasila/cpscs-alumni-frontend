@@ -75,8 +75,8 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
       return;
     }
 
-    // Validate file size (5MB limit for cropping, 2MB for direct upload)
-    const sizeLimit = type === 'profile' ? 5 : 2;
+    // Validate file size (2MB limit for both profile and document)
+    const sizeLimit = 2;
     if (!EnhancedImageCompressionService.isFileSizeValid(file, sizeLimit)) {
       toast({
         variant: "destructive",
@@ -242,6 +242,33 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
         )}
 
         <div className="flex-1 space-y-3">
+          {type === 'profile' && (
+            <div className="space-y-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={triggerFileInput}
+                disabled={isProcessing}
+                className="w-full h-11 md:h-12 text-sm md:text-base font-medium"
+              >
+                <Upload className="h-4 w-4 md:h-5 md:w-5 mr-2" />
+                {isProcessing ? 'Processing...' : selectedImage ? 'Change Profile Photo' : 'Upload Image'}
+              </Button>
+              
+              {selectedImage && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={removeImage}
+                  className="w-full h-10 text-sm"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Remove Photo
+                </Button>
+              )}
+            </div>
+          )}
+
           {selectedImage && type !== 'profile' && (
             <div className="relative inline-block">
               <img
@@ -288,7 +315,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({
           )}
 
           <p className="text-xs text-muted-foreground">
-            Max {type === 'profile' ? '5' : '2'}MB • JPG, PNG, HEIF formats supported
+            Max 2MB • JPG, PNG, HEIF formats supported
           </p>
         </div>
       </div>
