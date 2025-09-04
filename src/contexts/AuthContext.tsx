@@ -25,7 +25,7 @@ export type User = {
 type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; user?: User }>;
   signup: (userData: Partial<User> & { password: string }) => Promise<boolean>;
   logout: () => void;
   checkEmailExists: (email: string) => Promise<boolean>;
@@ -60,13 +60,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; user?: User }> => {
     const loggedInUser = await AuthService.login({ email, password });
     if (loggedInUser) {
       setUser(loggedInUser);
-      return true;
+      return { success: true, user: loggedInUser };
     }
-    return false;
+    return { success: false };
   };
 
   const signup = async (userData: Partial<User> & { password: string }): Promise<boolean> => {

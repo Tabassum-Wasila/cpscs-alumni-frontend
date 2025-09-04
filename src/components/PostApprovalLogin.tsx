@@ -39,8 +39,8 @@ const PostApprovalLogin: React.FC<PostApprovalLoginProps> = ({ defaultEmail }) =
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const success = await login(data.email, data.password);
-      if (success) {
+      const result = await login(data.email, data.password);
+      if (result.success && result.user) {
         toast({
           title: "Login Successful",
           description: "Welcome to the CPSCS Alumni Community!",

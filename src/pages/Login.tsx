@@ -28,7 +28,7 @@ const Login = () => {
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   
   // Get the return path from location state, or default to alumni-directory
   const from = location.state?.from || "/alumni-directory";
@@ -43,13 +43,15 @@ const Login = () => {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const success = await login(data.email, data.password);
-      if (success) {
+      const result = await login(data.email, data.password);
+      if (result.success && result.user) {
         toast({
           title: "Login Successful",
           description: "Welcome back to the CPSCS Alumni Portal!",
         });
-        navigate(from);
+        // Redirect to My Profile instead of alumni directory by default
+        const defaultRedirect = `/profile/${result.user.id}`;
+        navigate(from === "/alumni-directory" ? defaultRedirect : from);
       } else {
         toast({
           title: "Login Failed",
