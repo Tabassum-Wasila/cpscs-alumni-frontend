@@ -32,11 +32,12 @@ export const getSSCYears = (): string[] => {
 };
 
 /**
- * Generate HSC batch years from 1981 to current year
+ * Generate HSC batch years from 1981 to current year + 10
  * HSC starts from 1981 as students typically complete HSC 2 years after SSC
+ * Extended to +10 years for future students to select probable HSC years
  * @returns Array of HSC years as strings
  */
 export const getHSCYears = (): string[] => {
   const currentYear = getCurrentYear();
-  return generateYears(1981, currentYear);
+  return generateYears(1981, currentYear + 10);
 };

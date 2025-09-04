@@ -19,6 +19,12 @@ export interface SignupData {
   password: string;
   sscYear: string;
   hscYear: string;
+  attendanceFromYear: string;
+  attendanceToYear: string;
+  countryCode: string;
+  phoneNumber: string;
+  profilePhoto: string;
+  socialProfileLink: string;
 }
 
 export interface User {
@@ -128,7 +134,7 @@ export class AuthService {
     }
   }
 
-  static createUser(userData: SignupFormData): User {
+  static createUser(userData: SignupData): User {
     const newUser: User = {
       id: crypto.randomUUID(),
       fullName: userData.fullName,
@@ -140,14 +146,14 @@ export class AuthService {
       hasMembership: false,
       isAuthenticated: false,
       profile: {
-        profilePicture: '',
+        profilePicture: userData.profilePhoto || '',
         bio: '',
         profession: '',
         organization: '',
         city: '',
         country: '',
-        phoneNumber: '',
-        showPhone: true, // Changed from false to true - default to showing phone
+        phoneNumber: userData.phoneNumber || '',
+        showPhone: true,
         expertise: [],
         socialLinks: {},
         willingToMentor: false,

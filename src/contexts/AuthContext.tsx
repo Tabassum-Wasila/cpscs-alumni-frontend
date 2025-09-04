@@ -10,6 +10,9 @@ export type User = {
   email: string;
   sscYear: string;
   hscYear?: string;
+  attendanceFromYear?: string;
+  attendanceToYear?: string;
+  profilePhoto?: string;
   isAuthenticated: boolean;
   isAdmin?: boolean;
   isDemoUser?: boolean;
@@ -26,7 +29,7 @@ type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; user?: User }>;
-  signup: (userData: Partial<User> & { password: string }) => Promise<boolean>;
+  signup: (userData: SignupData) => Promise<boolean>;
   logout: () => void;
   checkEmailExists: (email: string) => Promise<boolean>;
   updateUserProfile: (profileData: Partial<UserProfile>) => Promise<boolean>;
@@ -69,9 +72,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { success: false };
   };
 
-  const signup = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    const signupData = userData as SignupData;
-    const newUser = await AuthService.signup(signupData);
+  const signup = async (userData: SignupData): Promise<boolean> => {
+    const newUser = await AuthService.signup(userData);
     if (newUser) {
       setUser(newUser);
       return true;

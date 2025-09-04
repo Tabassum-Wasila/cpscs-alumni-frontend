@@ -21,13 +21,16 @@ import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import ConfirmPasswordFeedback from '@/components/ConfirmPasswordFeedback';
 import HoverTooltip from '@/components/HoverTooltip';
 import SmartDocumentTooltip from '@/components/SmartDocumentTooltip';
-import { getSSCYears, getHSCYears } from '@/utils/yearUtils';
+import { ImageUploadField } from '@/components/ImageUploadField';
+import { getSSCYears, getHSCYears, generateYears, getCurrentYear } from '@/utils/yearUtils';
 
-// Enhanced validation schema with all fields mandatory and relaxed rules
+// Enhanced validation schema with all fields mandatory except proof document
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Name must be at least 2 characters." }),
   sscYear: z.string().min(1, { message: "Please select your SSC batch year." }),
   hscYear: z.string().min(1, { message: "Please select your HSC batch year." }),
+  attendanceFromYear: z.string().min(1, { message: "Please select from year." }),
+  attendanceToYear: z.string().min(1, { message: "Please select to year." }),
   countryCode: z.string().min(1, { message: "Please select country code." }),
   phoneNumber: z.string()
     .min(7, { message: "Please enter a valid phone number." })
@@ -39,6 +42,7 @@ const formSchema = z.object({
       message: "Password must contain at least one letter and one number."
     }),
   confirmPassword: z.string().min(1, { message: "Please confirm your password." }),
+  profilePhoto: z.string().min(1, { message: "Please upload a profile photo." }),
   socialProfileLink: z.string()
     .min(1, { message: "Please enter your social profile link." })
     .refine((url) => {
@@ -52,10 +56,13 @@ const formSchema = z.object({
         /^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
       );
     }, { message: "Please enter a valid social media profile URL." }),
-  proofDocument: z.instanceof(File, { message: "Please upload a proof document." }),
+  proofDocument: z.instanceof(File).optional(), // Made optional
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
+}).refine(data => parseInt(data.attendanceFromYear) <= parseInt(data.attendanceToYear), {
+  message: "From year must be before or same as to year",
+  path: ["attendanceToYear"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -71,6 +78,7 @@ const Signup = () => {
   const [submittedEmail, setSubmittedEmail] = useState('');
   const [socialProfileCompleted, setSocialProfileCompleted] = useState(false);
   const [documentUploaded, setDocumentUploaded] = useState(false);
+  const [profilePhotoUploaded, setProfilePhotoUploaded] = useState(false);
   const { signup, checkEmailExists } = useAuth();
 
   const form = useForm<FormValues>({
@@ -80,11 +88,14 @@ const Signup = () => {
       fullName: "",
       sscYear: "",
       hscYear: "",
+      attendanceFromYear: "",
+      attendanceToYear: "",
       countryCode: "+880",
       phoneNumber: "",
       email: "",
       password: "",
       confirmPassword: "",
+      profilePhoto: "",
       socialProfileLink: "",
     }
   });
@@ -158,9 +169,12 @@ const Signup = () => {
         email: formData.email,
         sscYear: formData.sscYear,
         hscYear: formData.hscYear,
+        attendanceFromYear: formData.attendanceFromYear,
+        attendanceToYear: formData.attendanceToYear,
         password: formData.password,
         countryCode: formData.countryCode,
         phoneNumber: formData.phoneNumber,
+        profilePhoto: formData.profilePhoto,
         socialProfileLink: formData.socialProfileLink,
       });
       
@@ -245,59 +259,120 @@ const Signup = () => {
                     )}
                   />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="sscYear"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm md:text-base">SSC Batch Year *</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="h-10 md:h-12">
-                                <SelectValue placeholder="Select year" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
-                              {getSSCYears().map((year) => (
-                                <SelectItem key={year} value={year}>{year}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage className="text-xs md:text-sm" />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="hscYear"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm md:text-base">HSC Batch Year *</FormLabel>
-                          <Select 
-                            onValueChange={field.onChange} 
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger className="h-10 md:h-12">
-                                <SelectValue placeholder="Select year" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
-                              {getHSCYears().map((year) => (
-                                <SelectItem key={year} value={year}>{year}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage className="text-xs md:text-sm" />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <FormField
+                       control={form.control}
+                       name="sscYear"
+                       render={({ field }) => (
+                         <FormItem>
+                           <FormLabel className="text-sm md:text-base">SSC Batch Year *</FormLabel>
+                           <Select 
+                             onValueChange={field.onChange} 
+                             defaultValue={field.value}
+                           >
+                             <FormControl>
+                               <SelectTrigger className="h-10 md:h-12">
+                                 <SelectValue placeholder="Select year" />
+                               </SelectTrigger>
+                             </FormControl>
+                             <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
+                               {getSSCYears().map((year) => (
+                                 <SelectItem key={year} value={year}>{year}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                           <FormMessage className="text-xs md:text-sm" />
+                         </FormItem>
+                       )}
+                     />
+                     
+                     <FormField
+                       control={form.control}
+                       name="hscYear"
+                       render={({ field }) => (
+                         <FormItem>
+                           <FormLabel className="text-sm md:text-base">HSC Batch Year *</FormLabel>
+                           <Select 
+                             onValueChange={field.onChange} 
+                             defaultValue={field.value}
+                           >
+                             <FormControl>
+                               <SelectTrigger className="h-10 md:h-12">
+                                 <SelectValue placeholder="Select year" />
+                               </SelectTrigger>
+                             </FormControl>
+                             <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
+                               {getHSCYears().map((year) => (
+                                 <SelectItem key={year} value={year}>{year}</SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                           <FormMessage className="text-xs md:text-sm" />
+                         </FormItem>
+                       )}
+                     />
+                   </div>
+
+                   <FormItem>
+                     <FormLabel className="text-sm md:text-base">From which year to which year did you attend this institution? *</FormLabel>
+                     <HoverTooltip 
+                       tooltip="আপনি কোন সাল থেকে কোন সাল পর্যন্ত এখানে অধ্যয়ন করেছেন?"
+                     >
+                       <div className="grid grid-cols-2 gap-4">
+                         <FormField
+                           control={form.control}
+                           name="attendanceFromYear"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel className="text-xs text-muted-foreground">From Year</FormLabel>
+                               <Select 
+                                 onValueChange={field.onChange} 
+                                 defaultValue={field.value}
+                               >
+                                 <FormControl>
+                                   <SelectTrigger className="h-10 md:h-12">
+                                     <SelectValue placeholder="From" />
+                                   </SelectTrigger>
+                                 </FormControl>
+                                 <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
+                                   {generateYears(1979, getCurrentYear() + 10).map((year) => (
+                                     <SelectItem key={year} value={year}>{year}</SelectItem>
+                                   ))}
+                                 </SelectContent>
+                               </Select>
+                               <FormMessage className="text-xs md:text-sm" />
+                             </FormItem>
+                           )}
+                         />
+                         
+                         <FormField
+                           control={form.control}
+                           name="attendanceToYear"
+                           render={({ field }) => (
+                             <FormItem>
+                               <FormLabel className="text-xs text-muted-foreground">To Year</FormLabel>
+                               <Select 
+                                 onValueChange={field.onChange} 
+                                 defaultValue={field.value}
+                               >
+                                 <FormControl>
+                                   <SelectTrigger className="h-10 md:h-12">
+                                     <SelectValue placeholder="To" />
+                                   </SelectTrigger>
+                                 </FormControl>
+                                 <SelectContent className="max-h-48 md:max-h-60 bg-white z-50">
+                                   {generateYears(1979, getCurrentYear() + 10).map((year) => (
+                                     <SelectItem key={year} value={year}>{year}</SelectItem>
+                                   ))}
+                                 </SelectContent>
+                               </Select>
+                               <FormMessage className="text-xs md:text-sm" />
+                             </FormItem>
+                           )}
+                         />
+                       </div>
+                     </HoverTooltip>
+                   </FormItem>
                   
                   <FormField
                     control={form.control}
@@ -433,68 +508,114 @@ const Signup = () => {
                         </FormItem>
                       )}
                     />
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="socialProfileLink"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm md:text-base">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
-                        <HoverTooltip 
-                          tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
-                        >
-                          <FormControl>
-                            <Input 
-                              placeholder="facebook.com/yourprofile or linkedin.com/in/yourprofile" 
-                              {...field} 
-                              className="h-10 md:h-12 text-sm md:text-base"
-                              onBlur={(e) => {
-                                field.onBlur();
-                                // Real-time validation for social profile
-                                const value = e.target.value.toLowerCase().trim();
-                                if (value && !value.includes('facebook.com') && !value.includes('linkedin.com') && !value.includes('twitter.com') && !value.includes('instagram.com') && !/^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(value)) {
-                                  form.setError("socialProfileLink", {
-                                    type: "manual",
-                                    message: "Please enter a valid social media profile URL."
-                                  });
-                                }
-                              }}
-                            />
-                          </FormControl>
-                        </HoverTooltip>
-                        <FormMessage className="text-xs md:text-sm" />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="proofDocument"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm md:text-base">Upload Student Proof Document *</FormLabel>
-                        <FormControl>
-                          <FileUpload
-                            onFileSelect={(file) => {
-                              if (file) {
-                                field.onChange(file);
-                                setDocumentUploaded(true);
-                              } else {
-                                setDocumentUploaded(false);
-                              }
-                            }}
-                            error={form.formState.errors.proofDocument?.message}
-                          />
-                        </FormControl>
-                        <SmartDocumentTooltip 
-                          show={socialProfileCompleted} 
-                          hasFile={documentUploaded}
-                        />
-                        <FormMessage className="text-xs md:text-sm" />
-                      </FormItem>
-                    )}
-                  />
+                   </div>
+
+                   <FormField
+                     control={form.control}
+                     name="profilePhoto"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormControl>
+                           <ImageUploadField
+                             title="Upload Profile Photo *"
+                             subtitle="অ্যাডমিন ভেরিফিকেশনের জন্য, অনুগ্রহ করে আপনার এমন একটি ছবি দিন, যেখানে আপনার মুখমণ্ডল স্পষ্টভাবে চেনা যায়।"
+                             type="profile"
+                             onImageSelect={(base64Image) => {
+                               if (base64Image) {
+                                 field.onChange(base64Image);
+                                 setProfilePhotoUploaded(true);
+                               } else {
+                                 field.onChange("");
+                                 setProfilePhotoUploaded(false);
+                               }
+                             }}
+                             currentImage={field.value}
+                           />
+                         </FormControl>
+                         <FormMessage className="text-xs md:text-sm" />
+                       </FormItem>
+                     )}
+                   />
+                   
+                   <FormField
+                     control={form.control}
+                     name="socialProfileLink"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormLabel className="text-sm md:text-base">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
+                         <HoverTooltip 
+                           tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
+                         >
+                           <FormControl>
+                             <Input 
+                               placeholder="facebook.com/yourprofile or linkedin.com/in/yourprofile" 
+                               {...field} 
+                               className="h-10 md:h-12 text-sm md:text-base"
+                               onBlur={(e) => {
+                                 field.onBlur();
+                                 // Real-time validation for social profile
+                                 const value = e.target.value.toLowerCase().trim();
+                                 if (value && !value.includes('facebook.com') && !value.includes('linkedin.com') && !value.includes('twitter.com') && !value.includes('instagram.com') && !/^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(value)) {
+                                   form.setError("socialProfileLink", {
+                                     type: "manual",
+                                     message: "Please enter a valid social media profile URL."
+                                   });
+                                 }
+                               }}
+                             />
+                           </FormControl>
+                         </HoverTooltip>
+                         <FormMessage className="text-xs md:text-sm" />
+                       </FormItem>
+                     )}
+                   />
+                   
+                   <FormField
+                     control={form.control}
+                     name="proofDocument"
+                     render={({ field }) => (
+                       <FormItem>
+                         <FormControl>
+                           <ImageUploadField
+                             title="Upload Student Proof Image"
+                             subtitle="আমাদের এই প্ল্যাটফর্ম শুধুমাত্র প্রাক্তন ছাত্র-ছাত্রীদের জন্য। আপনি যে আমাদেরই একজন, তা নিশ্চিত করতে একটি প্রমাণপত্র প্রয়োজন। এরপরই আপনার অ্যাকাউন্টটি সক্রিয় করা হবে।"
+                             type="document"
+                             onImageSelect={(base64Image) => {
+                               if (base64Image) {
+                                 // Convert base64 to File object for compatibility
+                                 fetch(base64Image)
+                                   .then(res => res.blob())
+                                   .then(blob => {
+                                     const file = new File([blob], "proof_document.jpg", { type: "image/jpeg" });
+                                     field.onChange(file);
+                                     setDocumentUploaded(true);
+                                   });
+                               } else {
+                                 field.onChange(undefined);
+                                 setDocumentUploaded(false);
+                               }
+                             }}
+                           />
+                         </FormControl>
+                         <div className="mt-3 p-3 bg-muted/30 rounded-lg">
+                           <p className="text-xs text-foreground font-medium mb-2">প্রমাণপত্র আপলোড করার নির্দেশনা:</p>
+                           <p className="text-xs text-muted-foreground leading-relaxed mb-2">
+                             আমাদের অ্যালামনাই কমিউনিটির নিরাপত্তা নিশ্চিত করতে, আপনার স্টুডেন্টশিপ প্রমাণের ডকুমেন্ট প্রয়োজন। সঠিক প্রমাণপত্র ছাড়া অ্যাকাউন্ট অনুমোদন করা সম্ভব হবে না।
+                           </p>
+                           <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+                             <li>SSC/HSC সার্টিফিকেট বা মার্কশিট</li>
+                             <li>স্কুলের পুরনো আইডি কার্ডের ছবি</li>
+                             <li>স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি</li>
+                             <li>যেকোনো ডকুমেন্ট যা প্রমাণ করে আপনি এই স্কুলের শিক্ষার্থী ছিলেন</li>
+                           </ul>
+                           <p className="text-xs text-muted-foreground mt-2 font-medium">
+                             সর্বোচ্চ 2 MB | JPG, PNG, HEIF, or Photo ফাইল গ্রহণযোগ্য
+                           </p>
+                         </div>
+                         <FormMessage className="text-xs md:text-sm" />
+                       </FormItem>
+                     )}
+                   />
                   
                   <Button 
                     type="submit" 
