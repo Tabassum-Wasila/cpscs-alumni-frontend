@@ -21,6 +21,7 @@ import PasswordStrengthIndicator from '@/components/PasswordStrengthIndicator';
 import ConfirmPasswordFeedback from '@/components/ConfirmPasswordFeedback';
 import HoverTooltip from '@/components/HoverTooltip';
 import SmartDocumentTooltip from '@/components/SmartDocumentTooltip';
+import ProofDocumentInstructions from '@/components/ProofDocumentInstructions';
 import { ImageUploadField } from '@/components/ImageUploadField';
 import { getSSCYears, getHSCYears, generateYears, getCurrentYear } from '@/utils/yearUtils';
 
@@ -238,34 +239,43 @@ const Signup = () => {
                 Create an account to connect with other CPSCS alumni
               </CardDescription>
             </CardHeader>
-            <CardContent className="px-4 md:px-6">
+            <CardContent className="px-6 md:px-8 py-6">
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
-                  <FormField
-                    control={form.control}
-                    name="fullName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm md:text-base">Full Name *</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Your full name" 
-                            {...field} 
-                            className="h-10 md:h-12 text-sm md:text-base"
-                          />
-                        </FormControl>
-                        <FormMessage className="text-xs md:text-sm" />
-                      </FormItem>
-                    )}
-                  />
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+                  {/* Personal Information Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Personal Information</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="fullName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-foreground">Full Name *</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Your full name" 
+                              {...field} 
+                              className="h-11 text-sm md:text-base"
+                            />
+                          </FormControl>
+                          <FormMessage className="text-xs md:text-sm" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField
-                       control={form.control}
-                       name="sscYear"
-                       render={({ field }) => (
-                         <FormItem>
-                           <FormLabel className="text-sm md:text-base">SSC Batch Year *</FormLabel>
+                  {/* Academic Information Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Academic Information</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="sscYear"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium text-foreground">SSC Batch Year *</FormLabel>
                            <Select 
                              onValueChange={field.onChange} 
                              defaultValue={field.value}
@@ -286,12 +296,12 @@ const Signup = () => {
                        )}
                      />
                      
-                     <FormField
-                       control={form.control}
-                       name="hscYear"
-                       render={({ field }) => (
-                         <FormItem>
-                           <FormLabel className="text-sm md:text-base">HSC Batch Year *</FormLabel>
+                      <FormField
+                        control={form.control}
+                        name="hscYear"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium text-foreground">HSC Batch Year *</FormLabel>
                            <Select 
                              onValueChange={field.onChange} 
                              defaultValue={field.value}
@@ -309,12 +319,12 @@ const Signup = () => {
                            </Select>
                            <FormMessage className="text-xs md:text-sm" />
                          </FormItem>
-                       )}
-                     />
-                   </div>
+                          )}
+                        />
+                      </div>
 
-                   <FormItem>
-                     <FormLabel className="text-sm md:text-base">From which year to which year did you attend this institution? *</FormLabel>
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium text-foreground">From which year to which year did you attend this institution? *</FormLabel>
                      <HoverTooltip 
                        tooltip="আপনি কোন সাল থেকে কোন সাল পর্যন্ত এখানে অধ্যয়ন করেছেন?"
                      >
@@ -324,7 +334,7 @@ const Signup = () => {
                            name="attendanceFromYear"
                            render={({ field }) => (
                              <FormItem>
-                               <FormLabel className="text-xs text-muted-foreground">From Year</FormLabel>
+                               <FormLabel className="text-xs text-muted-foreground font-medium">From Year</FormLabel>
                                <Select 
                                  onValueChange={field.onChange} 
                                  defaultValue={field.value}
@@ -350,7 +360,7 @@ const Signup = () => {
                            name="attendanceToYear"
                            render={({ field }) => (
                              <FormItem>
-                               <FormLabel className="text-xs text-muted-foreground">To Year</FormLabel>
+                               <FormLabel className="text-xs text-muted-foreground font-medium">To Year</FormLabel>
                                <Select 
                                  onValueChange={field.onChange} 
                                  defaultValue={field.value}
@@ -371,15 +381,20 @@ const Signup = () => {
                            )}
                          />
                        </div>
-                     </HoverTooltip>
-                   </FormItem>
+                      </HoverTooltip>
+                    </FormItem>
+                  </div>
                   
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm md:text-base">Phone Number *</FormLabel>
+                  {/* Contact Information Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Contact Information</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-foreground">Phone Number *</FormLabel>
                         <div className="flex space-x-2">
                           <FormField
                             control={form.control}
@@ -416,12 +431,12 @@ const Signup = () => {
                     )}
                   />
                   
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className="text-sm md:text-base">Email Address *</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-foreground">Email Address *</FormLabel>
                         <HoverTooltip 
                           tooltip="সঠিক ইমেইল এড্রেস লিখুন। আপনার রেজিস্ট্রেশনের সকল তথ্য এখানেই ইমেইল করা হবে। তাই, পুনরায় চেক করুন।"
                         >
@@ -438,18 +453,23 @@ const Signup = () => {
                             />
                           </FormControl>
                         </HoverTooltip>
-                        <FormMessage className="text-xs md:text-sm" />
-                      </FormItem>
-                    )}
-                  />
+                          <FormMessage className="text-xs md:text-sm" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm md:text-base">Create Password *</FormLabel>
+                  {/* Security Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Account Security</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium text-foreground">Create Password *</FormLabel>
                           <HoverTooltip 
                             tooltip="ভবিষ্যতে ব্যবহারের জন্য এই পাসওয়ার্ড-টি মনে রাখুন"
                           >
@@ -472,17 +492,17 @@ const Signup = () => {
                             </div>
                           </HoverTooltip>
                           <PasswordStrengthIndicator password={watchedPassword} />
-                          <FormMessage className="text-xs md:text-sm" />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="confirmPassword"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm md:text-base">Confirm Password *</FormLabel>
+                            <FormMessage className="text-xs md:text-sm" />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="confirmPassword"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-sm font-medium text-foreground">Confirm Password *</FormLabel>
                           <div className="relative">
                             <FormControl>
                               <Input 
@@ -504,45 +524,50 @@ const Signup = () => {
                               {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                             </button>
                           </div>
+                            <FormMessage className="text-xs md:text-sm" />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Profile Information Section */}
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Profile Information</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="profilePhoto"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <ImageUploadField
+                              title="Upload Profile Photo *"
+                              subtitle="অ্যাডমিন ভেরিফিকেশনের জন্য, অনুগ্রহ করে আপনার এমন একটি ছবি দিন, যেখানে আপনার মুখমণ্ডল স্পষ্টভাবে চেনা যায়।"
+                              type="profile"
+                              onImageSelect={(base64Image) => {
+                                if (base64Image) {
+                                  field.onChange(base64Image);
+                                  setProfilePhotoUploaded(true);
+                                } else {
+                                  field.onChange("");
+                                  setProfilePhotoUploaded(false);
+                                }
+                              }}
+                              currentImage={field.value}
+                            />
+                          </FormControl>
                           <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}
                     />
-                   </div>
-
-                   <FormField
-                     control={form.control}
-                     name="profilePhoto"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormControl>
-                           <ImageUploadField
-                             title="Upload Profile Photo *"
-                             subtitle="অ্যাডমিন ভেরিফিকেশনের জন্য, অনুগ্রহ করে আপনার এমন একটি ছবি দিন, যেখানে আপনার মুখমণ্ডল স্পষ্টভাবে চেনা যায়।"
-                             type="profile"
-                             onImageSelect={(base64Image) => {
-                               if (base64Image) {
-                                 field.onChange(base64Image);
-                                 setProfilePhotoUploaded(true);
-                               } else {
-                                 field.onChange("");
-                                 setProfilePhotoUploaded(false);
-                               }
-                             }}
-                             currentImage={field.value}
-                           />
-                         </FormControl>
-                         <FormMessage className="text-xs md:text-sm" />
-                       </FormItem>
-                     )}
-                   />
                    
-                   <FormField
-                     control={form.control}
-                     name="socialProfileLink"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormLabel className="text-sm md:text-base">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
+                    <FormField
+                      control={form.control}
+                      name="socialProfileLink"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm font-medium text-foreground">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
                          <HoverTooltip 
                            tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
                          >
@@ -565,61 +590,58 @@ const Signup = () => {
                              />
                            </FormControl>
                          </HoverTooltip>
-                         <FormMessage className="text-xs md:text-sm" />
-                       </FormItem>
-                     )}
-                   />
-                   
-                   <FormField
-                     control={form.control}
-                     name="proofDocument"
-                     render={({ field }) => (
-                       <FormItem>
-                         <FormControl>
-                           <ImageUploadField
-                             title="Upload Student Proof Image"
-                             subtitle="আমাদের এই প্ল্যাটফর্ম শুধুমাত্র প্রাক্তন ছাত্র-ছাত্রীদের জন্য। আপনি যে আমাদেরই একজন, তা নিশ্চিত করতে একটি প্রমাণপত্র প্রয়োজন। এরপরই আপনার অ্যাকাউন্টটি সক্রিয় করা হবে।"
-                             type="document"
-                             onImageSelect={(base64Image) => {
-                               if (base64Image) {
-                                 // Convert base64 to File object for compatibility
-                                 fetch(base64Image)
-                                   .then(res => res.blob())
-                                   .then(blob => {
-                                     const file = new File([blob], "proof_document.jpg", { type: "image/jpeg" });
-                                     field.onChange(file);
-                                     setDocumentUploaded(true);
-                                   });
-                               } else {
-                                 field.onChange(undefined);
-                                 setDocumentUploaded(false);
-                               }
-                             }}
-                           />
-                         </FormControl>
-                         <div className="mt-3 p-3 bg-muted/30 rounded-lg">
-                           <p className="text-xs text-foreground font-medium mb-2">প্রমাণপত্র আপলোড করার নির্দেশনা:</p>
-                           <p className="text-xs text-muted-foreground leading-relaxed mb-2">
-                             আমাদের অ্যালামনাই কমিউনিটির নিরাপত্তা নিশ্চিত করতে, আপনার স্টুডেন্টশিপ প্রমাণের ডকুমেন্ট প্রয়োজন। সঠিক প্রমাণপত্র ছাড়া অ্যাকাউন্ট অনুমোদন করা সম্ভব হবে না।
-                           </p>
-                           <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
-                             <li>SSC/HSC সার্টিফিকেট বা মার্কশিট</li>
-                             <li>স্কুলের পুরনো আইডি কার্ডের ছবি</li>
-                             <li>স্কুলের ক্যাম্পাসে বন্ধুদের সাথে তোলা ছবি</li>
-                             <li>যেকোনো ডকুমেন্ট যা প্রমাণ করে আপনি এই স্কুলের শিক্ষার্থী ছিলেন</li>
-                           </ul>
-                           <p className="text-xs text-muted-foreground mt-2 font-medium">
-                             সর্বোচ্চ 2 MB | JPG, PNG, HEIF, or Photo ফাইল গ্রহণযোগ্য
-                           </p>
-                         </div>
-                         <FormMessage className="text-xs md:text-sm" />
-                       </FormItem>
-                     )}
-                   />
+                          <FormMessage className="text-xs md:text-sm" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                    
+                  {/* Verification Section */}
+                  <div className="space-y-6">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Account Verification</h3>
+                    
+                    <FormField
+                      control={form.control}
+                      name="proofDocument"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <ImageUploadField
+                              title="Upload Student Proof Image"
+                              subtitle="আমাদের এই প্ল্যাটফর্ম শুধুমাত্র প্রাক্তন ছাত্র-ছাত্রীদের জন্য। আপনি যে আমাদেরই একজন, তা নিশ্চিত করতে একটি প্রমাণপত্রের ছবি প্রয়োজন।"
+                              type="document"
+                              onImageSelect={(base64Image) => {
+                                if (base64Image) {
+                                  // Convert base64 to File object for compatibility
+                                  fetch(base64Image)
+                                    .then(res => res.blob())
+                                    .then(blob => {
+                                      const file = new File([blob], "proof_document.jpg", { type: "image/jpeg" });
+                                      field.onChange(file);
+                                      setDocumentUploaded(true);
+                                    });
+                                } else {
+                                  field.onChange(undefined);
+                                  setDocumentUploaded(false);
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          
+                          <ProofDocumentInstructions 
+                            show={true} 
+                            hasFile={documentUploaded} 
+                          />
+                          
+                          <FormMessage className="text-xs md:text-sm" />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-cpscs-blue to-blue-700 h-12 md:h-14 text-sm md:text-base font-medium"
+                    className="w-full bg-gradient-to-r from-primary to-primary/80 h-12 md:h-14 text-sm md:text-base font-semibold mt-8"
                   >
                     Submit Request for Admin Approval
                   </Button>
