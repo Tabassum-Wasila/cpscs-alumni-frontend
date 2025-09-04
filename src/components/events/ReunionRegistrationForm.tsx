@@ -24,7 +24,7 @@ import PaymentFailureModal from './PaymentFailureModal';
 import { getSSCYears } from '@/utils/yearUtils';
 
 const formSchema = z.object({
-  sscYear: z.string({ required_error: "Please select your SSC batch year." }),
+  sscYear: z.string().min(1, "SSC batch year is required."),
   isCurrentStudent: z.boolean().default(false),
   
   // Gifts and Goodies - Required fields
@@ -366,7 +366,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                   name="sscYear"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>SSC Batch Year</FormLabel>
+                      <FormLabel>SSC Batch Year *</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
                         defaultValue={field.value}

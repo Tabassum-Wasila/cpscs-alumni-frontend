@@ -360,7 +360,7 @@ export class EventService {
       familyAndChildren: 1000,
       currentStudent: 0, // Free for current students
       youngAlumniDiscountEnabled: true,
-      currentStudentAttendanceEnabled: true,
+      currentStudentAttendanceEnabled: false, // Hidden by default - controlled by backend admin panel
       youngAlumniEligibleYears: { start: 2020, end: 2025 }
     };
     
@@ -444,7 +444,7 @@ export class EventService {
       familyAndChildren: 1000,
       currentStudent: 0, // N/A - Free for current students when enabled
       youngAlumniDiscountEnabled: true, // Can be controlled from backend admin panel
-      currentStudentAttendanceEnabled: true, // Can be controlled from backend admin panel
+      currentStudentAttendanceEnabled: false, // Hidden by default - controlled by backend admin panel
       youngAlumniEligibleYears: { start: 2020, end: 2025 }
     };
   }

@@ -22,12 +22,13 @@ export const getCurrentYear = (): number => {
 };
 
 /**
- * Generate SSC batch years from 1979 to current year
+ * Generate SSC batch years from 1979 to current year + 10
+ * This allows future students to select probable SSC years
  * @returns Array of SSC years as strings
  */
 export const getSSCYears = (): string[] => {
   const currentYear = getCurrentYear();
-  return generateYears(1979, currentYear);
+  return generateYears(1979, currentYear + 10);
 };
 
 /**

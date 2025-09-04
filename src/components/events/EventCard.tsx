@@ -127,7 +127,7 @@ const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </div>
 
           <div className="text-sm font-medium text-muted-foreground">
-            Registration Deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
+            Registration Deadline: {EventService.formatDateForDisplay(event.registrationDeadline)}
           </div>
           
           {/* Description preview with rich text support */}

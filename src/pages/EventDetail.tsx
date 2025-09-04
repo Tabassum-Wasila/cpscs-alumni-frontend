@@ -169,14 +169,14 @@ const EventDetail: React.FC = () => {
                   <div className="text-center py-4">
                     <Badge variant="outline" className="mb-4">Registration Closed</Badge>
                     <p className="text-muted-foreground">
-                      Registration deadline was {new Date(event.registrationDeadline).toLocaleDateString()}
+                      Registration deadline was {EventService.formatDateForDisplay(event.registrationDeadline)}
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <div className="text-center">
                       <p className="text-sm text-muted-foreground mb-4">
-                        Registration deadline: {new Date(event.registrationDeadline).toLocaleDateString()}
+                        Registration deadline: {EventService.formatDateForDisplay(event.registrationDeadline)}
                       </p>
                     </div>
                     
