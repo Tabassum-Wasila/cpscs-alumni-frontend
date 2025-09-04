@@ -49,8 +49,8 @@ const Login = () => {
           title: "Login Successful",
           description: "Welcome back to the CPSCS Alumni Portal!",
         });
-        // Redirect to My Profile instead of alumni directory by default
-        const defaultRedirect = `/profile/${result.user.id}`;
+        // Redirect to My Profile edit page instead of alumni directory by default
+        const defaultRedirect = "/complete-profile";
         navigate(from === "/alumni-directory" ? defaultRedirect : from);
       } else {
         toast({
