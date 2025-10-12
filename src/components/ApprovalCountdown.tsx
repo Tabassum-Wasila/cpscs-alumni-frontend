@@ -15,7 +15,7 @@ const ApprovalCountdown: React.FC<ApprovalCountdownProps> = ({
   onComplete, 
   onShowLogin 
 }) => {
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(3); // Previously 10 seconds
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
@@ -39,8 +39,9 @@ const ApprovalCountdown: React.FC<ApprovalCountdownProps> = ({
             Processing Your Request
           </CardTitle>
           <CardDescription>
-            An admin would check your form and approve your sign up if you are a genuine member. 
-            Please check your email for updates.
+            {/* An admin would check your form and approve your sign up if you are a genuine member. 
+            Please check your email for updates. */}
+            Please wait while we validate your details and set up your profile.
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
@@ -48,7 +49,7 @@ const ApprovalCountdown: React.FC<ApprovalCountdownProps> = ({
             {countdown}
           </div>
           <div className="text-sm text-gray-600">
-            Verifying your information...
+            Validating your information...
           </div>
         </CardContent>
       </Card>

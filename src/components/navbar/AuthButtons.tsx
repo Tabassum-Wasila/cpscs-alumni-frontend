@@ -25,7 +25,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
   if (isAuthenticated) {
     if (isMobile) {
       return <div className="flex gap-2 justify-end">
-          <Button variant="outline" size="sm" className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white px-3 py-1.5 text-xs h-8" asChild>
+          <Button variant="outline" size="sm" className="border-cpscs-green text-cpscs-green hover:bg-cpscs-green hover:text-white px-3 py-1.5 text-xs h-8" asChild>
             <Link to="/complete-profile">
               <User size={12} />
               <span>Profile</span>
@@ -39,7 +39,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
     }
     return <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm" className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-cpscs-gold/25">
+          <Button variant="outline" size="sm" className="border-[#587a33] text-[#587a33] hover:bg-[#587a33] hover:text-white transition-all duration-300 hover:shadow-lg hover:shadow-cpscs-/25 group" >
             <User size={16} />
             <span>{user?.fullName?.split(' ')[0] || 'Account'}</span>
           </Button>
@@ -61,7 +61,7 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
   }
   if (isMobile) {
     return <div className="flex gap-2 justify-end">
-        <Button variant="outline" size="sm" className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 group px-3 py-1.5 text-xs h-8" asChild>
+        <Button variant="outline" size="sm" className="border-cpscs-green text-cpscs-green hover:bg-cpscs-green hover:text-white transition-all duration-300 group px-3 py-1.5 text-xs h-8" asChild>
           <Link to="/login">
             <User size={12} className="transition-transform duration-300 group-hover:scale-110" />
             <span className="text-yellow-800">Log In</span>
@@ -78,10 +78,10 @@ const AuthButtons: React.FC<AuthButtonsProps> = ({
       </div>;
   }
   return <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" className="border-cpscs-gold text-cpscs-gold hover:bg-cpscs-gold hover:text-white transition-all duration-300 hover:shadow-md hover:shadow-cpscs-gold/20 group" asChild>
+      <Button variant="outline" size="sm" className="border-cpscs-green text-cpscs-green hover:bg-cpscs-green hover:text-white transition-all duration-300 hover:shadow-md hover:shadow-cpscs-green/20 group" asChild>
         <Link to="/login">
           <User size={16} className="transition-transform duration-300 group-hover:scale-110" />
-          <span className="text-fuchsia-700">Log In</span>
+          <span className="text-cpscs-green">Log In</span>
         </Link>
       </Button>
       <Button size="sm" className="bg-gradient-to-r from-cpscs-blue to-blue-700 hover:from-blue-700 hover:to-cpscs-blue transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:scale-105 group relative overflow-hidden" asChild>

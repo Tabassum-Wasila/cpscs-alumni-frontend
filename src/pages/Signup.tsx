@@ -44,20 +44,19 @@ const formSchema = z.object({
     }),
   confirmPassword: z.string().min(1, { message: "Please confirm your password." }),
   profilePhoto: z.string().min(1, { message: "Please upload a profile photo." }),
-  socialProfileLink: z.string()
-    .min(1, { message: "Please enter your social profile link." })
-    .refine((url) => {
-      const cleanUrl = url.toLowerCase().trim();
-      // More relaxed validation - just check for basic URL structure
-      return (
-        cleanUrl.includes('facebook.com') ||
-        cleanUrl.includes('linkedin.com') ||
-        cleanUrl.includes('twitter.com') ||
-        cleanUrl.includes('instagram.com') ||
-        /^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
-      );
-    }, { message: "Please enter a valid social media profile URL." }),
-  proofDocument: z.instanceof(File).optional(), // Made optional
+  socialProfileLink: z.string().optional().refine((url) => {
+    // Make field optional; if present validate its structure
+    if (!url || url.trim() === '') return true;
+    const cleanUrl = url.toLowerCase().trim();
+    return (
+      cleanUrl.includes('facebook.com') ||
+      cleanUrl.includes('linkedin.com') ||
+      cleanUrl.includes('twitter.com') ||
+      cleanUrl.includes('instagram.com') ||
+      /^(www\.)?[\w\-]+(\.[\w\-]+)+.*$/.test(cleanUrl)
+    );
+  }, { message: "Please enter a valid social media profile URL." }),
+  proofDocument: z.string().optional(), // Store as base64 string, optional
 }).refine(data => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -97,7 +96,7 @@ const Signup = () => {
       password: "",
       confirmPassword: "",
       profilePhoto: "",
-      socialProfileLink: "",
+  socialProfileLink: "",
     }
   });
 
@@ -177,6 +176,7 @@ const Signup = () => {
         phoneNumber: formData.phoneNumber,
         profilePhoto: formData.profilePhoto,
         socialProfileLink: formData.socialProfileLink,
+        proofDocument: formData.proofDocument,
       });
       
       if (!success) {
@@ -567,7 +567,7 @@ const Signup = () => {
                       name="socialProfileLink"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-sm font-medium text-foreground">Social Profile Link (Facebook/LinkedIn) *</FormLabel>
+                          <FormLabel className="text-sm font-medium text-foreground">Social Profile Link (Facebook/LinkedIn)</FormLabel>
                          <HoverTooltip 
                            tooltip="আপনার পাবলিক প্রোফাইল দেখে চেক করার পর আপনার একাউন্ট এপ্রুভ করা হবে।"
                          >
@@ -612,27 +612,20 @@ const Signup = () => {
                               type="document"
                               onImageSelect={(base64Image) => {
                                 if (base64Image) {
-                                  // Convert base64 to File object for compatibility
-                                  fetch(base64Image)
-                                    .then(res => res.blob())
-                                    .then(blob => {
-                                      const file = new File([blob], "proof_document.jpg", { type: "image/jpeg" });
-                                      field.onChange(file);
-                                      setDocumentUploaded(true);
-                                    });
+                                  field.onChange(base64Image);
+                                  setDocumentUploaded(true);
                                 } else {
-                                  field.onChange(undefined);
+                                  field.onChange("");
                                   setDocumentUploaded(false);
                                 }
                               }}
+                              currentImage={field.value}
                             />
                           </FormControl>
-                          
                           <ProofDocumentInstructions 
                             show={true} 
                             hasFile={documentUploaded} 
                           />
-                          
                           <FormMessage className="text-xs md:text-sm" />
                         </FormItem>
                       )}

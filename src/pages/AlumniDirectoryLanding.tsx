@@ -57,7 +57,7 @@ const AlumniDirectoryLanding = () => {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            {/* <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Button 
                 onClick={() => navigate('/login')}
                 size="lg"
@@ -75,7 +75,7 @@ const AlumniDirectoryLanding = () => {
                 <UserPlus className="mr-2 h-5 w-5" />
                 Join Our Community
               </Button>
-            </div>
+            </div> */}
           </div>
 
           {/* Stats Section */}

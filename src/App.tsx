@@ -25,6 +25,7 @@ import ReunionCommittee from "./pages/ReunionCommittee";
 import ProtectedRoute from "./components/ProtectedRoute";
 import HallOfFame from "./pages/HallOfFame";
 import NoticeBoard from "./pages/NoticeBoard";
+import BkashPaymentReturn from "./components/payment/BkashPaymentReturn";
 
 const AppContent = () => {
   return (
@@ -34,6 +35,7 @@ const AppContent = () => {
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/events" element={<Events />} />
         <Route path="/events/:id" element={<EventDetail />} />
+        <Route path="/events/reunion-payment-return" element={<BkashPaymentReturn />} />
         <Route path="/alumni-directory" element={
           <ProtectedRoute>
             <AlumniDirectory />

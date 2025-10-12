@@ -16,6 +16,7 @@ export interface SignupData {
   phoneNumber: string;
   profilePhoto: string;
   socialProfileLink: string;
+  proofDocument?: string;
 }
 
 export type User = {
@@ -78,31 +79,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; user?: User }> => {
-    const loggedInUser = await AuthService.login({ email, password });
-    if (loggedInUser) {
-      setUser(loggedInUser);
-      return { success: true, user: loggedInUser };
+    try {
+      const result = await AuthService.login({ email, password });
+      if (result) {
+        setUser(result.user);
+        return { success: true, user: result.user };
+      }
+      return { success: false };
+    } catch (error) {
+      console.error('Login error:', error);
+      return { success: false };
     }
-    return { success: false };
   };
 
   const signup = async (userData: SignupData): Promise<boolean> => {
-    const newUser = await AuthService.signup(userData);
-    if (newUser) {
-      setUser(newUser);
-      return true;
+    try {
+      const result = await AuthService.register({
+        fullName: userData.fullName,
+        email: userData.email,
+        password: userData.password,
+        passwordConfirmation: userData.password, // Use the same password for confirmation
+        sscYear: userData.sscYear,
+        hscYear: userData.hscYear,
+        attendanceFromYear: userData.attendanceFromYear,
+        attendanceToYear: userData.attendanceToYear,
+        countryCode: userData.countryCode,
+        phoneNumber: userData.phoneNumber,
+        socialProfileLink: userData.socialProfileLink,
+        profilePhoto: userData.profilePhoto,
+        proofDocument: userData.proofDocument,
+      });
+      
+      if (result) {
+        setUser(result.user);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Signup error:', error);
+      return false;
     }
-    return false;
   };
 
   const updateUserProfile = async (profileData: Partial<UserProfile>): Promise<boolean> => {
     if (!user) return false;
     
-    const updatedUser = await UserService.updateProfile(user.id, profileData);
-    if (updatedUser) {
-      setUser(updatedUser);
-      return true;
+    try {
+      const updatedUser = await UserService.updateProfile(user.id, profileData);
+      if (updatedUser) {
+        setUser(updatedUser);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Update profile error:', error);
+      return false;
     }
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      await AuthService.logout();
+      setUser(null);
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Still clear user state even if API call fails
+      setUser(null);
+    }
+  };
+
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    // This will need to be implemented as an API endpoint
+    // For now, return false as a placeholder
+    console.log('checkEmailExists not implemented for API yet:', email);
     return false;
   };
   
@@ -134,21 +183,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
-    AuthService.logout();
-    setUser(null);
-  };
-
-  const checkEmailExists = async (email: string): Promise<boolean> => {
-    return await AuthService.checkEmailExists(email);
-  };
-
   const getAdminSettings = () => {
     return { manualApproval: true };
   };
 
   const setAdminSettings = async (settings: { manualApproval: boolean }) => {
-    await AuthService.setAdminSettings(settings);
+    // This will need to be implemented as an API endpoint
+    console.log('setAdminSettings not implemented for API yet:', settings);
   };
 
   const getPendingApprovals = () => {
@@ -156,11 +197,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const approveUser = async (userId: string): Promise<boolean> => {
-    return await AuthService.approveUser(userId);
+    // This will need to be implemented as an API endpoint
+    console.log('approveUser not implemented for API yet:', userId);
+    return true;
   };
 
   const rejectUser = async (userId: string): Promise<boolean> => {
-    return await AuthService.rejectUser(userId);
+    // This will need to be implemented as an API endpoint
+    console.log('rejectUser not implemented for API yet:', userId);
+    return true;
   };
 
   return (

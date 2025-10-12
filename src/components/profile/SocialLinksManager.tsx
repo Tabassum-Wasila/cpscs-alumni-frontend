@@ -36,7 +36,7 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
 
     const updated = {
       ...socialLinks,
-      [newPlatform]: newUrl
+      [newPlatform]: ensureHttpPrefix(newUrl)
     };
     
     onChange(updated);
@@ -48,6 +48,15 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
     const updated = { ...socialLinks };
     delete updated[platform as keyof typeof updated];
     onChange(updated);
+  };
+
+  const ensureHttpPrefix = (url: string): string => {
+    if (!url) return url;
+    url = url.trim();
+    // Don't add prefix if it already has http:// or https://
+    if (url.match(/^https?:\/\//i)) return url;
+    // Add https:// prefix
+    return `https://${url}`;
   };
 
   const updateSocialLink = (platform: string, url: string) => {
@@ -80,6 +89,8 @@ const SocialLinksManager: React.FC<SocialLinksManagerProps> = ({
       <div className="space-y-3">
         {activePlatforms.map(([platform, url]) => {
           const platformConfig = SOCIAL_PLATFORMS.find(p => p.key === platform);
+          // Log for debugging
+          console.log(`Social link - ${platform}:`, url);
           return (
             <div key={platform} className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg border">
               <div className="flex items-center space-x-2 flex-1">

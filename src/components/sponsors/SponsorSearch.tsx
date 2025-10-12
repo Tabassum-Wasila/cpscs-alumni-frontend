@@ -37,7 +37,7 @@ const SponsorSearch: React.FC<SponsorSearchProps> = ({ onFiltersChange, totalCou
     const filters: SponsorFilters = {
       searchQuery,
       sortBy: selectedSort,
-      category: selectedCategory || undefined,
+      category: selectedCategory === 'all' ? undefined : selectedCategory,
       ...partialFilters
     };
     onFiltersChange(filters);

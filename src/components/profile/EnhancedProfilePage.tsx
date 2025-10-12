@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import DateOfBirthPicker from './DateOfBirthPicker';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Edit, Save, Camera, User, Briefcase, GraduationCap, 
@@ -65,6 +66,7 @@ const EnhancedProfilePage = () => {
     country: '',
     permanentAddress: '',
     sameAsCurrentAddress: false,
+    countryCode: '+880', // <-- add countryCode
     phoneNumber: '',
     showPhone: true,
     dateOfBirth: '',
@@ -129,6 +131,7 @@ const EnhancedProfilePage = () => {
         country: currentUser.profile.country || '',
         permanentAddress: currentUser.profile.permanentAddress || '',
         sameAsCurrentAddress: currentUser.profile.sameAsCurrentAddress || false,
+        countryCode: currentUser.profile.countryCode || '+880', // <-- expect from backend
         phoneNumber: currentUser.profile.phoneNumber || '',
         showPhone: currentUser.profile.showPhone ?? true,
         dateOfBirth: currentUser.profile.dateOfBirth || '',
@@ -143,6 +146,7 @@ const EnhancedProfilePage = () => {
         workExperience: currentUser.profile.workExperience || [],
         profileCompletionScore: currentUser.profile.profileCompletionScore || 0
       });
+      setCountryCode(currentUser.profile.countryCode || '+880'); // keep UI in sync
       setHasUnsavedChanges(false);
     }
   }, [currentUser]);
@@ -478,8 +482,8 @@ Contact: ${user.email}`);
                     
                     <div className="flex space-x-2">
                       <CountryCodeSelect
-                        value={countryCode}
-                        onValueChange={setCountryCode}
+                        value={profileData.countryCode}
+                        onValueChange={val => { setCountryCode(val); updateField('countryCode', val); }}
                         className="w-24"
                       />
                       <Input
@@ -504,35 +508,7 @@ Contact: ${user.email}`);
                   </div>
 
                   {/* Date of Birth */}
-                  <div className="space-y-2">
-                    <Label>Date of Birth</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !selectedDate && "text-muted-foreground"
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          onSelect={handleDateChange}
-                          disabled={(date) =>
-                            date > new Date() || date < new Date("1950-01-01")
-                          }
-                          initialFocus
-                          className={cn("p-3 pointer-events-auto")}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
+                  <DateOfBirthPicker value={selectedDate} onChange={handleDateChange} />
 
                   {/* Expertise */}
                   <div className="space-y-3">

@@ -1,11 +1,21 @@
 import { OTPService } from './otpService';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '../config/api';
+import { profile } from 'console';
 
 export interface SignupFormData {
   fullName: string;
   email: string;
   password: string;
+  passwordConfirmation: string;
   sscYear: string;
   hscYear: string;
+  attendanceFromYear: string;
+  attendanceToYear: string;
+  countryCode: string;
+  phoneNumber: string;
+  profilePhoto?: string;
+  socialProfileLink?: string;
+  proofDocument?: string;
 }
 
 export interface LoginCredentials {
@@ -13,31 +23,25 @@ export interface LoginCredentials {
   password: string;
 }
 
-export interface SignupData {
-  fullName: string;
-  email: string;
-  password: string;
-  sscYear: string;
-  hscYear: string;
-  attendanceFromYear: string;
-  attendanceToYear: string;
-  countryCode: string;
-  phoneNumber: string;
-  profilePhoto: string;
-  socialProfileLink: string;
-}
-
 export interface User {
   id: string;
   fullName: string;
   email: string;
-  password?: string;
   sscYear: string;
   hscYear: string;
-  dateJoined: string;
-  hasMembership: boolean;
+  attendanceFromYear?: string;
+  attendanceToYear?: string;
+  profilePhoto?: string;
   isAuthenticated: boolean;
-  profile: UserProfile;
+  isAdmin?: boolean;
+  isDemoUser?: boolean;
+  profile?: UserProfile;
+  hasMembership: boolean;
+  dateJoined: string;
+  approvalStatus?: 'pending' | 'approved' | 'rejected';
+  socialProfileLink?: string;
+  countryCode?: string;
+  phoneNumber?: string;
 }
 
 export type UserProfile = {
@@ -93,6 +97,20 @@ export type WorkExperience = {
 };
 
 export class AuthService {
+  // Token management
+  static getToken(): string | null {
+    return localStorage.getItem('auth_token');
+  }
+
+  static setToken(token: string): void {
+    localStorage.setItem('auth_token', token);
+  }
+
+  static removeToken(): void {
+    localStorage.removeItem('auth_token');
+  }
+
+  // User management
   static getCurrentUser(): User | null {
     const userJson = localStorage.getItem('cpscs_user');
     if (userJson) {
@@ -106,28 +124,223 @@ export class AuthService {
     return null;
   }
 
-  static isLoggedIn(): boolean {
-    return !!AuthService.getCurrentUser();
+  static setCurrentUser(user: User): void {
+    localStorage.setItem('cpscs_user', JSON.stringify(user));
   }
 
+  static isLoggedIn(): boolean {
+    return !!(AuthService.getCurrentUser() && AuthService.getToken());
+  }
+
+  // API Methods
+  static async login(credentials: LoginCredentials): Promise<{ user: User; token: string } | null> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.LOGIN), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
+      }
+
+      const data = await response.json();
+      
+      // Store token and user data
+      AuthService.setToken(data.token);
+      AuthService.setCurrentUser(data.user);
+      
+      return { user: data.user, token: data.token };
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
+    }
+  }
+
+  static async register(userData: SignupFormData): Promise<{ user: User; token: string } | null> {
+    try {
+      // Transform camelCase to snake_case for API
+      const apiData = {
+        full_name: userData.fullName,
+        email: userData.email,
+        password: userData.password,
+        password_confirmation: userData.passwordConfirmation,
+        ssc_year: userData.sscYear,
+        hsc_year: userData.hscYear,
+        phone_number: userData.phoneNumber,
+        country_code: userData.countryCode,
+        profile_photo: userData.profilePhoto,
+        social_profile_link: userData.socialProfileLink,
+        proof_document: userData.proofDocument,
+
+        // Optional fields that might not be in SignupFormData
+        ...(userData.attendanceFromYear && { attendance_from_year: userData.attendanceFromYear }),
+        ...(userData.attendanceToYear && { attendance_to_year: userData.attendanceToYear }),
+      };
+
+      console.log('Sending registration data:', apiData); // Debug log
+
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.REGISTER), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Registration error response:', errorData); // Debug log
+        throw new Error(errorData.message || 'Registration failed');
+      }
+
+      const data = await response.json();
+      
+      // Store token and user data
+      AuthService.setToken(data.token);
+      AuthService.setCurrentUser(data.user);
+      
+      return { user: data.user, token: data.token };
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
+    }
+  }
+
+  static async logout(): Promise<void> {
+    try {
+      const token = AuthService.getToken();
+      if (token) {
+        await fetch(getApiUrl(API_CONFIG.ENDPOINTS.LOGOUT), {
+          method: 'POST',
+          headers: getAuthHeaders(token),
+        });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Always clear local storage
+      AuthService.removeToken();
+      localStorage.removeItem('cpscs_user');
+    }
+  }
+
+  static async refreshToken(): Promise<string | null> {
+    try {
+      const token = AuthService.getToken();
+      if (!token) return null;
+
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.REFRESH), {
+        method: 'POST',
+        headers: getAuthHeaders(token),
+      });
+
+      if (!response.ok) {
+        throw new Error('Token refresh failed');
+      }
+
+      const data = await response.json();
+      AuthService.setToken(data.token);
+      
+      return data.token;
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      // If refresh fails, logout the user
+      await AuthService.logout();
+      return null;
+    }
+  }
+
+  static async getCurrentUserFromAPI(): Promise<User | null> {
+    try {
+      const token = AuthService.getToken();
+      if (!token) return null;
+
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ME), {
+        method: 'GET',
+        headers: getAuthHeaders(token),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired, try to refresh
+          const newToken = await AuthService.refreshToken();
+          if (newToken) {
+            // Retry with new token
+            return AuthService.getCurrentUserFromAPI();
+          }
+        }
+        throw new Error('Failed to fetch current user');
+      }
+
+      const data = await response.json();
+      AuthService.setCurrentUser(data.user);
+      
+      return data.user;
+    } catch (error) {
+      console.error("Get current user error:", error);
+      return null;
+    }
+  }
+
+  static async forgotPassword(email: string): Promise<void> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.FORGOT_PASSWORD), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to send reset email');
+      }
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      throw error;
+    }
+  }
+
+  static async resetPassword(email: string, token: string, password: string, passwordConfirmation: string): Promise<void> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.RESET_PASSWORD), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          token,
+          password,
+          passwordConfirmation,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Password reset failed');
+      }
+    } catch (error) {
+      console.error("Reset password error:", error);
+      throw error;
+    }
+  }
+
+  // Legacy methods for backward compatibility (will be deprecated)
   static updateUser(user: User): void {
-    localStorage.setItem('cpscs_user', JSON.stringify(user));
+    AuthService.setCurrentUser(user);
   }
 
   static updateStoredUser(updatedUser: User): boolean {
     try {
-      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      const userIndex = storedUsers.findIndex((user: User) => user.id === updatedUser.id);
-
-      if (userIndex !== -1) {
-        storedUsers[userIndex] = updatedUser;
-        localStorage.setItem('cpscs_users', JSON.stringify(storedUsers));
-        AuthService.updateUser(updatedUser);
-        return true;
-      } else {
-        console.warn('User not found in stored users.');
-        return false;
-      }
+      AuthService.setCurrentUser(updatedUser);
+      return true;
     } catch (error) {
       console.error('Error updating stored user:', error);
       return false;
@@ -139,12 +352,17 @@ export class AuthService {
       id: crypto.randomUUID(),
       fullName: userData.fullName,
       email: userData.email,
-      password: userData.password,
       sscYear: userData.sscYear,
       hscYear: userData.hscYear,
+      attendanceFromYear: userData.attendanceFromYear,
+      attendanceToYear: userData.attendanceToYear,
       dateJoined: new Date().toISOString(),
       hasMembership: false,
       isAuthenticated: false,
+      profilePhoto: userData.profilePhoto || '',
+      countryCode: userData.countryCode,
+      phoneNumber: userData.phoneNumber,
+      socialProfileLink: userData.socialProfileLink,
       profile: {
         profilePicture: userData.profilePhoto || '',
         bio: '',
@@ -163,7 +381,7 @@ export class AuthService {
         mentorshipAreas: [],
         education: [{
           id: crypto.randomUUID(),
-          institution: 'Chittagong Physical Training College',
+          institution: 'Cantonment Public School and College',
           degree: 'SSC',
           graduationYear: userData.sscYear,
           isDefault: true
@@ -173,158 +391,5 @@ export class AuthService {
     };
 
     return newUser;
-  }
-
-  static logout(): void {
-    localStorage.removeItem('cpscs_user');
-  }
-
-  static async login(credentials: LoginCredentials): Promise<User | null> {
-    try {
-      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      const user = storedUsers.find((u: User) => 
-        u.email === credentials.email && u.password === credentials.password
-      );
-      
-      if (user) {
-        const authenticatedUser = { ...user, isAuthenticated: true };
-        AuthService.updateUser(authenticatedUser);
-        return authenticatedUser;
-      }
-      return null;
-    } catch (error) {
-      console.error("Login error:", error);
-      return null;
-    }
-  }
-
-
-  static async signup(userData: SignupData): Promise<User | null> {
-    try {
-      console.log('Starting signup process with data:', { 
-        fullName: userData.fullName, 
-        email: userData.email,
-        sscYear: userData.sscYear,
-        hscYear: userData.hscYear,
-        attendanceFromYear: userData.attendanceFromYear,
-        attendanceToYear: userData.attendanceToYear
-      });
-      
-      // Load existing users and check for duplicates
-      const storedUsers = localStorage.getItem('cpscs_users');
-      const users = storedUsers ? JSON.parse(storedUsers) : [];
-      
-      const existingUser = users.find((user: User) => user.email.toLowerCase() === userData.email.toLowerCase());
-      if (existingUser) {
-        console.log('User already exists with email:', userData.email);
-        return null;
-      }
-      
-      // Create new user
-      const newUser = this.createUser(userData);
-      users.push(newUser);
-      localStorage.setItem('cpscs_users', JSON.stringify(users));
-      
-      // Set as authenticated and update current user
-      const authenticatedUser = { ...newUser, isAuthenticated: true };
-      AuthService.updateUser(authenticatedUser);
-      
-      console.log('New user created successfully:', { id: newUser.id, email: newUser.email });
-      return authenticatedUser;
-    } catch (error) {
-      console.error('Signup error:', error);
-      return null;
-    }
-  }
-
-  static async checkEmailExists(email: string): Promise<boolean> {
-    try {
-      const users = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      return users.some((u: User) => u.email === email);
-    } catch (error) {
-      console.error("Check email error:", error);
-      return false;
-    }
-  }
-
-  static async sendPasswordResetOTP(email: string): Promise<{ success: boolean; message: string }> {
-    return await OTPService.sendPasswordResetOTP(email);
-  }
-
-  static async verifyPasswordResetOTP(email: string, otp: string): Promise<{ success: boolean; message: string }> {
-    const isValid = OTPService.verifyOTP(email, otp, 'password-reset');
-    return {
-      success: isValid,
-      message: isValid ? 'OTP verified successfully' : 'Invalid or expired OTP'
-    };
-  }
-
-  static async resetPassword(email: string, otp: string, newPassword: string): Promise<{ success: boolean; message: string }> {
-    try {
-      // First verify the OTP
-      const otpValid = OTPService.verifyOTP(email, otp, 'password-reset');
-      if (!otpValid) {
-        return {
-          success: false,
-          message: 'Invalid or expired OTP'
-        };
-      }
-
-      // Update password
-      const users = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      const userIndex = users.findIndex((u: User) => u.email === email);
-      
-      if (userIndex === -1) {
-        return {
-          success: false,
-          message: 'User not found'
-        };
-      }
-
-      users[userIndex].password = newPassword;
-      localStorage.setItem('cpscs_users', JSON.stringify(users));
-      
-      // Remove the used OTP
-      OTPService.removeOTP(email, 'password-reset');
-      
-      return {
-        success: true,
-        message: 'Password reset successfully'
-      };
-    } catch (error) {
-      console.error("Reset password error:", error);
-      return {
-        success: false,
-        message: 'Failed to reset password'
-      };
-    }
-  }
-
-  static async getAdminSettings(): Promise<any> {
-    // Mock admin settings
-    return { approvalRequired: true };
-  }
-
-  static async setAdminSettings(settings: any): Promise<boolean> {
-    // Mock admin settings update
-    console.log("Admin settings updated:", settings);
-    return true;
-  }
-
-  static async getPendingApprovals(): Promise<User[]> {
-    // Mock pending approvals
-    return [];
-  }
-
-  static async approveUser(userId: string): Promise<boolean> {
-    // Mock user approval
-    console.log("User approved:", userId);
-    return true;
-  }
-
-  static async rejectUser(userId: string): Promise<boolean> {
-    // Mock user rejection
-    console.log("User rejected:", userId);
-    return true;
   }
 }

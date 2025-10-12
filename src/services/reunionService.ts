@@ -1,38 +1,44 @@
 import { delay } from '@/lib/utils';
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '@/config/api';
 
 export interface ReunionData {
-  is_reunion: boolean;
-  is_active: boolean;
-  event_date: string;
-  event_id: string;
-  registration_url?: string;
+  isReunion: boolean;
+  isActive: boolean;
+  eventDate: string;
+  eventId: string;
+  registrationUrl?: string | null;
   title?: string;
 }
 
 class ReunionService {
-  private baseUrl = '/api';
-
   async getActiveReunion(): Promise<ReunionData | null> {
     try {
-      // TODO: Replace with actual Laravel API endpoint
-      // const response = await fetch(`${this.baseUrl}/reunion/active`);
-      // if (!response.ok) throw new Error('Failed to fetch reunion data');
-      // return await response.json();
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ACTIVE_REUNION), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
 
-      // Mock data for development - replace with actual API call
+      if (!response.ok) {
+        throw new Error(`Failed to fetch active reunion: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error fetching active reunion:', error);
+      
+      // Fallback to mock data for development
       await delay(500); // Simulate API delay
       
-      // Mock active reunion data
+      // Mock active reunion data matching the new API response structure
       return {
-        is_reunion: true,
-        is_active: true,
-        event_date: 'December 25, 2025 09:00:00',
-        event_id: 'reunion-2025',
+        isReunion: true,
+        isActive: true,
+        eventDate: '2025-12-26',
+        eventId: '10',
+        registrationUrl: null,
         title: 'Grand Alumni Reunion 2025'
       };
-    } catch (error) {
-      console.error('Error fetching reunion data:', error);
-      return null;
     }
   }
 }

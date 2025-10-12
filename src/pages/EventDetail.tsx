@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { Calendar, Clock, MapPin, Users, ExternalLink, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,23 +19,26 @@ const EventDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [event, setEvent] = useState<Event | null>(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  useEffect(() => {
-    if (id) {
-      // DUMMY DATA - Replace with API call
-      const mockEvents = EventService.getMockEvents();
-      const foundEvent = mockEvents.find(e => e.id === id);
-      if (foundEvent) {
-        setEvent({
-          ...foundEvent,
-          status: EventService.getEventStatus(foundEvent.date, foundEvent.registrationDeadline)
-        });
+  // Fetch event data using React Query
+  const { data: event, isLoading, error } = useQuery({
+    queryKey: ['event', id],
+    queryFn: async () => {
+      if (!id) return null;
+      const eventData = await EventService.getEventById(id);
+      if (eventData) {
+        return {
+          ...eventData,
+          status: EventService.getEventStatus(eventData.date, eventData.registrationDeadline)
+        };
       }
-    }
-  }, [id]);
+      return null;
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Check for registration completion on window focus (for external forms)
   useEffect(() => {
@@ -65,13 +69,33 @@ const EventDetail: React.FC = () => {
     }
   };
 
-  if (!event) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-grow pt-24 pb-16 bg-background flex items-center justify-center">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Event not found</h2>
+            <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading event...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !event) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-grow pt-24 pb-16 bg-background flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-4">
+              {error ? 'Failed to load event' : 'Event not found'}
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              {error ? 'Please try again later.' : 'The event you are looking for does not exist.'}
+            </p>
             <Button onClick={() => navigate('/events')}>Back to Events</Button>
           </div>
         </div>
@@ -181,7 +205,7 @@ const EventDetail: React.FC = () => {
                     </div>
                     
                     {/* Special Reunion Registration Form */}
-                    {event.isSpecialEvent && event.id === 'grand-reunion-2025' ? (
+                    {event.isSpecialEvent && event.title === "Grand Alumni Reunion 2025" ? (
                       user ? (
                         <ReunionRegistrationForm 
                           eventId={event.id} 

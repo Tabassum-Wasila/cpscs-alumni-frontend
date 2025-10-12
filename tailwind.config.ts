@@ -69,6 +69,7 @@ export default {
 				'cpscs-gold': '#FFD700',
 				'cpscs-light': '#F5F5F7',
 				'cpscs-dark': '#1A1F2C',
+				'cpscs-green': '#587A33',
 			},
 			fontFamily: {
 				'sans': ['Inter', 'system-ui', 'sans-serif'],

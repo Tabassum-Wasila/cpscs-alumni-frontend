@@ -17,6 +17,7 @@ const CompleteProfile = () => {
   const from = location.state?.from || "/alumni-directory";
   
   const getProfileCompletion = (): { percentage: number; isComplete: boolean } => {
+    console.log("User in CompleteProfile:", user);
     if (!user) return { percentage: 0, isComplete: false };
     const percentage = UserService.calculateProfileCompletion(user);
     return { percentage, isComplete: percentage >= 80 };

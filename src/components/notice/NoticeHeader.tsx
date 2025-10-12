@@ -20,6 +20,10 @@ const NoticeHeader: React.FC<NoticeHeaderProps> = ({ filters, onFiltersChange, t
     onFiltersChange({ ...filters, sortBy: value as NoticeFilters['sortBy'] });
   };
 
+  const handleCategoryChange = (value: string) => {
+    onFiltersChange({ ...filters, category: value === 'all' ? undefined : value });
+  };
+
 
   return (
     <div className="bg-background/80 backdrop-blur-sm border-b border-border/50 py-4 px-6 sticky top-0 z-40">
@@ -42,6 +46,20 @@ const NoticeHeader: React.FC<NoticeHeaderProps> = ({ filters, onFiltersChange, t
             {totalNotices} notice{totalNotices !== 1 ? 's' : ''}
           </span>
 
+          {/* Category Filter */}
+          <Select value={filters.category || 'all'} onValueChange={handleCategoryChange}>
+            <SelectTrigger className="w-36 h-9 text-sm">
+              <Filter className="h-3 w-3 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              <SelectItem value="announcement">Announcement</SelectItem>
+              <SelectItem value="event">Event</SelectItem>
+              <SelectItem value="general">General</SelectItem>
+              <SelectItem value="spotlight">Spotlight</SelectItem>
+            </SelectContent>
+          </Select>
 
           {/* Sort */}
           <Select value={filters.sortBy} onValueChange={handleSortChange}>

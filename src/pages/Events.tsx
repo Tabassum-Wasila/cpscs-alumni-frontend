@@ -28,16 +28,26 @@ const Events = () => {
     queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
-  // Load events (will be replaced with API call)
+  // Fetch events using React Query
+  const { data: eventsData = [], isLoading: eventsLoading, error: eventsError } = useQuery({
+    queryKey: ['events'],
+    queryFn: async () => {
+      const events = await EventService.getMockEvents();
+      // Update status based on current date
+      return events.map(event => ({
+        ...event,
+        status: EventService.getEventStatus(event.date, event.registrationDeadline)
+      }));
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // Update local state when data changes
   useEffect(() => {
-    const mockEvents = EventService.getMockEvents();
-    // Update status based on current date
-    const eventsWithStatus = mockEvents.map(event => ({
-      ...event,
-      status: EventService.getEventStatus(event.date, event.registrationDeadline)
-    }));
-    setEvents(eventsWithStatus);
-  }, []);
+    if (eventsData) {
+      setEvents(eventsData);
+    }
+  }, [eventsData]);
 
   // Filter events based on search and filters
   useEffect(() => {
@@ -123,8 +133,33 @@ const Events = () => {
             </div>
           </div>
 
-          {/* Events Grid/List */}
-          {filteredEvents.length === 0 ? (
+          {/* Loading State */}
+          {eventsLoading && (
+            <div className="text-center py-16">
+              <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Loading events...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {eventsError && !eventsLoading && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold mb-2 text-destructive">Failed to Load Events</h3>
+              <p className="text-muted-foreground mb-4">
+                We're having trouble loading the events. Please try again later.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+              >
+                Retry
+              </Button>
+            </div>
+          )}
+
+          {/* No Events State */}
+          {!eventsLoading && !eventsError && filteredEvents.length === 0 && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">📅</div>
               <h3 className="text-xl font-semibold mb-2">No events found</h3>
@@ -134,7 +169,10 @@ const Events = () => {
                   : 'Check back soon for upcoming events!'}
               </p>
             </div>
-          ) : (
+          )}
+
+          {/* Events Grid/List */}
+          {!eventsLoading && !eventsError && filteredEvents.length > 0 && (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredEvents.map((event) => (
                 <EventCard key={event.id} event={event} />

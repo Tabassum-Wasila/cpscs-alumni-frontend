@@ -6,12 +6,12 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import VipSponsorBanner from '../components/VipSponsorBanner';
 import { bannerService } from '../services/bannerService';
-import { Bell } from 'lucide-react';
+import { NoticesService } from '../services/noticesService';
+import { Bell, Loader2 } from 'lucide-react';
 import NoticeCard from '../components/notice/NoticeCard';
 import NoticeModal from '../components/notice/NoticeModal';
 import NoticeHeader from '../components/notice/NoticeHeader';
 import { Notice, NoticeFilters } from '../types/notice';
-import { sampleNotices } from '../data/noticesData';
 
 const NoticeBoard = () => {
   const location = useLocation();
@@ -28,9 +28,18 @@ const NoticeBoard = () => {
     queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
+  // Fetch notices data from API
+  const { data: noticesData, isLoading: noticesLoading, error: noticesError } = useQuery({
+    queryKey: ['notices'],
+    queryFn: () => NoticesService.getNotices(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
   // Filter and sort notices
   const filteredNotices = useMemo(() => {
-    let filtered = [...sampleNotices];
+    if (!noticesData) return [];
+    
+    let filtered = [...noticesData];
 
     // Apply search filter
     if (filters.searchQuery) {
@@ -41,6 +50,11 @@ const NoticeBoard = () => {
       );
     }
 
+    // Apply category filter
+    if (filters.category) {
+      filtered = filtered.filter(notice => notice.category === filters.category);
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
       const dateA = new Date(a.publishDate).getTime();
@@ -49,16 +63,14 @@ const NoticeBoard = () => {
     });
 
     return filtered;
-  }, [filters]);
+  }, [filters, noticesData]);
 
   const handleNoticeClick = (notice: Notice) => {
-    console.log('Notice clicked:', notice.noticeTitle); // Debug log
     setSelectedNotice(notice);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
-    console.log('Modal closing'); // Debug log
     setIsModalOpen(false);
     setTimeout(() => {
       setSelectedNotice(null);
@@ -92,36 +104,62 @@ const NoticeBoard = () => {
         {/* Notice List with enhanced container */}
         <div className="container mx-auto px-4 pb-16">
           <div className="bg-background/60 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl overflow-hidden">
-            <NoticeHeader 
-              filters={filters}
-              onFiltersChange={setFilters}
-              totalNotices={filteredNotices.length}
-            />
-            
-            <div className="p-6">
-              {filteredNotices.length === 0 ? (
-                <div className="text-center py-16">
-                  <Bell className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-muted-foreground mb-2">No notices found</h3>
-                  <p className="text-muted-foreground">
-                    {filters.searchQuery 
-                      ? "Try adjusting your search terms or filters"
-                      : "Check back later for new announcements"
-                    }
-                  </p>
+            {/* Loading State */}
+            {noticesLoading && (
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                <p className="text-muted-foreground">Loading notices...</p>
+              </div>
+            )}
+
+            {/* Error State */}
+            {noticesError && (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <Bell className="w-10 h-10 text-red-500" />
                 </div>
-              ) : (
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {filteredNotices.map((notice) => (
-                    <NoticeCard
-                      key={notice.id}
-                      notice={notice}
-                      onClick={() => handleNoticeClick(notice)}
-                    />
-                  ))}
+                <h2 className="text-2xl font-bold text-foreground mb-2">Unable to Load Notices</h2>
+                <p className="text-muted-foreground max-w-md">
+                  We're having trouble loading the latest notices. Please try again later.
+                </p>
+              </div>
+            )}
+
+            {/* Main Content - Only show when data is loaded */}
+            {noticesData && !noticesLoading && (
+              <>
+                <NoticeHeader 
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  totalNotices={filteredNotices.length}
+                />
+                
+                <div className="p-6">
+                  {filteredNotices.length === 0 ? (
+                    <div className="text-center py-16">
+                      <Bell className="h-16 w-16 text-muted-foreground/50 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-muted-foreground mb-2">No notices found</h3>
+                      <p className="text-muted-foreground">
+                        {filters.searchQuery 
+                          ? "Try adjusting your search terms or filters"
+                          : "Check back later for new announcements"
+                        }
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                      {filteredNotices.map((notice) => (
+                        <NoticeCard
+                          key={notice.id}
+                          notice={notice}
+                          onClick={() => handleNoticeClick(notice)}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>

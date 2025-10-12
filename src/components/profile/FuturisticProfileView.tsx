@@ -45,7 +45,7 @@ const FuturisticProfileView: React.FC<FuturisticProfileViewProps> = ({
   }, []);
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name?.split(' ').map(n => n[0]).join('').toUpperCase();
   };
 
   const handleContactVerification = (contactType: 'email' | 'phone') => {
@@ -739,7 +739,7 @@ const FuturisticProfileView: React.FC<FuturisticProfileViewProps> = ({
                     <Card className="bg-gradient-to-br from-white/90 to-gray-50/30 backdrop-blur-xl border-gray-200/30 shadow-xl">
                       <CardContent className="text-center py-12">
                         <Globe className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-500">No social media links provided.</p>
+                        <p className="text-gray-500">No social media links provided.{JSON.stringify(user.profile)}</p>
                       </CardContent>
                     </Card>
                   )}

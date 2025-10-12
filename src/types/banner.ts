@@ -7,6 +7,9 @@ export interface VipBanner {
   sponsorBannerUrl: string;
   sponsorRedirectUrl: string;
   bannerSize: BannerSize;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BannerResponse {

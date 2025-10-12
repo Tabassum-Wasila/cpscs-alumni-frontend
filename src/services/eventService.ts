@@ -1,4 +1,6 @@
 
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '@/config/api';
+
 export interface Event {
   id: string;
   title: string;
@@ -167,186 +169,49 @@ export class EventService {
     return schemes[category] || schemes.other;
   }
 
-  // Mock data for development (will be replaced with backend API)
-  static getMockEvents(): Event[] {
-    return [
-      {
-        id: "grand-reunion-2025",
-        title: "Grand Alumni Reunion 2025",
-        description: `<div style="font-family: 'Noto Sans Bengali', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 2rem;">
-    <div style="max-width: 800px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); overflow: hidden;">
-        <div style="padding: 2.5rem; text-align: center; background: transparent;">
-            <h1 style="font-size: 2.75rem; font-weight: 800; margin: 0; letter-spacing: 1px; background: linear-gradient(90deg, #4f46e5, #522081); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">গ্র্যান্ড অ্যালামনাই রিইউনিয়ন ২০২৫</h1>
-            <p style="font-size: 1.25rem; color: #475569; margin-top: 0.5rem;">এসো প্রাণে প্রাণে মিলি সবাই</p>
-        </div>
-        <div style="padding: 2.5rem; padding-top: 0;">
-            <p style="font-size: 1.1rem; text-align: center; line-height: 1.8; color: #475569; margin-bottom: 3rem;">
-                বহুল প্রতীক্ষিত সেই মাহেন্দ্রক্ষণের আর দেরি নেই! স্মৃতির করিডোর ধরে হেঁটে পুরনো বন্ধুদের সাথে reconnect করার এবং আমাদের প্রিয় প্রতিষ্ঠানের গৌরব উদযাপন করার সময় এসেছে। এটি শুধু একটি অনুষ্ঠান নয়, এটি আমাদের শেকড়ে ফেরার উৎসব।
-            </p>
+  // Fetch events from API (replaces mock data)
+  static async getMockEvents(): Promise<Event[]> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.EVENTS), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
 
-            <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 2.5rem; color: #1e293b;">পূর্ণাঙ্গ অনুষ্ঠান সূচি</h2>
-            <div style="position: relative; padding-left: 40px; border-left: 3px solid #cbd5e1;">
-                
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">➡️</div>
-                    <p style="color: #475569; margin: 0; font-weight: 700; font-size: 1.25rem; color: #1e293b;">প্রথম পর্ব</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎁</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৮:০০ - ৮:৩০ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">গিফট ব্যাগ ও টোকেন প্রদান</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৮:৪০ - ৯:১৫ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক ও অতিথিবৃন্দের আসন গ্রহণ</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🚩</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">সকাল ৯:২০ - ১০:০০ টা পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">বড় মাঠে সমাবেশ</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">📣</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১০:১৫ - ১১:০০ টা পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">উদ্বোধনী ঘোষণা, প্রধান অতিথি, বিশেষ অতিথিবৃন্দ ও সভাপতির স্বাগত বক্তব্য ও মাঠ পরিদর্শন। (জুলাই শহীদদের, এবং হারানো শিক্ষক ও শিক্ষার্থীদের স্মরণে ১ মিনিট নীরবতা পালন।)</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">☕</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১১:১০ - ১২:৫৫ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">নাস্তার বিরতি: প্রাক্তন শিক্ষক ও ব্যাচ ভিত্তিক শিক্ষার্থীদের স্মৃতিচারণ, ফটোসেশন।</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍽️</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">১:০০ - ২:৩০ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">নামাজ ও দুপুরের খাবার বিরতি</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">⚽</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">২:৩৫ - ৫:৩৫ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">বিভিন্ন ধরনের খেলাধুলা</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍵</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৫:৪০ - ৬:১৫ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">নামাজ ও চা বিরতি</p>
-                </div>
-
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">➡️</div>
-                    <p style="color: #475569; margin: 0; font-weight: 700; font-size: 1.25rem; color: #1e293b;">দ্বিতীয় পর্ব</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎤</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৬: ২০ - ০৭ টা পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">প্রধান ও বিশেষ অতিথিবৃন্দের আসন গ্রহণ ও বক্তব্য প্রদান</p>
-                </div>
-                <div style="position: relative; margin-bottom: 2rem;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏆</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">০৭: ০৫ - ৭:৩০ মিনিট পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">প্রাক্তন শিক্ষক, ডোনার ও কমিটি সদস্যদের ক্রেস্ট প্রদান</p>
-                </div>
-                <div style="position: relative; margin-bottom: 0;">
-                    <div style="position: absolute; left: -54px; top: 0; width: 40px; height: 40px; background-color: #ffffff; border: 3px solid #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎶</div>
-                    <p style="font-weight: 600; color: #522081; margin-bottom: 0.25rem;">৭:৩৫ - ১১: ০০ টা পর্যন্ত।</p>
-                    <p style="color: #475569; margin: 0;">রাতের খাবার, লটারি র‍্যাফেল ড্র ও সাংস্কৃতিক অনুষ্ঠান</p>
-                </div>
-            </div>
-
-            <div style="background-color: #f1f5f9; border-radius: 8px; padding: 2rem; margin-top: 3rem;">
-                <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 1.5rem; color: #1e293b;">🎟️ রেজিস্ট্রেশন ফি</h2>
-                <ul style="list-style: none; padding: 0; margin: 0;">
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">আর্লি বার্ড (Early Birds)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">২০০০ টাকা</strong>
-                    </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">লেট আউল (Late Owls)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">২৫০০ টাকা</strong>
-                    </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #e2e8f0; font-size: 1.1rem;">
-                        <span style="color: #475569;">ইয়াং অ্যালামনাই (এসএসসি ২০২০-২০২৫)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">১৫০০ টাকা</strong>
-                    </li>
-                    <li style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; font-size: 1.1rem;">
-                        <span style="color: #475569;">পরিবার ও শিশু (৫ বছরের উর্ধ্বে)</span>
-                        <strong style="font-weight: 600; color: #1e293b;">১০০০ টাকা</strong>
-                    </li>
-                </ul>
-                <p style="text-align: center; font-size: 0.9rem; color: #64748b; margin-top: 1.5rem;">
-                    <em><strong>দ্রষ্টব্য:</strong> ৫ বছরের কম বয়সী শিশুদের জন্য কোনো ফি লাগবে না, তবে তাদের জন্য আলাদা খাবারের প্যাকেট থাকবে না। গেস্টদের মধ্যে স্বামী/স্ত্রী, বাবা-মা অথবা ৫ বছরের বেশি বয়সী শিশুরা অন্তর্ভুক্ত।</em>
-                </p>
-            </div>
-        </div>
-    </div>
-</div>`,
-        date: "2025-12-26",
-        time: "8:00 AM - 11:00 PM",
-        venue: "Cantonment Public School and College, Saidpur",
-        type: "in-person",
-        category: "reunion",
-        status: "upcoming",
-        registrationDeadline: "2025-12-16",
-        capacity: 500,
-        currentRegistrations: 234,
-        image: "https://i.postimg.cc/fR9gCNtY/IMG-7464.jpg",
-        useInternalForm: true,
-        isSpecialEvent: true,
-        organizer: "CPSCS Alumni Association",
-        contactEmail: "reunion@cpscsalumni.org",
-        tags: ["reunion", "networking", "cultural"],
-        location: {
-          address: "Cantonment Public School and College, Saidpur",
-          coordinates: { lat: 25.7439, lng: 88.9294 }
-        },
-        createdAt: "2025-01-01",
-        updatedAt: "2025-01-10"
-      },
-      {
-        id: "2",
-        title: "Career Development Workshop",
-        description: "<p>Enhance your professional skills with our comprehensive career development workshop.</p><p>Topics covered: Resume building, interview techniques, networking strategies, and industry insights.</p>",
-        date: "2025-09-15",
-        time: "3:00 PM - 5:00 PM",
-        venue: "Zoom",
-        type: "online",
-        category: "workshop",
-        status: "upcoming",
-        registrationDeadline: "2025-09-10",
-        capacity: 100,
-        currentRegistrations: 67,
-        useInternalForm: true,
-        organizer: "Career Development Committee",
-        contactEmail: "career@cpscsalumni.org",
-        tags: ["career", "professional", "skills"],
-        createdAt: "2025-01-05",
-        updatedAt: "2025-01-12"
-      },
-      {
-        id: "3",
-        title: "Alumni Sports Day",
-        description: "<p>Get ready for a day of friendly competition and fun!</p><p>Events include cricket, football, badminton, and various other sports activities.</p>",
-        date: "2025-10-08",
-        time: "10:00 AM - 4:00 PM",
-        venue: "CPSCS Sports Ground",
-        type: "in-person",
-        category: "sports",
-        status: "upcoming",
-        registrationDeadline: "2025-09-30",
-        capacity: 200,
-        currentRegistrations: 89,
-        useInternalForm: true,
-        organizer: "Sports Committee",
-        contactEmail: "sports@cpscsalumni.org",
-        tags: ["sports", "competition", "outdoor"],
-        location: {
-          address: "CPSCS Sports Ground, Saidpur",
-          coordinates: { lat: 25.7445, lng: 88.9301 }
-        },
-        createdAt: "2025-01-03",
-        updatedAt: "2025-01-08"
+      if (!response.ok) {
+        throw new Error(`Failed to fetch events: ${response.status}`);
       }
-    ];
+
+      const data = await response.json();
+      console.log(data)
+      return data.data || data; // Handle both {data: []} and direct array responses
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      // Return empty array on error - frontend will handle error states
+      return [];
+    }
+  }
+
+  // Fetch single event by ID from API
+  static async getEventById(id: string): Promise<Event | null> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.EVENT_BY_ID(id)), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return null; // Event not found
+        }
+        throw new Error(`Failed to fetch event: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || data; // Handle both {data: {}} and direct object responses
+    } catch (error) {
+      console.error('Error fetching event:', error);
+      return null;
+    }
   }
 
   static calculateReunionFees(registration: ReunionRegistration, pricing?: ReunionPricing): FeeBreakdown {
@@ -433,20 +298,35 @@ export class EventService {
     };
   }
 
-  static getReunionPricing(): ReunionPricing {
-    // This would normally come from backend/admin panel with admin-controlled flags
-    return {
-      earlyBirdDeadline: "2025-11-26",
-      lateOwlDeadline: "2025-12-16",
-      regularEarlyBird: 2000,
-      regularLateOwl: 2500,
-      youngAlumni: 1500,
-      familyAndChildren: 1000,
-      currentStudent: 0, // N/A - Free for current students when enabled
-      youngAlumniDiscountEnabled: true, // Can be controlled from backend admin panel
-      currentStudentAttendanceEnabled: false, // Hidden by default - controlled by backend admin panel
-      youngAlumniEligibleYears: { start: 2020, end: 2025 }
-    };
+  static async getReunionPricing(eventId: string): Promise<ReunionPricing> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.EVENT_PRICING(eventId)), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch event pricing: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.data || data; // Handle both {data: {}} and direct object responses
+    } catch (error) {
+      console.error('Error fetching event pricing:', error);
+      // Return default pricing as fallback
+      // return {
+      //   earlyBirdDeadline: "2025-11-26",
+      //   lateOwlDeadline: "2025-12-16",
+      //   regularEarlyBird: 2000,
+      //   regularLateOwl: 2500,
+      //   youngAlumni: 1500,
+      //   familyAndChildren: 1000,
+      //   currentStudent: 0,
+      //   youngAlumniDiscountEnabled: true,
+      //   currentStudentAttendanceEnabled: false,
+      //   youngAlumniEligibleYears: { start: 2020, end: 2025 }
+      // };
+    }
   }
 
   // Format date for display (e.g., "26 November 2025")

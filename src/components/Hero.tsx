@@ -16,7 +16,7 @@ const Hero = () => {
     refetchOnWindowFocus: false
   });
 
-  const showReunionContent = reunionData?.is_reunion && reunionData?.is_active;
+  const showReunionContent = reunionData?.isReunion && reunionData?.isActive;
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!heroRef.current) return;
@@ -42,9 +42,9 @@ const Hero = () => {
 
   // Function to calculate time until the reunion
   const calculateTimeLeft = () => {
-    if (!reunionData?.event_date) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    if (!reunionData?.eventDate) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
     
-    const reunionDate = new Date(reunionData.event_date).getTime();
+    const reunionDate = new Date(reunionData.eventDate).getTime();
     const now = new Date().getTime();
     const difference = reunionDate - now;
     if (difference > 0) {
@@ -149,7 +149,7 @@ const Hero = () => {
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cpscs-gold via-yellow-300 to-cpscs-gold rounded-xl blur-lg opacity-70 group-hover:opacity-100 group-hover:blur-xl transition-all duration-300 animate-pulse group-hover:animate-none"></div>
                 <Button className="relative bg-gradient-to-r from-cpscs-gold via-yellow-400 to-cpscs-gold hover:from-yellow-300 hover:via-cpscs-gold hover:to-yellow-300 text-cpscs-blue hover:text-white font-bold px-8 py-6 rounded-xl transition-all duration-300 hover:scale-[1.02] shadow-xl border-2 border-cpscs-gold/50 hover:border-white/50 overflow-hidden">
-                  <Link to={reunionData?.registration_url || '/events'} className="flex items-center gap-2 relative z-10">
+                  <Link to={reunionData?.registrationUrl || '/events'} className="flex items-center gap-2 relative z-10">
                     <span>Register for Reunion</span>
                     <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                   </Link>

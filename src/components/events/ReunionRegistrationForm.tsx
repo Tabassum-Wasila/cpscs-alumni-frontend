@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,6 +22,9 @@ import BkashPaymentButton from '../payment/BkashPayment';
 import RegistrationSuccessModal from './RegistrationSuccessModal';
 import TShirtSizeGuideModal from './TShirtSizeGuideModal';
 import PaymentFailureModal from './PaymentFailureModal';
+import PaymentModal from '../PaymentModal';
+import { BkashService } from '@/services/bkashService';
+import { ReunionRegistrationService, ReunionRegistrationRequest } from '@/services/reunionRegistrationService';
 import { getSSCYears } from '@/utils/yearUtils';
 
 const formSchema = z.object({
@@ -81,6 +85,7 @@ interface ReunionRegistrationFormProps {
 }
 
 const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ eventId, onSuccess }) => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
   const [feeBreakdown, setFeeBreakdown] = useState<FeeBreakdown>({
@@ -93,10 +98,20 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
     totalFee: 0
   });
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentOption, setPaymentOption] = useState<'bkash' | 'offline'>('bkash');
+  const [showOfflineModal, setShowOfflineModal] = useState(false);
+  const [showRegistrationPointModal, setShowRegistrationPointModal] = useState(false);
+  const [offlinePaidFrom, setOfflinePaidFrom] = useState('');
+  const [offlineTrxId, setOfflineTrxId] = useState('');
+  const [offlineVerifiedBy, setOfflineVerifiedBy] = useState('');
+  const [offlineCodeType, setOfflineCodeType] = useState<'secret' | 'trx'>('trx');
+  const [offlineSecretCode, setOfflineSecretCode] = useState('');
+  const [showCustomSuccessModal, setShowCustomSuccessModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showFailureModal, setShowFailureModal] = useState(false);
   const [paymentFailureReason, setPaymentFailureReason] = useState<'cancelled' | 'failed' | 'timeout' | 'error'>('failed');
   const [pricing, setPricing] = useState<ReunionPricing>();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -120,14 +135,23 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
 
   // Load pricing and user data
   useEffect(() => {
-    const reunionPricing = EventService.getReunionPricing();
-    setPricing(reunionPricing);
+    const loadPricing = async () => {
+      try {
+        const reunionPricing = await EventService.getReunionPricing(eventId);
+        setPricing(reunionPricing);
+      } catch (error) {
+        console.error('Failed to load reunion pricing:', error);
+        // Use default pricing from EventService if API fails
+      }
+    };
+
+    loadPricing();
     
     // Pre-fill user data if available
     if (user?.sscYear) {
       form.setValue("sscYear", user.sscYear);
     }
-  }, [user, form]);
+  }, [user, form, eventId]);
 
   // Handle URL parameters for payment success/failure from bKash redirect
   useEffect(() => {
@@ -149,6 +173,21 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
       // Clean up URL parameters
       window.history.replaceState({}, '', window.location.pathname);
     }
+
+    // Listen for bKash payment success events from payment return page
+    const handleBkashSuccess = (event: CustomEvent) => {
+      const paymentDetails = event.detail;
+      handlePaymentSuccess({
+        paymentID: paymentDetails.paymentID,
+        trxID: paymentDetails.transactionId
+      });
+    };
+
+    window.addEventListener('bkash-payment-success', handleBkashSuccess as EventListener);
+    
+    return () => {
+      window.removeEventListener('bkash-payment-success', handleBkashSuccess as EventListener);
+    };
   }, []);
 
   // Calculate fees when form values change
@@ -189,67 +228,100 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
       return;
     }
 
-    setShowPaymentModal(true);
+    // open modal based on selected option
+    // Note: the QR / bKash instructions modal (existing) is shown for the 'bkash' option.
+    // The new "registration point" modal is shown for the offline registration-point option.
+    if (paymentOption === 'bkash') {
+      setShowOfflineModal(true);
+    } else {
+      setShowRegistrationPointModal(true);
+    }
   };
 
-  const handlePaymentSuccess = async (data: { paymentID: string; trxID: string }) => {
-    // Complete registration data to send to backend
-    const registrationData = {
-      eventId,
-      userId: user?.id,
-      userProfile: {
-        name: user?.fullName,
-        email: user?.email,
-        phone: user?.phoneNumber,
-        sscYear: user?.sscYear,
-        hscYear: user?.hscYear,
-        countryCode: user?.countryCode,
-        isAdmin: user?.isAdmin,
-        hasMembership: user?.hasMembership
-      },
-      registrationDetails: {
-        sscYear: watchValues.sscYear,
-        isCurrentStudent: watchValues.isCurrentStudent,
-        tshirtSize: watchValues.tshirtSize,
-        collectionMethod: watchValues.collectionMethod,
-        spouse: watchValues.bringingSpouse ? { name: watchValues.spouseName } : null,
-        father: watchValues.bringingFather ? { name: watchValues.fatherName } : null,
-        mother: watchValues.bringingMother ? { name: watchValues.motherName } : null,
-        children: watchValues.bringingChildren && watchValues.numberOfChildren > 0 ? {
-          numberOfChildren: watchValues.numberOfChildren,
-          names: watchValues.childNames || []
-        } : null,
-        other: watchValues.bringingOther ? {
-          relation: watchValues.otherRelation,
-          name: watchValues.otherName
-        } : null,
-        wantsToVolunteer: watchValues.wantsToVolunteer,
-        specialRequests: watchValues.specialRequests
-      },
-      feeBreakdown,
-      paymentDetails: {
-        paymentID: data.paymentID,
-        transactionId: data.trxID,
-        amount: feeBreakdown.totalFee,
-        paymentStatus: 'success',
-        paymentMethod: 'bkash',
-        paymentDate: new Date().toISOString()
-      },
-      registrationDate: new Date().toISOString(),
-    };
+  const onInvalidSubmit = (errors: any) => {
+    console.log('Form submission failed due to validation errors:', errors);
+    toast({
+      title: "Form Validation Error",
+      description: "Please fill in all required fields before proceeding to payment.",
+      variant: "destructive",
+    });
+  };
 
-    console.log('Complete registration data to be sent to backend:', registrationData);
-    
-    // TODO: Send to Laravel backend API
-    // This will trigger confirmation email with unique registration code
-    // await fetch('/api/reunion-registration', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(registrationData)
-    // });
-    
-    setShowPaymentModal(false);
-    setShowSuccessModal(true);
+  const handlePaymentSuccess = async (
+    data: { paymentID: string; trxID: string },
+    metadata?: { paidFromNumber?: string; verifiedBy?: string; secretCode?: string }
+  ) => {
+    try {
+      setLoading(true);
+      
+      // Prepare registration data for the API using the ReunionRegistrationRequest shape
+      const registrationData: ReunionRegistrationRequest = {
+        eventId: eventId,
+        userId: user?.id || '',
+        userProfile: {
+          name: user?.fullName || '',
+          email: user?.email || '',
+          phone: user?.phoneNumber || '',
+          sscYear: user?.sscYear || watchValues.sscYear || '',
+          countryCode: user?.countryCode || '' ,
+          hasMembership: !!user?.hasMembership,
+        },
+        registrationDetails: {
+          sscYear: watchValues.sscYear,
+          isCurrentStudent: watchValues.isCurrentStudent,
+          tshirtSize: watchValues.tshirtSize || 'M',
+          collectionMethod: watchValues.collectionMethod || 'event-booth',
+          spouse: watchValues.bringingSpouse ? { name: watchValues.spouseName || '' } : null,
+          father: watchValues.bringingFather ? { name: watchValues.fatherName || '' } : null,
+          mother: watchValues.bringingMother ? { name: watchValues.motherName || '' } : null,
+          children: watchValues.bringingChildren && watchValues.numberOfChildren > 0 ? {
+            numberOfChildren: watchValues.numberOfChildren,
+            names: watchValues.childNames || []
+          } : null,
+          other: watchValues.bringingOther ? { relation: watchValues.otherRelation || '', name: watchValues.otherName || '' } : null,
+          wantsToVolunteer: watchValues.wantsToVolunteer,
+          specialRequests: watchValues.specialRequests || undefined,
+        },
+        feeBreakdown: {
+          baseFee: feeBreakdown.baseFee,
+          spouseFee: feeBreakdown.spouseFee,
+          fatherFee: feeBreakdown.fatherFee,
+          motherFee: feeBreakdown.motherFee,
+          childrenFee: feeBreakdown.childrenFee,
+          otherGuestFee: feeBreakdown.otherGuestFee,
+          totalFee: feeBreakdown.totalFee,
+        },
+        paymentDetails: {
+          paymentID: data.paymentID,
+          transactionId: data.trxID,
+          amount: feeBreakdown.totalFee,
+          paymentStatus: 'pending', // will be updated by backend after verification
+          paymentMethod: paymentOption === 'bkash' ? 'bkash' : 'offline',
+          paymentDate: new Date().toISOString(),
+          payment_payer_number: metadata?.paidFromNumber || undefined,
+          verified_by: metadata?.verifiedBy || undefined,
+          secret_code: metadata?.secretCode || null,
+        },
+        registrationDate: new Date().toISOString(),
+      };
+
+      // Submit registration to backend
+      const result = await ReunionRegistrationService.submitRegistration(registrationData);
+      
+      console.log('Registration submitted successfully:', result);
+      
+  setShowPaymentModal(false);
+  setShowOfflineModal(false);
+  // show custom success modal with required message
+  // setShowCustomSuccessModal(true);
+  setShowSuccessModal(true);
+      
+    } catch (error) {
+      console.error('Registration submission failed:', error);
+      alert('Registration submission failed. Please contact support.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getPricingDisplay = () => {
@@ -286,7 +358,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
               
               {pricing.youngAlumniDiscountEnabled && (
                 <div className="flex justify-between items-center">
-                  <span>Young Alumni (SSC 2020-2025):</span>
+                  <span>Young Alumni ({pricing.youngAlumniEligibleYears.start} - {pricing.youngAlumniEligibleYears.end}):</span>
                   <span className="font-semibold">৳{pricing.youngAlumni}</span>
                 </div>
               )}
@@ -350,7 +422,7 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
       {getPricingDisplay()}
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit, onInvalidSubmit)} className="space-y-8">
           {/* Registration Details */}
           <Card className="border-2 hover:border-primary/20 transition-colors duration-300 shadow-lg hover:shadow-xl">
             <CardHeader className="bg-gradient-to-r from-primary/5 to-primary-glow/5 rounded-t-lg">
@@ -813,6 +885,37 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                 </div>
               </div>
               
+              {/* Payment option selector */}
+              <div className="mt-6 mb-4">
+                <div>
+                    <div className="flex justify-between font-medium text-md">
+                    <span>Please specify your payment method:</span>
+                  </div>
+                  <label className="block mt-4">
+                    <input
+                      type="radio"
+                      name="paymentOption"
+                      value="bkash"
+                      checked={paymentOption === 'bkash'}
+                      onChange={() => setPaymentOption('bkash')}
+                      className="mr-2"
+                    />
+                    Pay via bKash App or Phone
+                  </label>
+                  <label className="block mt-4">
+                    <input
+                      type="radio"
+                      name="paymentOption"
+                      value="offline"
+                      checked={paymentOption === 'offline'}
+                      onChange={() => setPaymentOption('offline')}
+                      className="mr-2"
+                    />
+                    Paid through offline registration point
+                  </label>
+                </div>
+              </div>
+
               {!showPaymentModal ? (
                 <Button 
                   type="submit" 
@@ -828,12 +931,13 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
                     Complete your payment below to confirm registration
                   </p>
                   
-                  <BkashPaymentButton
-                    amount={feeBreakdown.totalFee}
-                    invoice={`REUNION_${Date.now()}`}
-                    onSuccess={handlePaymentSuccess}
-                    onClose={() => setShowPaymentModal(false)}
-                  />
+                  <Button 
+                    onClick={() => setShowPaymentModal(false)}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Back to Form
+                  </Button>
                 </div>
               )}
             </CardContent>
@@ -847,6 +951,8 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
         onClose={() => {
           setShowSuccessModal(false);
           onSuccess();
+          navigate('/', { replace: true });
+          setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }), 50);
         }}
         eventTitle="Grand Alumni Reunion"
       />
@@ -861,6 +967,143 @@ const ReunionRegistrationForm: React.FC<ReunionRegistrationFormProps> = ({ event
         }}
         reason={paymentFailureReason}
       />
+
+      {/* bKash Payment Modal */}
+      {showPaymentModal && (
+        <PaymentModal
+          amount={feeBreakdown.totalFee}
+          description="Grand Alumni Reunion 2025 Registration"
+          invoice={BkashService.generateInvoiceNumber('REUNION')}
+          reference={`Reunion Registration - ${user?.fullName || 'Alumni'}`}
+          onSuccess={(data) => handlePaymentSuccess(data)}
+          onCancel={() => setShowPaymentModal(false)}
+          onError={(error) => {
+            console.error('Payment error:', error);
+            setPaymentFailureReason('error');
+            setShowFailureModal(true);
+            setShowPaymentModal(false);
+          }}
+        />
+      )}
+
+      {/* Offline Payment Modal */}
+      {showOfflineModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-lg bg-white rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">Offline / bKash App Payment</h3>
+              <div className="flex flex-col items-center mb-4">
+              <img src="/bkash-qr.jpeg" alt="bKash QR" className="w-56 h-56 md:w-72 md:h-72 object-contain mb-3" />
+              <div className="text-center font-medium">কীভাবে পেমেন্ট করবেন?</div>
+              <div className="mt-2 text-sm text-muted-foreground text-left">
+                <p>বিকাশ অ্যাপ ওপেন করুন &gt;&gt; Make Payment অপশনে যান &gt;&gt; পাশের QR code স্ক্যান করুন, অথবা মার্চেন্ট নাম্বার 01886579596 টাইপ করুন &gt;&gt; নির্দিষ্ট এমাউন্ট দিন &gt;&gt; রেফারেন্স এ আপনার Full Name লিখুন &gt;&gt; পেমেন্ট সম্পন্ন করুন।</p>
+                <p className="mt-2">অথবা,  বাটন ফোনে পেমেন্ট করতে চাইলে *২৪৭# ডায়াল করে &gt;&gt; পেমেন্ট অপশন সিলেক্ট করে &gt;&gt; উপরের পদ্ধতি অনুসরণ করুন।</p>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="text-sm font-medium">Your Amount: ৳{feeBreakdown.totalFee}</div>
+              <div className="text-sm font-medium">Your Reference: {user?.fullName || ''}</div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 mb-4">
+              <div>
+                <label className="block text-sm font-medium">Paid from (Number):*</label>
+                <input value={offlinePaidFrom} onChange={(e) => setOfflinePaidFrom(e.target.value)} className="w-full border p-2 rounded" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Transaction ID:*</label>
+                <input value={offlineTrxId} onChange={(e) => setOfflineTrxId(e.target.value)} className="w-full border p-2 rounded" />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowOfflineModal(false)}>Cancel</Button>
+              <Button onClick={async () => {
+                // Validate fields before submitting form
+                if (!offlinePaidFrom.trim() || !offlineTrxId.trim()) {
+                  toast({ title: 'Validation', description: 'Please fill required fields', variant: 'destructive' });
+                  return;
+                }
+
+                // call handlePaymentSuccess with metadata (simulate paymentID/trxID)
+                const fakePayment = { paymentID: BkashService.generateInvoiceNumber('TRX'), trxID: offlineTrxId };
+                await handlePaymentSuccess(fakePayment, { paidFromNumber: offlinePaidFrom, verifiedBy: offlineVerifiedBy, secretCode: offlineSecretCode });
+              }}>Submit</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Registration Point Modal (for offline registration by operator) */}
+      {showRegistrationPointModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-white rounded-lg p-6">
+            <h3 className="text-lg font-semibold mb-4">অফলাইন রেজিস্ট্রেশন পয়েন্ট</h3>
+            <p className="text-sm text-muted-foreground mb-4">অফলাইন রেজিস্ট্রেশন পয়েন্টে কাগজের ফরমে রেজিস্ট্রেশন করলে, এই অপশন প্রযোজ্য হবে। নিচে অপারেটর/ভলান্টিয়ার তথ্য দিন।</p>
+
+            <div className="mb-3">
+              <label className="block text-sm font-medium">Verified by (Name / Operator ID):*</label>
+              <input value={offlineVerifiedBy} onChange={(e) => setOfflineVerifiedBy(e.target.value)} className="w-full border p-2 rounded" />
+            </div>
+
+            <div className="mb-3">
+              <FormLabel className="block text-sm font-medium mb-1">Verification Type</FormLabel>
+              <div className="flex items-center gap-4">
+                <label className="inline-flex items-center">
+                  <input type="radio" name="regPointCodeType" checked={offlineCodeType === 'secret'} onChange={() => setOfflineCodeType('secret')} className="mr-2" />
+                  Secret Code
+                </label>
+                <label className="inline-flex items-center">
+                  <input type="radio" name="regPointCodeType" checked={offlineCodeType === 'trx'} onChange={() => setOfflineCodeType('trx')} className="mr-2" />
+                  Transaction ID
+                </label>
+              </div>
+            </div>
+
+            {offlineCodeType === 'secret' ? (
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Secret Code:*</label>
+                <input value={offlineSecretCode} onChange={(e) => setOfflineSecretCode(e.target.value)} className="w-full border p-2 rounded" />
+              </div>
+            ) : (
+              <div className="mb-3">
+                <label className="block text-sm font-medium">Transaction ID:*</label>
+                <input value={offlineTrxId} onChange={(e) => setOfflineTrxId(e.target.value)} className="w-full border p-2 rounded" />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowRegistrationPointModal(false)}>Cancel</Button>
+              <Button onClick={async () => {
+                if (!offlineVerifiedBy.trim() || (offlineCodeType === 'secret' ? !offlineSecretCode.trim() : !offlineTrxId.trim())) {
+                  toast({ title: 'Validation', description: 'Please fill required fields', variant: 'destructive' });
+                  return;
+                }
+
+                // Simulate a payment/registration id and submit same success behavior
+                const fakePayment = { paymentID: BkashService.generateInvoiceNumber('REGPT'), trxID: offlineTrxId || offlineSecretCode };
+                await handlePaymentSuccess(fakePayment, { paidFromNumber: offlinePaidFrom, verifiedBy: offlineVerifiedBy, secretCode: offlineCodeType === 'secret' ? offlineSecretCode : undefined });
+                setShowRegistrationPointModal(false);
+              }}>Submit</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Success Modal (Offline / bKash) */}
+      {showCustomSuccessModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-md bg-white rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold mb-4">আপনার রেজিস্ট্রেশন Request সফল হয়েছে।</h3>
+            <p className="text-sm mb-4">একজন এডমিন আপনার ফরম এবং Transaction ID চেক করবেন। আপনার রেজিস্ট্রেশন Approved হলে, আপনি একটি ইমেইল পাবেন। ইন শা আল্লাহ।</p>
+            <p className="text-sm mb-4">তিন কার্যদিবসের মধ্যে Approved ইমেইল না পেলে, অনুগ্রহ পূর্বক 01886579596 নাম্বারে যোগাযোগ করুন।</p>
+            <div className="flex justify-center">
+              <Button onClick={() => { setShowCustomSuccessModal(false);}}>Close</Button>
+              {/* <Button onClick={() => { setShowCustomSuccessModal(false); setShowSuccessModal(true); }}>Close</Button> */}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

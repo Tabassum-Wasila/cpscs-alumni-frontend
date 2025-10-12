@@ -1,5 +1,5 @@
 import { CommitteeData, CommitteeTerm, CommitteeByTerm } from '@/types/committee';
-import { committeeData } from '@/data/committeeData';
+import { API_CONFIG, getApiUrl } from '@/config/api';
 
 // Mock API service for committee data
 // Replace with actual Laravel API endpoints when backend is ready
@@ -7,47 +7,29 @@ import { committeeData } from '@/data/committeeData';
 class CommitteeService {
   private baseUrl = '/api/committee'; // Replace with actual Laravel API URL
 
-  // Mock data for terms - will be replaced with real API calls
-  private mockTerms: CommitteeTerm[] = [
-    {
-      id: '2024-2026',
-      term: '2024-2026',
-      startYear: 2024,
-      endYear: 2026,
-      isActive: true
-    },
-    {
-      id: '2022-2024',
-      term: '2022-2024',
-      startYear: 2022,
-      endYear: 2024,
-      isActive: false
-    },
-    {
-      id: '2020-2022',
-      term: '2020-2022', 
-      startYear: 2020,
-      endYear: 2022,
-      isActive: false
-    }
-  ];
+
 
   /**
    * Fetch all available committee terms
    */
   async getTerms(): Promise<CommitteeTerm[]> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`${this.baseUrl}/terms`);
-      // return response.json();
-      
-      // Mock implementation
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(this.mockTerms), 500);
-      });
+  const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.COMMITTEES));
+      console.log('API /committees response:', response);
+
+      if (!response.ok) throw new Error('Failed to fetch committee terms');
+      const data = await response.json();
+      console.log('API /committees response:', data);
+      return data.map((item: any, idx: number) => ({
+        id: String(item.id),
+        term: item.term,
+        startYear: item.term ? parseInt(item.term.split('-')[0]) : undefined,
+        endYear: item.term ? parseInt(item.term.split('-')[1]) : undefined,
+        isActive: idx === 0
+      }));
     } catch (error) {
       console.error('Error fetching committee terms:', error);
-      return this.mockTerms;
+      return [];
     }
   }
 
@@ -65,17 +47,13 @@ class CommitteeService {
    */
   async getCommitteeByTerm(termId: string): Promise<CommitteeData> {
     try {
-      // TODO: Replace with actual API call
-      // const response = await fetch(`${this.baseUrl}/${termId}`);
-      // return response.json();
-      
-      // Mock implementation - return current data for all terms for now
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(committeeData), 300);
-      });
+  const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.COMMITTEE_BY_ID(termId)));
+      if (!response.ok) throw new Error('Failed to fetch committee data');
+      const data = await response.json();
+      return data;
     } catch (error) {
       console.error(`Error fetching committee data for term ${termId}:`, error);
-      return committeeData;
+      throw error;
     }
   }
 
@@ -83,8 +61,9 @@ class CommitteeService {
    * Get the latest committee data
    */
   async getLatestCommittee(): Promise<CommitteeData> {
-    const latestTerm = await this.getLatestTerm();
-    return this.getCommitteeByTerm(latestTerm.id);
+    const terms = await this.getTerms();
+    if (terms.length === 0) throw new Error('No committee terms found');
+    return this.getCommitteeByTerm(terms[0].id);
   }
 }
 

@@ -18,10 +18,8 @@ const Committee = () => {
   const [selectedMember, setSelectedMember] = useState<CommitteeMemberType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // State for selected terms for each committee type
-  const [executiveTermId, setExecutiveTermId] = useState<string>('');
-  const [advisorTermId, setAdvisorTermId] = useState<string>('');
-  const [ambassadorsTermId, setAmbassadorsTermId] = useState<string>('');
+  // State for selected term - single term for all committee types
+  const [selectedTermId, setSelectedTermId] = useState<string>('');
 
   // Fetch banner data based on current path
   const {
@@ -41,50 +39,28 @@ const Committee = () => {
     queryFn: () => committeeService.getTerms()
   });
 
-  // Fetch committee data for executive committee
+  // Fetch committee data for the selected term
   const {
-    data: executiveCommitteeData,
-    isLoading: executiveLoading
+    data: committeeData,
+    isLoading: committeeLoading
   } = useQuery({
-    queryKey: ['committee-data', executiveTermId],
-    queryFn: () => executiveTermId ? committeeService.getCommitteeByTerm(executiveTermId) : committeeService.getLatestCommittee(),
-    enabled: !!executiveTermId || terms.length > 0
-  });
-
-  // Fetch committee data for advisor council
-  const {
-    data: advisorCouncilData,
-    isLoading: advisorLoading
-  } = useQuery({
-    queryKey: ['committee-data', advisorTermId],
-    queryFn: () => advisorTermId ? committeeService.getCommitteeByTerm(advisorTermId) : committeeService.getLatestCommittee(),
-    enabled: !!advisorTermId || terms.length > 0
-  });
-
-  // Fetch committee data for ambassadors
-  const {
-    data: ambassadorsData,
-    isLoading: ambassadorsLoading
-  } = useQuery({
-    queryKey: ['committee-data', ambassadorsTermId],
-    queryFn: () => ambassadorsTermId ? committeeService.getCommitteeByTerm(ambassadorsTermId) : committeeService.getLatestCommittee(),
-    enabled: !!ambassadorsTermId || terms.length > 0
+    queryKey: ['committee-data', selectedTermId],
+    queryFn: () => selectedTermId ? committeeService.getCommitteeByTerm(selectedTermId) : committeeService.getLatestCommittee(),
+    enabled: !!selectedTermId || terms.length > 0
   });
 
   // Set default term to latest when terms are loaded
   React.useEffect(() => {
-    if (terms.length > 0 && !executiveTermId) {
+    if (terms.length > 0 && !selectedTermId) {
       const latestTerm = terms.find(term => term.isActive) || terms[0];
-      setExecutiveTermId(latestTerm.id);
-      setAdvisorTermId(latestTerm.id);
-      setAmbassadorsTermId(latestTerm.id);
+      setSelectedTermId(latestTerm.id);
     }
-  }, [terms, executiveTermId]);
+  }, [terms, selectedTermId]);
 
   // Sort members by sequence number for all committees
-  const sortedExecutiveCommittee = executiveCommitteeData ? [...executiveCommitteeData.executiveCommittee].sort((a, b) => a.sequence - b.sequence) : [];
-  const sortedAdvisorCouncil = advisorCouncilData ? [...advisorCouncilData.advisorCouncil].sort((a, b) => a.sequence - b.sequence) : [];
-  const sortedAmbassadors = ambassadorsData ? [...ambassadorsData.ambassadors].sort((a, b) => a.sequence - b.sequence) : [];
+  const sortedExecutiveCommittee = committeeData ? [...committeeData.executiveCommittee].sort((a, b) => a.sequence - b.sequence) : [];
+  const sortedAdvisorCouncil = committeeData ? [...committeeData.advisorCouncil].sort((a, b) => a.sequence - b.sequence) : [];
+  const sortedAmbassadors = committeeData ? [...committeeData.ambassadors].sort((a, b) => a.sequence - b.sequence) : [];
   const handleMemberClick = (member: CommitteeMemberType) => {
     setSelectedMember(member);
     setIsModalOpen(true);
@@ -96,13 +72,13 @@ const Committee = () => {
   const handlePreviousCommitteeClick = () => {
     window.open('https://drive.google.com/drive/folders/1amaPm_pwG7IrJz1uF_neJEvSYt_6JF67?usp=sharing', '_blank');
   };
-  const renderTermDropdown = (selectedTermId: string, onTermChange: (termId: string) => void, isLoading: boolean) => (
+  const renderTermDropdown = (isLoading: boolean) => (
     <div className="mb-6">
       <div className="flex items-center gap-3 mb-4">
         <Calendar className="w-5 h-5 text-primary" />
         <span className="text-sm font-semibold text-muted-foreground">Select Term:</span>
       </div>
-      <Select value={selectedTermId} onValueChange={onTermChange} disabled={isLoading || termsLoading}>
+      <Select value={selectedTermId} onValueChange={setSelectedTermId} disabled={isLoading || termsLoading}>
         <SelectTrigger className="w-full max-w-xs bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
           <SelectValue placeholder="Select committee term" />
         </SelectTrigger>
@@ -170,7 +146,16 @@ const Committee = () => {
           {/* Page Header */}
           <div className="text-center mb-12">
             <h1 className="font-bold text-primary mb-4 text-3xl">Committees of CPSCS Alumni Association</h1>
+            {committeeData && (
+              <div className="space-y-2">
+                {/* <h2 className="text-xl font-semibold text-foreground">{committeeData.title}</h2>
+                <p className="text-lg text-muted-foreground">{committeeData.term}</p> */}
+              </div>
+            )}
           </div>
+
+          {/* Term Selection - Single dropdown for all committees */}
+          {renderTermDropdown(committeeLoading)}
           
           {/* Committee Tabs */}
           <Tabs defaultValue="executive" className="w-full">
@@ -191,18 +176,15 @@ const Committee = () => {
             </div>
 
             <TabsContent value="executive" className="mt-6">
-              {renderTermDropdown(executiveTermId, setExecutiveTermId, executiveLoading)}
-              {renderCommitteeGrid(sortedExecutiveCommittee, executiveLoading)}
+              {renderCommitteeGrid(sortedExecutiveCommittee, committeeLoading)}
             </TabsContent>
 
             <TabsContent value="advisor" className="mt-6">
-              {renderTermDropdown(advisorTermId, setAdvisorTermId, advisorLoading)}
-              {renderCommitteeGrid(sortedAdvisorCouncil, advisorLoading)}
+              {renderCommitteeGrid(sortedAdvisorCouncil, committeeLoading)}
             </TabsContent>
 
             <TabsContent value="ambassadors" className="mt-6">
-              {renderTermDropdown(ambassadorsTermId, setAmbassadorsTermId, ambassadorsLoading)}
-              {renderCommitteeGrid(sortedAmbassadors, ambassadorsLoading)}
+              {renderCommitteeGrid(sortedAmbassadors, committeeLoading)}
             </TabsContent>
           </Tabs>
 

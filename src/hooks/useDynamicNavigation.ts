@@ -25,14 +25,14 @@ export const useDynamicNavigation = () => {
   // Insert reunion committee after main committee if reunion is active
   const dynamicNavLinks: NavLink[] = [...baseNavLinks];
   
-  if (reunionData?.is_reunion && reunionData?.is_active) {
-    const insertIndex = baseNavLinks.findIndex(link => link.path === '/committee') + 1;
-    dynamicNavLinks.splice(insertIndex, 0, { name: 'Reunion Committee', path: '/reunion-committee' });
-  }
+  // if (reunionData?.isReunion && reunionData?.isActive) {
+  //   const insertIndex = baseNavLinks.findIndex(link => link.path === '/committee') + 1;
+  //   dynamicNavLinks.splice(insertIndex, 0, { name: 'Reunion Committee', path: '/reunion-committee' });
+  // }
 
   // Add remaining static links
   dynamicNavLinks.push(
-    { name: 'Sponsors', path: '/sponsors' },
+    // { name: 'Sponsors', path: '/sponsors' },
     { name: 'Hall of Fame', path: '/hall-of-fame' },
     { name: 'Magazine', path: '/magazine' },
     { name: 'Notice Board', path: '/notice-board' }
@@ -40,6 +40,6 @@ export const useDynamicNavigation = () => {
 
   return {
     navLinks: dynamicNavLinks,
-    hasActiveReunion: reunionData?.is_reunion && reunionData?.is_active
+    hasActiveReunion: reunionData?.isReunion && reunionData?.isActive
   };
 };

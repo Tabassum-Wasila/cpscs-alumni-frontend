@@ -106,11 +106,12 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
           {/* Success Message */}
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-foreground animate-fade-in">
-              🎉 Registration Successful! 🎉
+              {/* 🎉 Registration Successful! 🎉 */}
+              🎉 আপনার রেজিস্ট্রেশন Request সফল হয়েছে! 🎉
             </h2>
             
             <div className="space-y-2">
-              <p className="text-lg text-muted-foreground">
+            {/*   <p className="text-lg text-muted-foreground">
                 You're all set for
               </p>
               <p className="text-xl font-semibold text-primary">
@@ -125,9 +126,13 @@ const RegistrationSuccessModal: React.FC<RegistrationSuccessModalProps> = ({
               <p className="text-sm text-muted-foreground mt-2">
                 A confirmation email will be sent to you shortly.
               </p>
-            </div>
-          </div>
+              */}
+              <p className="text-sm mb-4">একজন এডমিন আপনার ফরম এবং Transaction ID চেক করবেন। আপনার রেজিস্ট্রেশন Approved হলে, আপনি একটি ইমেইল পাবেন। ইন শা আল্লাহ।</p>
+              <p className="text-sm mb-4">তিন কার্যদিবসের মধ্যে Approved ইমেইল না পেলে, অনুগ্রহ পূর্বক 01886579596 নাম্বারে যোগাযোগ করুন।</p>
 
+            </div> 
+          </div>
+          
           {/* Close Button */}
           <Button 
             onClick={onClose}

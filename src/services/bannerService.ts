@@ -1,44 +1,33 @@
 
 import { VipBanner, BannerResponse } from '../types/banner';
-
-// Mock data for testing - in production this would be actual API calls
-const mockBannerData: VipBanner[] = [
-  {
-    id: '1',
-    pagePathIdentifier: '/',
-    sponsorBannerUrl: 'https://i.postimg.cc/KYMKgR1S/Test-VIP-sponsor-1200-x-300-px.png',
-    sponsorRedirectUrl: 'https://example.com/vip-sponsor-1',
-    bannerSize: 'large'
-  },
-  {
-    id: '2',
-    pagePathIdentifier: '/notice-board',
-    sponsorBannerUrl: 'https://i.postimg.cc/pTQpq4Qs/Test-VIP-sponsor-1200x150.gif',
-    sponsorRedirectUrl: 'https://example.com/vip-sponsor-2',
-    bannerSize: 'standard'
-  },
-  {
-    id: '3',
-    pagePathIdentifier: '/gallery',
-    sponsorBannerUrl: 'https://i.postimg.cc/pTQpq4Qs/Test-VIP-sponsor-1200x150.gif',
-    sponsorRedirectUrl: 'https://example.com/vip-sponsor-3',
-    bannerSize: 'standard'
-  }
-];
+import { API_CONFIG, getApiUrl, getAuthHeaders } from '@/config/api';
 
 class BannerService {
-  // Simulate API call to get banner by page path
+  // Get banner by page path from API
   async getBannerByPath(path: string): Promise<BannerResponse> {
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      const banner = mockBannerData.find(b => b.pagePathIdentifier === path) || null;
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.BANNER_BY_PATH(path)), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return {
+            banner: null,
+            success: true,
+            message: 'No banner assigned to this page'
+          };
+        }
+        throw new Error(`Failed to fetch banner: ${response.status} ${response.statusText}`);
+      }
+
+      const banner: VipBanner = await response.json();
       
       return {
         banner,
         success: true,
-        message: banner ? 'Banner found' : 'No banner assigned to this page'
+        message: 'Banner found'
       };
     } catch (error) {
       console.error('Error fetching banner:', error);
@@ -50,11 +39,20 @@ class BannerService {
     }
   }
 
-  // Get all banners (for admin panel - future use)
+  // Get all banners from API
   async getAllBanners(): Promise<VipBanner[]> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      return mockBannerData;
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.BANNERS), {
+        method: 'GET',
+        headers: getAuthHeaders(),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch banners: ${response.status} ${response.statusText}`);
+      }
+
+      const banners: VipBanner[] = await response.json();
+      return banners;
     } catch (error) {
       console.error('Error fetching all banners:', error);
       return [];
