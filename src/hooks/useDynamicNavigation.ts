@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { reunionService } from '@/services/reunionService';
+import { reunionCommitteeService } from '@/services/reunionCommitteeService';
 
 interface NavLink {
   name: string;
@@ -7,9 +7,12 @@ interface NavLink {
 }
 
 export const useDynamicNavigation = () => {
-  const { data: reunionData } = useQuery({
-    queryKey: ['active-reunion'],
-    queryFn: () => reunionService.getActiveReunion(),
+  // Check for an active reunion by asking the reunion committee API.
+  // If a reunion committee exists (non-null), treat that as an active reunion
+  // for navigation purposes.
+  const { data: reunionCommitteeData } = useQuery({
+    queryKey: ['active-reunion-committee'],
+    queryFn: () => reunionCommitteeService.getActiveReunionCommittee(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchInterval: 10 * 60 * 1000 // 10 minutes
   });
@@ -25,10 +28,11 @@ export const useDynamicNavigation = () => {
   // Insert reunion committee after main committee if reunion is active
   const dynamicNavLinks: NavLink[] = [...baseNavLinks];
   
-  // if (reunionData?.isReunion && reunionData?.isActive) {
-  //   const insertIndex = baseNavLinks.findIndex(link => link.path === '/committee') + 1;
-  //   dynamicNavLinks.splice(insertIndex, 0, { name: 'Reunion Committee', path: '/reunion-committee' });
-  // }
+  // If the reunion committee API returned a non-null object, show the link.
+  if (reunionCommitteeData) {
+    const insertIndex = baseNavLinks.findIndex(link => link.path === '/committee') + 1;
+    dynamicNavLinks.splice(insertIndex, 0, { name: 'Reunion Committee', path: '/reunion-committee' });
+  }
 
   // Add remaining static links
   dynamicNavLinks.push(
@@ -40,6 +44,6 @@ export const useDynamicNavigation = () => {
 
   return {
     navLinks: dynamicNavLinks,
-    hasActiveReunion: reunionData?.isReunion && reunionData?.isActive
+    hasActiveReunion: !!reunionCommitteeData
   };
 };

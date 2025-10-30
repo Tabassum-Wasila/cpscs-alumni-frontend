@@ -46,18 +46,16 @@ class ReunionCommitteeService {
    */
   async getReunionCommitteeByTerm(termId: string): Promise<ReunionCommitteeData | null> {
     try {
-      // TODO: Replace with actual Laravel API endpoint
-      // const response = await fetch(`${this.baseUrl}/term/${termId}`);
-      // if (!response.ok) return null;
-      // return await response.json();
-
-      // Mock implementation
-      await delay(500);
-      
-      return this.generateMockCommitteeData(termId);
+      // call backend reunion endpoint
+      const res = await fetch(`/api/committee/${encodeURIComponent(termId)}/reunion`);
+      if (!res.ok) {
+        console.error('Failed to fetch reunion committee:', res.statusText);
+        return null;
+      }
+      const data = await res.json();
+      return data as ReunionCommitteeData;
     } catch (error) {
       console.error('Error fetching reunion committee by term:', error);
-      return null;
     }
   }
 
@@ -66,50 +64,30 @@ class ReunionCommitteeService {
    */
   async getActiveReunionCommittee(): Promise<ReunionCommitteeData | null> {
     try {
-      // TODO: Replace with actual Laravel API endpoint
-      // const response = await fetch(`${this.baseUrl}/active`);
-      // if (!response.ok) return null;
-      // return await response.json();
+      console.debug('[reunionCommitteeService] getActiveReunionCommittee called');
 
-      // Mock implementation
-      await delay(500);
-      
-      return this.generateMockCommitteeData('reunion-current');
+      // Preferred active endpoint
+      // const activeRes = await fetch(`/api/committee/active/reunion`);
+      // if (activeRes.ok) {
+      //   const json = await activeRes.json(); // parse once
+      //   console.debug('[reunionCommitteeService] active reunion response:', json);
+      //   return json as ReunionCommitteeData;
+      // }
+
+      // Fallback to "current" endpoint
+      const currentRes = await fetch(`/api/committee/current/reunion`);
+      if (currentRes.ok) {
+        const json2 = await currentRes.json(); // parse once
+        console.debug('[reunionCommitteeService] current reunion response:', json2);
+        return json2 as ReunionCommitteeData;
+      }
+
+      console.debug('[reunionCommitteeService] no active reunion available', activeRes.status, currentRes.status);
+      return null;
     } catch (error) {
-      console.error('Error fetching reunion committee data:', error);
+      console.error('[reunionCommitteeService] Error fetching active reunion committee:', error);
       return null;
     }
-  }
-
-  /**
-   * Generate mock committee data for any term
-   */
-  private generateMockCommitteeData(termId: string): ReunionCommitteeData {
-    const allMembers = [
-      ...committeeData.executiveCommittee,
-      ...committeeData.advisorCouncil,
-      ...committeeData.ambassadors
-    ];
-
-    // Shuffle and distribute members across committees
-    const shuffled = [...allMembers].sort(() => Math.random() - 0.5);
-    
-    return {
-      title: "Grand Alumni Reunion Committee",
-      subtitle: "Organizing Committee",
-      event_id: termId,
-      committees: {
-        conveningCommittee: shuffled.slice(0, 8),
-        registrationCommittee: shuffled.slice(8, 15),
-        publicityCommittee: shuffled.slice(15, 22),
-        foodCommittee: shuffled.slice(22, 28),
-        sponsorCommittee: shuffled.slice(28, 35),
-        sportsCommittee: shuffled.slice(35, 41),
-        culturalCommittee: shuffled.slice(41, 48),
-        receptionCommittee: shuffled.slice(48, 55),
-        batchCoordinators: shuffled.slice(55, 65)
-      }
-    };
   }
 }
 

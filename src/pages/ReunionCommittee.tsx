@@ -10,15 +10,13 @@ import { ReunionCommitteeMember } from '@/types/reunionCommittee';
 import CommitteeMember from '../components/committee/CommitteeMember';
 import CommitteeModal from '../components/committee/CommitteeModal';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Calendar } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const ReunionCommittee = () => {
   const location = useLocation();
   const [selectedMember, setSelectedMember] = useState<ReunionCommitteeMember | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedTermId, setSelectedTermId] = useState<string>('');
 
   // Fetch banner data
   const {
@@ -29,32 +27,15 @@ const ReunionCommittee = () => {
     queryFn: () => bannerService.getBannerByPath(location.pathname)
   });
 
-  // Fetch available terms
-  const {
-    data: terms = [],
-    isLoading: termsLoading
-  } = useQuery({
-    queryKey: ['reunion-committee-terms'],
-    queryFn: () => reunionCommitteeService.getReunionTerms()
-  });
-
-  // Fetch reunion committee data
+  // Fetch reunion committee data (active only) — no terms used
   const {
     data: reunionCommitteeData,
     isLoading: committeesLoading
   } = useQuery({
-    queryKey: ['reunion-committee-data', selectedTermId],
-    queryFn: () => selectedTermId ? reunionCommitteeService.getReunionCommitteeByTerm(selectedTermId) : reunionCommitteeService.getActiveReunionCommittee(),
-    enabled: !!selectedTermId || terms.length > 0
+    queryKey: ['reunion-committee-active'],
+    queryFn: () => reunionCommitteeService.getActiveReunionCommittee(),
+    staleTime: 5 * 60 * 1000
   });
-
-  // Set default term to latest when terms are loaded
-  React.useEffect(() => {
-    if (terms.length > 0 && !selectedTermId) {
-      const latestTerm = terms.find(term => term.isActive) || terms[0];
-      setSelectedTermId(latestTerm.id);
-    }
-  }, [terms, selectedTermId]);
 
   const handleMemberClick = (member: ReunionCommitteeMember) => {
     setSelectedMember(member);
@@ -196,35 +177,6 @@ const ReunionCommittee = () => {
             <p className="text-muted-foreground mb-6 text-lg">{reunionCommitteeData.subtitle}</p>
           </div>
 
-          {/* Term Dropdown */}
-          <div className="mb-8 flex justify-center">
-            <div className="w-full max-w-xs">
-              <div className="flex items-center gap-3 mb-4 justify-center">
-                <Calendar className="w-5 h-5 text-primary" />
-                <span className="text-sm font-semibold text-muted-foreground">Select Term:</span>
-              </div>
-              <Select value={selectedTermId} onValueChange={setSelectedTermId} disabled={committeesLoading || termsLoading}>
-                <SelectTrigger className="w-full bg-card/80 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-colors">
-                  <SelectValue placeholder="Select committee term" />
-                </SelectTrigger>
-                <SelectContent className="bg-card/95 backdrop-blur-sm border-border/50">
-                  {terms.map((term) => (
-                    <SelectItem key={term.id} value={term.id} className="hover:bg-muted/50">
-                      <div className="flex items-center gap-2">
-                        <span>{term.term}</span>
-                        {term.isActive && (
-                          <span className="px-2 py-1 text-xs bg-primary/20 text-primary rounded-full">
-                            Current
-                          </span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
           {/* Committee Accordion */}
           <Accordion type="single" collapsible className="w-full space-y-4">
             {committeeConfig.map((committee) => {
@@ -238,7 +190,6 @@ const ReunionCommittee = () => {
                 >
                   <AccordionTrigger className="px-6 py-4 hover:no-underline">
                     <div className="flex items-center gap-4 text-left">
-                      <div className="text-2xl">{committee.icon}</div>
                       <div>
                         <h3 className="font-semibold text-lg text-primary">{committee.title}</h3>
                         <Badge variant="secondary" className="mt-2">
