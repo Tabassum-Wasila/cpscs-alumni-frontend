@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Search, Filter, Users, MapPin, Heart, GraduationCap, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserType } from '@/contexts/AuthContext';
+import { getAuthHeaders } from '@/config/api';
 import Navbar from '@/components/Navbar';
 const AlumniDirectory = () => {
   const navigate = useNavigate();
@@ -23,10 +24,65 @@ const AlumniDirectory = () => {
     willingToMentor: false
   });
 
-  // Load user data from localStorage
+  // Load user data from backend API instead of localStorage
   useEffect(() => {
-    const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-    setUsers(storedUsers);
+    let mounted = true;
+
+    async function loadAlumni() {
+      try {
+  const res = await fetch('/api/alumni?per_page=1000', { headers: { ...(getAuthHeaders() as any), Accept: 'application/json' } });
+        if (!res.ok) {
+          console.error('Failed to fetch alumni list:', res.status);
+          return;
+        }
+
+        const payload = await res.json();
+
+        // Accept paginator ({ data: [...] }), { alumni: [...] } or plain array
+        const rawItems = Array.isArray(payload)
+          ? payload
+          : Array.isArray((payload as any).alumni)
+            ? (payload as any).alumni
+            : Array.isArray((payload as any).data)
+              ? (payload as any).data
+              : [];
+
+        const mapped = rawItems.map((a: any) => ({
+          id: String(a.id),
+          fullName: a.full_name ?? a.fullName ?? 'Unknown',
+          email: a.email ?? '',
+          sscYear: a.ssc_year ?? a.sscYear ?? '',
+          hscYear: a.hsc_year ?? a.hscYear ?? '',
+          profilePhoto: a.profile_photo ?? a.profile?.profile_picture ?? a.profile_picture ?? '',
+          isAuthenticated: false,
+          isAdmin: false,
+          isDemoUser: false,
+          hasMembership: !!a.has_membership,
+          profile: {
+            profilePicture: a.profile?.profile_picture ?? a.profile_photo ?? a.profile_picture ?? a.profilePhoto ?? '',
+            bio: a.profile?.bio ?? null,
+            profession: a.profile?.profession ?? a.profession ?? null,
+            organization: a.profile?.organization ?? a.organization ?? null,
+            organizationWebsite: a.profile?.organization_website ?? null,
+            jobTitle: a.profile?.job_title ?? null,
+            city: a.profile?.city ?? null,
+            country: a.profile?.country ?? null,
+            phoneNumber: a.profile?.phone_number ?? null,
+            showPhone: !!(a.profile?.show_phone),
+            willingToMentor: !!(a.profile?.willing_to_mentor ?? a.willing_to_mentor ?? false),
+            profileCompletionScore: a.profile?.profile_completion_score ?? a.profileCompletionScore ?? 0
+          }
+        } as UserType));
+
+        if (mounted) setUsers(mapped);
+      } catch (err) {
+        console.error('Error loading alumni:', err);
+      }
+    }
+
+    loadAlumni();
+
+    return () => { mounted = false; };
   }, []);
 
   // Memoize derived data to prevent unnecessary re-renders

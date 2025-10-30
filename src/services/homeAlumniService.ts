@@ -1,5 +1,3 @@
-import { committeeData } from '@/data/committeeData';
-
 export interface FeaturedAlumni {
   id: string;
   fullName: string;
@@ -13,165 +11,137 @@ export interface FeaturedAlumni {
 }
 
 export class HomeAlumniService {
-  
-  /**
-   * Backend API Specification for Future Integration
-   * 
-   * GET /api/alumni/featured?limit=40&min_completion=80
-   * Response: { 
-   *   alumni: FeaturedAlumni[], 
-   *   total: number, 
-   *   hasMore: boolean 
-   * }
-   * 
-   * Profile Completion Criteria (Qualified Alumni):
-   * - Must have profilePicture (photo field)
-   * - Must have sscYear and hscYear 
-   * - Must have profession
-   * - Must have organization
-   * - Profile completion score ≥ 80%
-   * - Account must be active and verified
-   */
+  private static buildUrl(path: string) {
+    // adjust base if you use a proxy / env var
+    return `/api${path}`;
+  }
 
-  // Transform committee data to alumni data for dummy implementation
-  private static transformCommitteeToAlumni(committee: any): FeaturedAlumni {
-    const slug = this.generateSlug(committee.name, committee.ssc_batch);
-    
+  private static generateSlug(name: string, sscYear: string): string {
+    const nameSlug = (name || 'unknown')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    return `${nameSlug}-${sscYear || ''}`;
+  }
+
+  private static calculateCompletionScore(payload: any): number {
+    let score = 0;
+    const max = 5;
+    if (payload.profile_photo || payload.profilePicture || payload.image) score += 1;
+    if (payload.full_name || payload.fullName || payload.name) score += 1;
+    if (payload.profession) score += 1;
+    if (payload.organization) score += 1;
+    if ((payload.ssc_year || payload.sscYear || payload.ssc_batch) && (payload.hsc_year || payload.hscYear || payload.hsc_batch)) score += 1;
+    return Math.round((score / max) * 100);
+  }
+
+  private static shuffleArray<T>(arr: T[]): T[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  private static normalizeItem(a: any): FeaturedAlumni {
+    const id = String(a.id ?? a.uuid ?? a.slug ?? a._id ?? Math.random().toString(36).slice(2));
+    const fullName = a.full_name ?? a.fullName ?? a.name ?? 'Unknown';
+    const profilePicture = a.profile_photo ?? a.image ?? a.profilePicture ?? '';
+    const sscYear = String(a.ssc_year ?? a.sscYear ?? a.ssc_batch ?? '');
+    const hscYear = String(a.hsc_year ?? a.hscYear ?? a.hsc_batch ?? '');
+    const profession = a.profession ?? '';
+    const organization = a.organization ?? a.org ?? 'Not specified';
+    const profileCompletionScore = typeof a.profileCompletionScore === 'number' ? a.profileCompletionScore : this.calculateCompletionScore(a);
+    const slug = a.slug ?? this.generateSlug(fullName, sscYear);
+
     return {
-      id: committee.sequence.toString(),
-      fullName: committee.name,
-      profilePicture: committee.photo,
-      sscYear: committee.ssc_batch,
-      hscYear: committee.hsc_batch,
-      profession: committee.profession,
-      organization: committee.organization || 'Not specified',
-      profileCompletionScore: this.calculateCompletionScore(committee),
+      id,
+      fullName,
+      profilePicture,
+      sscYear,
+      hscYear,
+      profession,
+      organization,
+      profileCompletionScore,
       slug
     };
   }
 
-  // Calculate profile completion score based on available data
-  private static calculateCompletionScore(committee: any): number {
-    let score = 0;
-    const maxScore = 5;
-    
-    // Required fields for qualified alumni
-    if (committee.photo) score += 1;                    // Profile picture required
-    if (committee.name) score += 1;                     // Full name required
-    if (committee.profession) score += 1;               // Profession required
-    if (committee.organization) score += 1;             // Organization required
-    if (committee.ssc_batch && committee.hsc_batch) score += 1;  // Education years required
-    
-    return Math.round((score / maxScore) * 100);
-  }
-
-  private static generateSlug(name: string, sscYear: string): string {
-    const nameSlug = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
-    return `${nameSlug}-${sscYear}`;
-  }
-
-  // Shuffle array using Fisher-Yates algorithm
-  private static shuffleArray<T>(array: T[]): T[] {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  }
-
-  // Filter alumni based on profile completion criteria (Qualified Alumni Requirements)
-  private static filterQualifiedAlumni(alumni: FeaturedAlumni[]): FeaturedAlumni[] {
-    return alumni.filter(alumnus => 
-      alumnus.profileCompletionScore >= 80 &&
-      alumnus.profilePicture &&                    // Must have profile picture
-      alumnus.fullName &&                          // Must have full name
-      alumnus.profession &&                        // Must have profession
-      alumnus.organization &&                      // Must have organization
-      alumnus.sscYear &&                           // Must have SSC year
-      alumnus.hscYear                              // Must have HSC year
+  private static filterQualified(alumni: FeaturedAlumni[], minScore = 80): FeaturedAlumni[] {
+    return alumni.filter(a =>
+      (a.profileCompletionScore ?? 0) >= minScore &&
+      !!a.profilePicture &&
+      !!a.fullName &&
+      !!a.profession &&
+      !!a.organization &&
+      !!a.sscYear &&
+      !!a.hscYear
     );
   }
 
-  // Get featured alumni for homepage display
-  static async getFeaturedAlumni(limit: number = 20): Promise<FeaturedAlumni[]> {
+  /**
+   * Fetch featured alumni from backend.
+   * Expects backend endpoint: GET /api/alumni/featured?limit=40
+   * Response: either { alumni: [...] } or an array [...]
+   */
+  static async getFeaturedAlumni(limit = 20): Promise<FeaturedAlumni[]> {
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 300));
-
-      // Transform all committee members to alumni format
-      const allCommitteeMembers = [
-        ...committeeData.executiveCommittee,
-        ...committeeData.advisorCouncil,
-        ...committeeData.ambassadors
-      ];
-
-      console.log('Total committee members:', allCommitteeMembers.length);
-      
-      const transformedAlumni = allCommitteeMembers.map((member) => this.transformCommitteeToAlumni(member));
-      console.log('Transformed alumni:', transformedAlumni.length);
-      
-      // Filter qualified alumni (80%+ completion)
-      const qualifiedAlumni = this.filterQualifiedAlumni(transformedAlumni);
-      console.log('Qualified alumni:', qualifiedAlumni.length);
-      
-      // Shuffle and limit the results
-      const shuffledAlumni = this.shuffleArray(qualifiedAlumni);
-      console.log('Final alumni for display:', shuffledAlumni.length);
-      
-      return shuffledAlumni.slice(0, limit);
-    } catch (error) {
-      console.error('Error fetching featured alumni:', error);
+      const url = this.buildUrl(`/alumni/featured?limit=${encodeURIComponent(limit)}`);
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) {
+        console.warn('homeAlumniService.getFeaturedAlumni: backend returned', res.status);
+        return [];
+      }
+      const payload = await res.json();
+      // Accept multiple backend shapes: plain array, { alumni: [...] }, or Laravel paginator { data: [...] }
+      const items = Array.isArray(payload)
+        ? payload
+        : Array.isArray((payload as any).alumni)
+          ? (payload as any).alumni
+          : Array.isArray((payload as any).data)
+            ? (payload as any).data
+            : [];
+      const mapped = items.map((i: any) => this.normalizeItem(i));
+      // keep server ordering; still apply qualification filter client-side
+      const qualified = this.filterQualified(mapped, 80);
+      return qualified.slice(0, limit);
+    } catch (err) {
+      console.error('homeAlumniService.getFeaturedAlumni error:', err);
       return [];
     }
   }
 
-  // Get alumni data for flowing rows animation (ensures 20+ cards each for smooth circular flow)
-  static async getAlumniForFlowingRows(): Promise<{ topRow: FeaturedAlumni[], bottomRow: FeaturedAlumni[] }> {
+  /**
+   * Get alumni items for the flowing rows animation.
+   * This requests more items and duplicates/shuffles to ensure enough cards.
+   */
+  static async getAlumniForFlowingRows(): Promise<{ topRow: FeaturedAlumni[]; bottomRow: FeaturedAlumni[] }> {
     try {
-      const featuredAlumni = await this.getFeaturedAlumni(50); // Get more alumni for better distribution
-      
-      if (featuredAlumni.length === 0) {
-        return { topRow: [], bottomRow: [] };
+      const featured = await this.getFeaturedAlumni(50);
+      if (!featured || featured.length === 0) return { topRow: [], bottomRow: [] };
+
+      let expanded = [...featured];
+      while (expanded.length < 40) {
+        expanded = expanded.concat(this.shuffleArray(featured).slice(0, Math.min(featured.length, 40 - expanded.length)));
+        if (featured.length === 0) break;
       }
-      
-      // Ensure we have enough data by intelligently duplicating the alumni
-      let expandedAlumni = [...featuredAlumni];
-      
-      // If we have less than 40 alumni, duplicate the array to ensure smooth flow
-      while (expandedAlumni.length < 40) {
-        const shuffledCopy = this.shuffleArray([...featuredAlumni]);
-        expandedAlumni = [...expandedAlumni, ...shuffledCopy];
-      }
-      
-      // Split into two rows with 20+ items each
-      const midpoint = Math.ceil(expandedAlumni.length / 2);
-      const topRow = expandedAlumni.slice(0, midpoint);
-      const bottomRow = expandedAlumni.slice(midpoint);
-      
-      console.log(`Alumni rows created - Top: ${topRow.length}, Bottom: ${bottomRow.length}`);
-      
-      return { 
-        topRow: this.shuffleArray(topRow), 
-        bottomRow: this.shuffleArray(bottomRow) 
+
+      const midpoint = Math.ceil(expanded.length / 2);
+      return {
+        topRow: this.shuffleArray(expanded.slice(0, midpoint)),
+        bottomRow: this.shuffleArray(expanded.slice(midpoint))
       };
-    } catch (error) {
-      console.error('Error getting alumni for flowing rows:', error);
+    } catch (err) {
+      console.error('homeAlumniService.getAlumniForFlowingRows error:', err);
       return { topRow: [], bottomRow: [] };
     }
   }
 
-  // For future Laravel backend integration
   static getProfileCompletionCriteria() {
     return {
-      requiredFields: [
-        'profilePicture',
-        'fullName', 
-        'sscYear',
-        'hscYear',
-        'profession',
-        'organization'
-      ],
+      requiredFields: ['profilePicture', 'fullName', 'sscYear', 'hscYear', 'profession', 'organization'],
       minimumCompletionScore: 80
     };
   }

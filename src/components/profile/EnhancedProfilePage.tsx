@@ -85,12 +85,17 @@ const EnhancedProfilePage = () => {
   // Load user data when component mounts or user changes
   useEffect(() => {
     if (userId && !isOwnProfile) {
-      // Load other user's profile
-      const storedUsers = JSON.parse(localStorage.getItem('cpscs_users') || '[]');
-      const foundUser = storedUsers.find((u: UserType) => u.id === userId);
-      if (foundUser) {
-        setViewUser(foundUser);
-      }
+      // Load other user's profile from backend
+      let mounted = true;
+      (async () => {
+        try {
+          const fetched = await UserService.getUserProfile(userId);
+          if (mounted && fetched) setViewUser(fetched);
+        } catch (err) {
+          console.error('Error loading user profile:', err);
+        }
+      })();
+      return () => { mounted = false; };
     }
   }, [userId, isOwnProfile]);
 
