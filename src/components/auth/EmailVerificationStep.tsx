@@ -52,7 +52,7 @@ const EmailVerificationStep: React.FC<EmailVerificationStepProps> = ({ onNext, o
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to send OTP. Please try again.",
+        description: "Failed to send OTP. Please try again." + error,
         variant: "destructive",
       });
     } finally {

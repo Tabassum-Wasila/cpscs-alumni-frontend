@@ -9,6 +9,7 @@ export const API_CONFIG = {
     LOGOUT: '/alumni/logout',
     REFRESH: '/alumni/refresh',
     FORGOT_PASSWORD: '/alumni/forgot-password',
+    CHECK_RESET_OTP: '/alumni/check-reset-otp',
     RESET_PASSWORD: '/alumni/reset-password',
     
     // User Profile

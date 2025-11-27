@@ -12,12 +12,11 @@ import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 const passwordSchema = z.object({
   password: z.string()
-    .min(8, { message: "Password must be at least 8 characters long." })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter." })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter." })
-    .regex(/[0-9]/, { message: "Password must contain at least one number." })
-    .regex(/[^A-Za-z0-9]/, { message: "Password must contain at least one special character." }),
-  confirmPassword: z.string(),
+    .min(8, { message: "Password must be at least 8 characters." })
+    .regex(/^(?=.*[a-zA-Z])(?=.*\d)/, {
+      message: "Password must contain at least one letter and one number."
+    }),  
+    confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -51,7 +50,7 @@ const NewPasswordStep: React.FC<NewPasswordStepProps> = ({ email, otp, onNext, o
   const onSubmit = async (data: PasswordFormValues) => {
     setIsLoading(true);
     try {
-      const result = await AuthService.resetPassword(email, otp, data.password);
+      const result = await AuthService.resetPassword(email, otp, data.password, data.confirmPassword);
       
       if (result.success) {
         toast({

@@ -307,9 +307,46 @@ export class AuthService {
     }
   }
 
-  static async resetPassword(email: string, token: string, password: string, passwordConfirmation: string): Promise<void> {
+  // Compatibility wrapper used by UI components expecting a sendPasswordResetOTP method
+  static async sendPasswordResetOTP(email: string): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.RESET_PASSWORD), {
+      await AuthService.forgotPassword(email);
+      return { success: true, message: 'If an account exists for that email, a reset link has been sent.' };
+    } catch (err: any) {
+      // Provide friendly message to UI; backend may return validation error
+      const msg = err?.message || 'Failed to send reset link.';
+      return { success: false, message: msg };
+    }
+  }
+
+  // Some UI flows expect an OTP verification step. If the backend doesn't provide a dedicated
+  // OTP verification endpoint for password reset, accept the token/otp from the user and proceed.
+  // This function mirrors that behavior for backward compatibility.
+  static async verifyPasswordResetOTP(email: string, otp: string): Promise<{ success: boolean; message: string }> {
+
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.CHECK_RESET_OTP), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+          const msg = data?.message || 'Please enter the token you received in email.';
+          return { success: false, message: msg };
+        }
+      return { success: true, message: 'Token accepted. Proceed to set a new password.' };
+    } catch (error: any) {
+      return { success: false, message: error?.message || 'OTP Verification Failed' };
+    }
+  }
+
+  static async resetPassword(email: string, token: string, password: string, passwordConfirmation: string): Promise<{ success: boolean; message: string }> {
+    try {
+        const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.RESET_PASSWORD), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -318,17 +355,21 @@ export class AuthService {
           email,
           token,
           password,
-          passwordConfirmation,
+          password_confirmation: passwordConfirmation,
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Password reset failed');
+        const msg = data?.message || 'Password reset failed';
+        return { success: false, message: msg };
       }
-    } catch (error) {
+
+      return { success: true, message: data?.message || 'Password reset successfully.' };
+    } catch (error: any) {
       console.error("Reset password error:", error);
-      throw error;
+      return { success: false, message: error?.message || 'Failed to reset password' };
     }
   }
 

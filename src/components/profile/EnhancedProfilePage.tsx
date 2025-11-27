@@ -739,6 +739,12 @@ Contact: ${user.email}`);
             </TabsContent>
           </Tabs>
         </div>
+        <div className="flex gap-2 justify-end mt-[1rem]">
+          <Button onClick={handleSave} disabled={isSaving}>
+            <Save className="h-4 w-4 mr-2" />
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
       </div>
 
       {/* Unsaved Changes Dialog */}

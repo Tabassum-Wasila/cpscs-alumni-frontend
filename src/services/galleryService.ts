@@ -253,7 +253,16 @@ class GalleryService {
 
   async getGalleryImages(filters?: SearchFilters): Promise<GalleryImage[]> {
     try {
-      const response = await fetch(this.adminApiUrl);
+      const params = new URLSearchParams();
+      if (filters?.query) params.append('query', filters.query);
+      if (filters?.tags) filters.tags.forEach(tag => params.append('tags[]', tag));
+      if (filters?.dateRange) {
+        params.append('date_start', filters.dateRange.start);
+        params.append('date_end', filters.dateRange.end);
+      }
+      if (filters?.sortBy) params.append('sort_by', filters.sortBy);
+
+      const response = await fetch(`/api/gallery?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
         this.allImages = data.images || SAMPLE_IMAGES;
@@ -312,11 +321,9 @@ class GalleryService {
   }
 
   async getAllTags(): Promise<string[]> {
-    const allTags = new Set<string>();
-    this.allImages.forEach(image => {
-      image.tags?.forEach(tag => allTags.add(tag));
-    });
-    return Array.from(allTags).sort();
+    const response = await fetch('/api/gallery/tags');
+    const data = await response.json();
+    return data.tags; // expects { tags: [...] }
   }
 
   async getImageMetadata(url: string): Promise<{ width: number; height: number } | null> {

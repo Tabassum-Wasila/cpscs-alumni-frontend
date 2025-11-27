@@ -114,23 +114,25 @@ const OTPVerificationStep: React.FC<OTPVerificationStepProps> = ({ email, onNext
     <div className="space-y-6">
       <div className="text-center space-y-4">
         <div className="space-y-2">
-          <InputOTP 
-            maxLength={6} 
-            value={otp} 
-            onChange={setOtp}
-            disabled={isLoading}
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-            </InputOTPGroup>
-          </InputOTP>
-          
-          <p className="text-sm text-muted-foreground">
+          <div className="flex justify-center">
+            <InputOTP 
+              maxLength={6} 
+              value={otp} 
+              onChange={setOtp}
+              disabled={isLoading}
+            >
+              <InputOTPGroup>
+                <InputOTPSlot index={0} />
+                <InputOTPSlot index={1} />
+                <InputOTPSlot index={2} />
+                <InputOTPSlot index={3} />
+                <InputOTPSlot index={4} />
+                <InputOTPSlot index={5} />
+              </InputOTPGroup>
+            </InputOTP>
+          </div>
+
+          <p className="text-sm text-muted-foreground text-center">
             Enter the 6-digit code sent to your email
           </p>
         </div>

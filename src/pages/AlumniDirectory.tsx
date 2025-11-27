@@ -60,17 +60,17 @@ const AlumniDirectory = () => {
           hasMembership: !!a.has_membership,
           profile: {
             profilePicture: a.profile?.profile_picture ?? a.profile_photo ?? a.profile_picture ?? a.profilePhoto ?? '',
-            bio: a.profile?.bio ?? null,
-            profession: a.profile?.profession ?? a.profession ?? null,
-            organization: a.profile?.organization ?? a.organization ?? null,
-            organizationWebsite: a.profile?.organization_website ?? null,
-            jobTitle: a.profile?.job_title ?? null,
-            city: a.profile?.city ?? null,
-            country: a.profile?.country ?? null,
-            phoneNumber: a.profile?.phone_number ?? null,
-            showPhone: !!(a.profile?.show_phone),
-            willingToMentor: !!(a.profile?.willing_to_mentor ?? a.willing_to_mentor ?? false),
-            profileCompletionScore: a.profile?.profile_completion_score ?? a.profileCompletionScore ?? 0
+            bio: a.profile?.bio ?? a.bio ?? null,
+            profession: a.profession ?? a.profile?.profession ?? null,
+            organization: a.organization ?? a.profile?.organization ?? null,
+            organizationWebsite: a.organization_website ?? a.profile?.organization_website ?? null,
+            jobTitle: a.job_title ?? a.profile?.job_title ?? null,
+            city: a.city ?? a.profile?.city ?? null,
+            country: a.country ?? a.profile?.country ?? null,
+            phoneNumber: a.phone_number ?? a.profile?.phone_number ?? null,
+            showPhone: !!(a.show_phone ?? a.profile?.show_phone),
+            willingToMentor: !!(a.willing_to_mentor ?? a.profile?.willing_to_mentor ?? false),
+            profileCompletionScore: a.profileCompletionScore ?? a.profile?.profile_completion_score ?? 0
           }
         } as UserType));
 
@@ -90,13 +90,13 @@ const AlumniDirectory = () => {
     return [...new Set(users.map(user => user.sscYear).filter(year => year && year.toString().trim() !== ''))].sort();
   }, [users]);
   const uniqueCountries = useCallback(() => {
-    return [...new Set(users.map(user => user.profile?.country).filter(country => country && country.trim() !== ''))].sort();
+    return [...new Set(users.map(user => user.profile?.country).filter(country => country && typeof country === 'string' && country.trim() !== ''))].sort();
   }, [users]);
   const uniqueProfessions = useCallback(() => {
-    return [...new Set(users.map(user => user.profile?.profession).filter(profession => profession && profession.trim() !== ''))].sort();
+    return [...new Set(users.map(user => user.profile?.profession).filter(profession => profession && typeof profession === 'string' && profession.trim() !== ''))].sort();
   }, [users]);
   const mentorCount = useCallback(() => {
-    return users.filter(user => user.profile?.willingToMentor).length;
+    return users.filter(user => user.profile?.willingToMentor === true).length;
   }, [users]);
   const filteredUsers = useCallback(() => {
     let filtered = users.filter(user => {
@@ -122,7 +122,7 @@ const AlumniDirectory = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pt-24 lg:pt-28">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-4">Alumni Directory</h1>
